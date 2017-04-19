@@ -1,0 +1,15 @@
+﻿<ToggleButton x:Name="IconToggleButtonControl" x:Class="FactorioSupervisor.Resources.Controls.IconToggleButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="35" d:DesignWidth="35">
+    <Grid Background="{Binding ElementName=IconToggleButtonControl, Path=Background}">
+        <Viewbox Width="{Binding ElementName=IconToggleButtonControl, Path=ViewboxWidth}" Height="{Binding ElementName=IconToggleButtonControl, Path=ViewboxWidth}" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Path Data="{Binding ElementName=IconToggleButtonControl, Path=Icon}"
+                  Fill="{Binding ElementName=IconToggleButtonControl, Path=Foreground}"
+                  Stretch="Uniform" />
+        </Viewbox>
+    </Grid>
+</ToggleButton>

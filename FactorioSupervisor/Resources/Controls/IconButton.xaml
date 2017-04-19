@@ -1,0 +1,15 @@
+﻿<Button x:Name="IconButtonControl" x:Class="FactorioSupervisor.Resources.Controls.IconButton"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d" 
+             d:DesignHeight="35" d:DesignWidth="35">
+    <Grid Background="{Binding ElementName=IconButtonControl, Path=Background}">
+        <Viewbox Width="{Binding ElementName=IconButtonControl, Path=ViewboxWidth}" Height="{Binding ElementName=IconButtonControl, Path=ViewboxWidth}" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Path Data="{Binding ElementName=IconButtonControl, Path=Icon}"
+                  Fill="{Binding ElementName=IconButtonControl, Path=Foreground}"
+                  Stretch="Uniform" />
+        </Viewbox>
+    </Grid>
+</Button>

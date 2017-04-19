@@ -1,0 +1,29 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Style x:Key="PropertyGroupDescriptorTextBlock" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="#66FFFFFF" />
+        <Setter Property="FontFamily" Value="Segoe UI Semibold" />
+        <Setter Property="VerticalAlignment" Value="Top" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="PropertyDescriptorTextBlock" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="#33FFFFFF" />
+        <Setter Property="Margin" Value="0,0,0,2" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+
+    <Style x:Key="PropertyValueTextBlock" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="#B2FFFFFF" />
+        <Setter Property="Margin" Value="0,0,0,8" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
+    </Style>
+    
+        <Style x:Key="PropertyDebugValueTextBlock" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="#66FFFFFF" />
+        <Setter Property="Margin" Value="0,2" />
+        <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+</ResourceDictionary>
