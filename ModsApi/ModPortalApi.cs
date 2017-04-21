@@ -80,5 +80,31 @@ namespace ModsApi
             // Return the response
             return response;
         }
+
+        public async Task<bool> CanReachApi()
+        {
+            HttpWebResponse response = null;
+            var result = false;
+
+            if (WebRequest.Create(ApiResponseUrl) is HttpWebRequest request)
+            {
+                request.Method = WebRequestMethods.Http.Head;
+                request.Timeout = 10000;
+
+                try
+                {
+                    response = await request.GetResponseAsync() as HttpWebResponse;
+                }
+                catch
+                {
+                    // ignored
+                }
+            }
+
+            if (response != null && response.StatusCode == HttpStatusCode.OK)
+                result = true;
+
+            return result;
+        }
     }
 }

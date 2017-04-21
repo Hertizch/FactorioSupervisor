@@ -286,43 +286,52 @@ namespace FactorioSupervisor.ViewModels
             ShowProgressBar = true;
             IsCheckingForUpdates = true;
 
+            // Create api class
             var modPortalApi = new ModPortalApi();
 
-            // Build the request string
-            var sb = new StringBuilder();
-            sb.Append("?page_size=max");
-            foreach (var mod in Mods)
-                sb.Append($"&namelist={mod.Name}");
-
-            // Build the Api Data
-            await modPortalApi.BuildApiData(sb.ToString());
-
-            // Loop the api data results and get it's properties
-            foreach (var result in modPortalApi.ApiData.Results)
+            // Check if api is reachable
+            if (await modPortalApi.CanReachApi())
             {
-                // Select the first entry in the loop
-                var mod = Mods.First(x => result.Name == x.Name);
+                // Build the request string
+                var sb = new StringBuilder();
+                sb.Append("?page_size=max");
+                foreach (var mod in Mods)
+                    sb.Append($"&namelist={mod.Name}");
 
-                mod.RemoteVersion = result.Releases.First().Version;
-                mod.DownloadUrl = result.Releases.First().DownloadUrl;
-                mod.RemoteFilename = result.Releases.First().FileName;
+                // Build the Api Data
+                await modPortalApi.BuildApiData(sb.ToString());
 
-                // Check if remote version is greater than installed version
-                if (Version.Parse(mod.RemoteVersion) > Version.Parse(mod.InstalledVersion))
-                    mod.UpdateAvailable = true;
-            }
+                // Loop the api data results and get it's properties
+                foreach (var result in modPortalApi.ApiData.Results)
+                {
+                    // Select the first entry in the loop
+                    var mod = Mods.First(x => result.Name == x.Name);
 
-            // Set IsUpdatesAvailable flag
-            if (Mods.Any(x => x.UpdateAvailable))
-            {
-                IsUpdatesAvailable = true;
-                SetNotifyBanner($"{Mods.Count(x => x.UpdateAvailable)} updates available");
-                Logger.WriteLine($"{Mods.Count(x => x.UpdateAvailable)} updates available", true);
+                    mod.RemoteVersion = result.Releases.First().Version;
+                    mod.DownloadUrl = result.Releases.First().DownloadUrl;
+                    mod.RemoteFilename = result.Releases.First().FileName;
+
+                    // Check if remote version is greater than installed version
+                    if (Version.Parse(mod.RemoteVersion) > Version.Parse(mod.InstalledVersion))
+                        mod.UpdateAvailable = true;
+                }
+
+                // Set IsUpdatesAvailable flag
+                if (Mods.Any(x => x.UpdateAvailable))
+                {
+                    IsUpdatesAvailable = true;
+                    SetNotifyBanner($"{Mods.Count(x => x.UpdateAvailable)} updates available");
+                    Logger.WriteLine($"{Mods.Count(x => x.UpdateAvailable)} updates available", true);
+                }
+                else
+                {
+                    SetNotifyBanner("No updates available");
+                    Logger.WriteLine("No updates available", true);
+                }
             }
             else
             {
-                SetNotifyBanner("No updates available");
-                Logger.WriteLine("No updates available", true);
+                Logger.WriteLine("Failed to reach host: http://mods.factorio.com", true);
             }
 
             IsCheckingForUpdates = false;
