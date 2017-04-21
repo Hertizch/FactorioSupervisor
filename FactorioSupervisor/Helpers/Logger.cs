@@ -9,6 +9,7 @@ namespace FactorioSupervisor.Helpers
     public static class Logger
     {
         private static readonly string LogFileName = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, Assembly.GetExecutingAssembly().GetName().Name + ".log");
+        private static readonly bool PrintAllValues = true;
 
         public static void WriteLine(string value, bool writeToFile = false, Exception exception = null)
         {
@@ -26,14 +27,14 @@ namespace FactorioSupervisor.Helpers
                     {
                         Debug.WriteLine($"[{DateTime.Now}]: {value} [Exception: {exception.Message}]");
 
-                        if (writeToFile)
+                        if (writeToFile || PrintAllValues)
                             streamWriter.WriteLine($"[{DateTime.Now}]: {value} [Exception: {exception.Message}]");
                     }
                     else
                     {
                         Debug.WriteLine($"[{DateTime.Now}]: {value}");
 
-                        if (writeToFile)
+                        if (writeToFile || PrintAllValues)
                             streamWriter.WriteLine($"[{DateTime.Now}]: {value}");
                     }
                 }

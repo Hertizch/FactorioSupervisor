@@ -23,6 +23,9 @@ namespace FactorioSupervisor.ViewModels
         private string _modsPath;
         private string _modPortalUsername;
         private string _modPortalPassword;
+        private bool _autoCheckModUpdate;
+        private bool _autoDownloadModUpdate;
+        private bool _autoHideNotifyBanner;
         private RelayCommand _loadUserSettingsCmd;
         private RelayCommand _saveUserSettingsCmd;
 
@@ -66,6 +69,33 @@ namespace FactorioSupervisor.ViewModels
             set { if (value == _modPortalPassword) return; _modPortalPassword = value; OnPropertyChanged(nameof(ModPortalPassword)); }
         }
 
+        /// <summary>
+        /// Gets or sets if the application should automatically check for mod updates at startup
+        /// </summary>
+        public bool AutoCheckModUpdate
+        {
+            get { return _autoCheckModUpdate; }
+            set { if (value == _autoCheckModUpdate) return; _autoCheckModUpdate = value; OnPropertyChanged(nameof(AutoCheckModUpdate)); }
+        }
+
+        /// <summary>
+        /// Gets or sets if the application should automatically download mod updates when available
+        /// </summary>
+        public bool AutoDownloadModUpdate
+        {
+            get { return _autoDownloadModUpdate; }
+            set { if (value == _autoDownloadModUpdate) return; _autoDownloadModUpdate = value; OnPropertyChanged(nameof(AutoDownloadModUpdate)); }
+        }
+
+        /// <summary>
+        /// Gets or sets if the application should automatically hide the notification banner
+        /// </summary>
+        public bool AutoHideNotifyBanner
+        {
+            get { return _autoHideNotifyBanner; }
+            set { if (value == _autoHideNotifyBanner) return; _autoHideNotifyBanner = value; OnPropertyChanged(nameof(AutoHideNotifyBanner)); }
+        }
+
         /*
          * Commands
          */
@@ -84,10 +114,21 @@ namespace FactorioSupervisor.ViewModels
         {
             var settings = Settings.Default;
 
+            // Persist user settings with version increments
+            if (settings.UpdateSettings)
+            {
+                settings.Upgrade();
+                settings.UpdateSettings = false;
+                settings.Save();
+            }
+
             FactorioExePath = settings.FactorioExePath;
             ModsPath = settings.ModsPath;
             ModPortalUsername = settings.ModPortalUsername;
             ModPortalPassword = settings.ModPortalPassword;
+            AutoCheckModUpdate = settings.AutoCheckModUpdate;
+            AutoDownloadModUpdate = settings.AutoDownloadModUpdate;
+            AutoHideNotifyBanner = settings.AutoHideNotifyBanner;
 
             Logger.WriteLine("Loaded user settings", true);
         }
@@ -100,6 +141,10 @@ namespace FactorioSupervisor.ViewModels
             settings.ModsPath = ModsPath;
             settings.ModPortalUsername = ModPortalUsername;
             settings.ModPortalPassword = ModPortalPassword;
+            settings.SelectedProfile = BaseVm.ProfilesVm.SelectedProfile.Name;
+            settings.AutoCheckModUpdate = AutoCheckModUpdate;
+            settings.AutoDownloadModUpdate = AutoDownloadModUpdate;
+            settings.AutoHideNotifyBanner = AutoHideNotifyBanner;
 
             settings.Save();
 

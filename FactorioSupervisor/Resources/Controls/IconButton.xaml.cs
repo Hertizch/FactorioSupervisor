@@ -19,16 +19,16 @@ namespace FactorioSupervisor.Resources.Controls
             set { SetValue(IconProperty, value); }
         }
 
-        public double ViewboxWidth
+        public double MarginCustom
         {
-            get { return (double)GetValue(ViewboxWidthProperty); }
-            set { SetValue(ViewboxWidthProperty, value); }
+            get { return (double)GetValue(MarginCustomProperty); }
+            set { SetValue(MarginCustomProperty, value); }
         }
 
         public static readonly DependencyProperty IconProperty = DependencyProperty.Register(nameof(Icon), typeof(PathGeometry),
             typeof(IconButton), new PropertyMetadata(default(PathGeometry)));
 
-        public static readonly DependencyProperty ViewboxWidthProperty = DependencyProperty.Register(nameof(ViewboxWidth), typeof(double),
-            typeof(IconButton), new PropertyMetadata(default(double)));
+        public static readonly DependencyProperty MarginCustomProperty = DependencyProperty.Register(nameof(MarginCustom), typeof(double),
+            typeof(IconButton), new PropertyMetadata((double)8));
     }
 }

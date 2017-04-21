@@ -7,18 +7,29 @@
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Background" Value="#FF0E0E0E" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBox}">
                     <Grid>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30" />
-                            <RowDefinition Height="*" />
+                            <RowDefinition />
                         </Grid.RowDefinitions>
-                        <c:IconToggleButton Style="{DynamicResource ProfilesButton}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ToolTip="Profiles" />
-                        <Popup x:Name="PART_Popup" Grid.Row="1" IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="Slide" Placement="Bottom">
-                            <Grid Name="DropDown" MinWidth="200" MaxHeight="{TemplateBinding ComboBox.MaxDropDownHeight}" Background="{TemplateBinding Background}">
-                                <ScrollViewer x:Name="DropDownScrollViewer" Margin="15">
+                        <c:IconToggleButton Style="{DynamicResource ProfilesButton}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" MarginCustom="6" ToolTip="Profiles" />
+                        <Popup x:Name="PART_Popup" Grid.Row="1" IsOpen="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="Slide" Placement="Bottom">
+                            <Grid Name="DropDown" MinWidth="250" MaxHeight="800" Background="{TemplateBinding Background}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="20,15,20,0">
+                                    <c:IconButton Style="{DynamicResource ProfileItemButton}" Icon="{StaticResource IconProfileAdd}" Command="{Binding DataContext.ProfilesVm.CreateProfileCmd, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" ToolTip="Add profile" />
+                                    <c:IconButton Style="{DynamicResource ProfileItemButton}" Icon="{StaticResource IconDelete}" Command="{Binding DataContext.ProfilesVm.DeleteProfileCmd, RelativeSource={RelativeSource AncestorType={x:Type Window}}}" ToolTip="Delete profile" />
+                                    <c:IconButton Style="{DynamicResource ProfileItemButton}" Icon="{StaticResource IconImport}" ToolTip="Import profile..." />
+                                    <c:IconButton Style="{DynamicResource ProfileItemButton}" Icon="{StaticResource IconExport}" ToolTip="Export profile..." />
+                                </StackPanel>
+                                <ScrollViewer x:Name="DropDownScrollViewer" Grid.Row="1" Margin="15">
                                     <ItemsPresenter x:Name="ItemsPresenter" KeyboardNavigation.DirectionalNavigation="Contained" />
                                 </ScrollViewer>
                             </Grid>
@@ -34,6 +45,7 @@
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Foreground" Value="#66FFFFFF" />
         <Setter Property="Background" Value="Transparent" />
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type ComboBoxItem}">
@@ -60,7 +72,6 @@
         <Setter Property="Foreground" Value="#B2FFFFFF" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Icon" Value="{StaticResource IconProfiles}" />
-        <Setter Property="ViewboxWidth" Value="18" />
         <Setter Property="Width" Value="30" />
         <Setter Property="Template">
             <Setter.Value>
@@ -84,5 +95,32 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
+
+    <Style x:Key="ProfileItemButton" TargetType="{x:Type c:IconButton}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Foreground" Value="#B2FFFFFF" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="MarginCustom" Value="9" />
+        <Setter Property="Width" Value="30" />
+        <Setter Property="Height" Value="30" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type c:IconButton}">
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="#FFFFFFFF" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Foreground" Value="#33FFFFFF" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

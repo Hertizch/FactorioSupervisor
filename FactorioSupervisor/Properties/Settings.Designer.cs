@@ -70,5 +70,65 @@ namespace FactorioSupervisor.Properties {
                 this["ModPortalPassword"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string SelectedProfile {
+            get {
+                return ((string)(this["SelectedProfile"]));
+            }
+            set {
+                this["SelectedProfile"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool UpdateSettings {
+            get {
+                return ((bool)(this["UpdateSettings"]));
+            }
+            set {
+                this["UpdateSettings"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoCheckModUpdate {
+            get {
+                return ((bool)(this["AutoCheckModUpdate"]));
+            }
+            set {
+                this["AutoCheckModUpdate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool AutoDownloadModUpdate {
+            get {
+                return ((bool)(this["AutoDownloadModUpdate"]));
+            }
+            set {
+                this["AutoDownloadModUpdate"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool AutoHideNotifyBanner {
+            get {
+                return ((bool)(this["AutoHideNotifyBanner"]));
+            }
+            set {
+                this["AutoHideNotifyBanner"] = value;
+            }
+        }
     }
 }

@@ -64,10 +64,10 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal">
-                        <c:IconToggleButton x:Name="SettingsButton" Style="{StaticResource SettingsButton}" ToolTip="Settings" IsChecked="False" />
+                        <c:IconToggleButton x:Name="SettingsButton" Style="{StaticResource SettingsButton}" MarginCustom="10" ToolTip="Settings" IsChecked="False" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <c:IconButton Style="{StaticResource TitlebarButton}" ViewboxWidth="8" Icon="{StaticResource IconClose}" Width="35" Command="ApplicationCommands.Close" />
+                        <c:IconButton Style="{StaticResource TitlebarButton}" Icon="{StaticResource IconClose}" MarginCustom="12" Width="35" Command="ApplicationCommands.Close" />
                     </StackPanel>
                 </Grid>
 
@@ -109,14 +109,13 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Height="30" Orientation="Horizontal">
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconCheckmarkChecked}" Command="{Binding Path=ModsVm.ToggleEnableModsCmd}" ViewboxWidth="14" Width="30" ToolTip="Enable all" />
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconCheckUpdate}" Command="{Binding Path=ModsVm.GetModRemoteDataCmd}" IsEnabled="{Binding Path=ModsVm.IsCheckingForUpdates, Converter={StaticResource InvertedBooleanConverter}}" ViewboxWidth="13" Width="30" ToolTip="Check for updates" />
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconDownload}" Command="{Binding Path=ModsVm.DownloadModCmd}" IsEnabled="{Binding Path=ModsVm.IsUpdating, Converter={StaticResource InvertedBooleanConverter}}" ViewboxWidth="12" Width="30" ToolTip="Update all" />
+                            <!--
+                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconCheckmarkChecked}" Command="{Binding Path=ModsVm.ToggleEnableModsCmd}" ViewboxWidth="18" Width="30" ToolTip="Enable all" />
+                            -->
                             <ComboBox x:Name="ProfilesComboBox" Style="{StaticResource ProfilesComboBox}" ItemContainerStyle="{StaticResource ProfilesComboBoxItem}" ItemsSource="{Binding Path=ProfilesVm.Profiles}" DisplayMemberPath="Name" SelectedItem="{Binding Path=ProfilesVm.SelectedProfile, Mode=OneWay}">
                                 <ComboBox.ContextMenu>
                                     <ContextMenu x:Name="ProfilesContextMenu">
                                         <MenuItem Header="New" Command="{Binding Path=ProfilesVm.CreateProfileCmd}" />
-                                        <MenuItem Header="Delete" Command="{Binding Path=ProfilesVm.DeleteProfileCmd}" CommandParameter="{Binding RelativeSource={RelativeSource AncestorType={x:Type ContextMenu}}, Path=PlacementTarget.SelectedItem}" />
                                     </ContextMenu>
                                 </ComboBox.ContextMenu>
                                 <i:Interaction.Triggers>
@@ -125,9 +124,12 @@
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </ComboBox>
+                            
+                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconCheckUpdate}" Command="{Binding Path=ModsVm.GetModRemoteDataCmd}" IsEnabled="{Binding Path=ModsVm.IsCheckingForUpdates, Converter={StaticResource InvertedBooleanConverter}}" Width="30" ToolTip="Check for updates" />
+                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconDownload}" Command="{Binding Path=ModsVm.DownloadModCmd}" IsEnabled="{Binding Path=ModsVm.IsUpdating, Converter={StaticResource InvertedBooleanConverter}}" Width="30" ToolTip="Update all" />
                         </StackPanel>
                         <StackPanel Grid.Column="1" Height="30" Orientation="Horizontal" HorizontalAlignment="Right">
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconDots}" ViewboxWidth="12" Width="30" ToolTip="Options" />
+                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconDots}" Width="30" ToolTip="Options" />
                         </StackPanel>
                     </Grid>
 
@@ -254,15 +256,23 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
                     <TextBlock Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Factorio settings" />
-                    <StackPanel Grid.Column="1" Grid.Row="0">
+                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,0,12">
                         <c:DescriptionTextBox DescriptionText="Factorio .exe path" Text="{Binding Path=ConfigVm.FactorioExePath, Mode=TwoWay}" />
                         <c:DescriptionTextBox DescriptionText="Mods folder path" Text="{Binding Path=ConfigVm.ModsPath, Mode=TwoWay}" />
                     </StackPanel>
+                    
+                     <TextBlock Grid.Column="0" Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Application settings" />
+                    <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,0,12">
+                        <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoCheckModUpdate, Mode=TwoWay}" Content="Check for mod updates at startup" />
+                        <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoDownloadModUpdate, Mode=TwoWay}" Content="Update mods automatically" />
+                        <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoHideNotifyBanner, Mode=TwoWay}" Content="Hide the notification banner automatically after 10 seconds" />
+                    </StackPanel>
 
-                    <TextBlock Grid.Column="0" Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Mod portal settings" />
-                    <StackPanel Grid.Column="1" Grid.Row="1">
+                    <TextBlock Grid.Column="0" Grid.Row="2" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Mod portal settings" />
+                    <StackPanel Grid.Column="1" Grid.Row="2">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition />
@@ -285,7 +295,7 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding Path=ModsVm.NotifyBannerValue}" Foreground="#7FFFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="25,0,0,0" />
-                    <c:IconButton Grid.Column="1" Style="{StaticResource NotifyButton}" ViewboxWidth="6" Icon="{StaticResource IconClose}" Command="{Binding Path=ModsVm.CloseNotifyBannerCmd}" Margin="0,0,5,0" ToolTip="Close" />
+                    <c:IconButton Grid.Column="1" Style="{StaticResource NotifyButton}" Icon="{StaticResource IconClose}" Command="{Binding Path=ModsVm.CloseNotifyBannerCmd}" Margin="0,0,5,0" ToolTip="Close" />
                 </Grid>
             </Border>
         </AdornerDecorator>

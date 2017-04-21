@@ -79,6 +79,9 @@ namespace FactorioSupervisor
         {
             if ((bool)e.NewValue)
             {
+                if (!BaseVm.ConfigVm.AutoHideNotifyBanner)
+                    return;
+
                 // Create timer with duration of 10 secs
                 var timer = new System.Timers.Timer(10000);
                 timer.Elapsed += (s, a) =>

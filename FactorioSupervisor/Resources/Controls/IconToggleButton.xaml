@@ -6,10 +6,6 @@
              mc:Ignorable="d" 
              d:DesignHeight="35" d:DesignWidth="35">
     <Grid Background="{Binding ElementName=IconToggleButtonControl, Path=Background}">
-        <Viewbox Width="{Binding ElementName=IconToggleButtonControl, Path=ViewboxWidth}" Height="{Binding ElementName=IconToggleButtonControl, Path=ViewboxWidth}" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <Path Data="{Binding ElementName=IconToggleButtonControl, Path=Icon}"
-                  Fill="{Binding ElementName=IconToggleButtonControl, Path=Foreground}"
-                  Stretch="Uniform" />
-        </Viewbox>
+        <Path Data="{Binding ElementName=IconToggleButtonControl, Path=Icon}" Fill="{Binding ElementName=IconToggleButtonControl, Path=Foreground}" Stretch="Uniform" Margin="{Binding ElementName=IconToggleButtonControl, Path=MarginCustom}" />
     </Grid>
 </ToggleButton>

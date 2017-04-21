@@ -1,6 +1,7 @@
 ﻿using FactorioSupervisor.Extensions;
 using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
+using FactorioSupervisor.Properties;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -18,17 +19,57 @@ namespace FactorioSupervisor.ViewModels
 
             Profiles = new ObservableCollection<Profile>();
 
+            // Create profiles folder
             if (!Directory.Exists(_profilesPath))
-                Directory.CreateDirectory(_profilesPath);
+            {
+                Logger.WriteLine($"Directory: '{_profilesPath}' does not exist", true);
 
+                Exception exception = null;
+
+                try
+                {
+                    Directory.CreateDirectory(_profilesPath);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                    Logger.WriteLine($"ERROR: Failed to create directory: '{_profilesPath}'", true, ex);
+                }
+                finally
+                {
+                    if (exception == null)
+                        Logger.WriteLine($"Successfully created directory: '{_profilesPath}'", true);
+                }
+            }
+
+            // Load profiles
             if (LoadProfilesCmd.CanExecute(null))
                 LoadProfilesCmd.Execute(null);
 
-            // Create a default profile if collection is empty
-            if (Profiles.Count <= 0)
-                Profiles.Add(new Profile { Name = "Default", Filename = "Default.json" });
+            // Create a default profile if needed
+            CreateDefaultProfile();
 
-            SelectedProfile = Profiles.First();
+            // Select profile from settings
+            if (!string.IsNullOrEmpty(Settings.Default.SelectedProfile))
+            {
+                bool profileExists = Profiles.Any(x => x.Name == Settings.Default.SelectedProfile);
+
+                if (profileExists)
+                {
+                    SelectedProfile = Profiles.First(x => x.Name == Settings.Default.SelectedProfile);
+                    Logger.WriteLine($"Property: '{nameof(Settings.Default.SelectedProfile)}' has value: '{Settings.Default.SelectedProfile}' and exists in profiles collection: '{profileExists}' - Setting property: '{nameof(SelectedProfile)}' to value: '{Settings.Default.SelectedProfile}'");
+                }
+                else
+                {
+                    SelectedProfile = Profiles.First();
+                    Logger.WriteLine($"Property: '{nameof(Settings.Default.SelectedProfile)}' has value: '{Settings.Default.SelectedProfile}' and exists in profiles collection: '{profileExists}' - Setting property: '{nameof(SelectedProfile)}' to value: '{Profiles.First().Name}'");
+                }
+            }
+            else
+            {
+                SelectedProfile = Profiles.First();
+                Logger.WriteLine($"Property: '{nameof(Settings.Default.SelectedProfile)}' is null - Setting property: '{nameof(SelectedProfile)}' to value: '{Profiles.First().Name}'");
+            }
 
             if (SwitchProfileCmd.CanExecute(null))
                 SwitchProfileCmd.Execute(null);
@@ -96,7 +137,7 @@ namespace FactorioSupervisor.ViewModels
             (_createProfileCmd = new RelayCommand(Execute_CreateProfileCmd, p => true));
 
         public RelayCommand DeleteProfileCmd => _deleteProfileCmd ??
-            (_deleteProfileCmd = new RelayCommand(p => Execute_DeleteProfileCmd(p as Profile), p => true));
+            (_deleteProfileCmd = new RelayCommand(Execute_DeleteProfileCmd, p => true));
 
         /*
          * Methods
@@ -131,23 +172,8 @@ namespace FactorioSupervisor.ViewModels
             // Serialize to json string
             var json = JsonConvert.SerializeObject(SelectedProfile, Formatting.Indented);
 
-            Exception exception = null;
-
             // Write to file
-            try
-            {
-                File.WriteAllText(profileFilename, json);
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-                Logger.WriteLine($"Failed to write file '{profileFilename}'", true, ex);
-            }
-            finally
-            {
-                if (exception == null)
-                    Logger.WriteLine($"Saved PreviousProfile '{SelectedProfile.Name}' to '{profileFilename}'", true);
-            }
+            WriteProfileJsonToFile(SelectedProfile, json);
         }
 
         private void Execute_SwitchProfileCmd(Profile newProfile)
@@ -170,29 +196,11 @@ namespace FactorioSupervisor.ViewModels
             // Get enabled mod names
             PreviousProfile.EnabledModNames = GetEnabledModNames();
 
-            // Get filename
-            var previousProfileFilename = Path.Combine(_profilesPath, StringExtensions.MakeValidFileName(PreviousProfile.Name) + ".json");
-
             // Serialize to json string
             var json = JsonConvert.SerializeObject(PreviousProfile, Formatting.Indented);
 
-            Exception exception = null;
-
             // Write to file
-            try
-            {
-                File.WriteAllText(previousProfileFilename, json);
-            }
-            catch (Exception ex)
-            {
-                exception = ex;
-                Logger.WriteLine($"Failed to write file '{previousProfileFilename}'", true, ex);
-            }
-            finally
-            {
-                if (exception == null)
-                    Logger.WriteLine($"Saved PreviousProfile '{PreviousProfile.Name}' to '{previousProfileFilename}'", true);
-            }
+            WriteProfileJsonToFile(PreviousProfile, json);
 
             /*
              * Load and set SelectedProfile from newProfile
@@ -206,6 +214,29 @@ namespace FactorioSupervisor.ViewModels
             Logger.WriteLine($"Loaded SelectedProfile '{SelectedProfile.Name}'", true);
         }
 
+        private void WriteProfileJsonToFile(Profile profile, string json)
+        {
+            // Set filename
+            var filename = Path.Combine(_profilesPath, StringExtensions.MakeValidFileName(profile.Name) + ".json");
+
+            Exception exception = null;
+
+            try
+            {
+                File.WriteAllText(filename, json);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+                Logger.WriteLine($"ERROR: Failed to create/overwrite file: '{filename}'", true, ex);
+            }
+            finally
+            {
+                if (exception == null)
+                    Logger.WriteLine($"Successfully created/overwritten file: '{filename}' for profile: '{profile.Name}'", true);
+            }
+        }
+
         private void Execute_CreateProfileCmd(object obj)
         {
             string newProfileName = "New profile";
@@ -216,31 +247,37 @@ namespace FactorioSupervisor.ViewModels
             Profiles.Add(new Profile { Name = newProfileName, Filename = newProfileName + ".json" });
         }
 
-        private void Execute_DeleteProfileCmd(Profile selectedProfile)
+        private void Execute_DeleteProfileCmd(object obj)
         {
             Logger.WriteLine($"Executing method '{nameof(Execute_DeleteProfileCmd)}'");
 
-            if (selectedProfile == null)
-            {
-                Logger.WriteLine($"This is a bug, select the profile you wish to delete first.", true);
-                return;
-            }
+            var filename = Path.Combine(_profilesPath, SelectedProfile.Filename);
 
-            var filename = Path.Combine(_profilesPath, selectedProfile.Filename);
+            Exception exception = null;
 
             // Delete profile file
-            if (File.Exists(filename))
+            try
             {
                 File.Delete(filename);
-                Logger.WriteLine($"Deleted file '{selectedProfile.Filename}'");
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+                Logger.WriteLine($"ERROR: Failed to delete file: '{SelectedProfile.Filename}' for profile: '{SelectedProfile.Name}'", true, ex);
+            }
+            finally
+            {
+                if (exception == null)
+                {
+                    Logger.WriteLine($"Successfully deleted file: '{SelectedProfile.Filename}' for profile: '{SelectedProfile.Name}'", true);
+
+                    // Remove from collection
+                    Profiles.RemoveAt(Profiles.IndexOf(SelectedProfile));
+                }
             }
 
-            // Remove from collection
-            Profiles.RemoveAt(Profiles.IndexOf(selectedProfile));
-
-            // Create a default profile if collection is empty
-            if (Profiles.Count == 0)
-                Profiles.Add(new Profile { Name = "Default", Filename = "Default.json" });
+            // Create a default profile if needed
+            CreateDefaultProfile();
 
             SelectedProfile = Profiles.First();
         }
@@ -248,6 +285,22 @@ namespace FactorioSupervisor.ViewModels
         private static IEnumerable<string> GetEnabledModNames()
         {
             return BaseVm.ModsVm.Mods.Count > 0 ? new List<string>(BaseVm.ModsVm.Mods.Where(x => x.IsEnabled).Select(x => x.Name).ToList()) : null;
+        }
+
+        private void CreateDefaultProfile()
+        {
+            if (Profiles.Count == 0)
+            {
+                var profile = new Profile()
+                {
+                    Name = "Default",
+                    Filename = "Default.json"
+                };
+
+                Profiles.Add(profile);
+
+                Logger.WriteLine($"Profiles collection count is 0 - Created default profile: '{profile.Name}'.");
+            }
         }
 
         private void SetEnabledMods()

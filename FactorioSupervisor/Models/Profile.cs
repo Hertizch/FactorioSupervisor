@@ -1,5 +1,7 @@
 ﻿using FactorioSupervisor.Extensions;
+using Newtonsoft.Json;
 using System.Collections.Generic;
+using System.Configuration;
 
 namespace FactorioSupervisor.Models
 {
@@ -12,6 +14,7 @@ namespace FactorioSupervisor.Models
         /// <summary>
         /// Gets or sets the profile name
         /// </summary>
+        [JsonProperty(PropertyName = "name")]
         public string Name
         {
             get { return _name; }
@@ -21,6 +24,7 @@ namespace FactorioSupervisor.Models
         /// <summary>
         /// Gets or sets the profile filename
         /// </summary>
+        [JsonProperty(PropertyName = "filename")]
         public string Filename
         {
             get { return _filename; }
@@ -30,6 +34,7 @@ namespace FactorioSupervisor.Models
         /// <summary>
         /// Gets or sets the mod names associated to this profile
         /// </summary>
+        [JsonProperty(PropertyName = "enabled_mod_names")]
         public IEnumerable<string> EnabledModNames
         {
             get { return _enabledModNames; }

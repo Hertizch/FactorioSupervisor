@@ -1,6 +1,7 @@
 ﻿using FactorioSupervisor.Extensions;
 using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
+using FactorioSupervisor.Properties;
 using ModsApi;
 using Newtonsoft.Json;
 using System;
@@ -40,6 +41,13 @@ namespace FactorioSupervisor.ViewModels
                 });
 
                 SelectedMod = Mods[0];
+            }
+
+            // Auto check for mod updates - if user specified
+            if (BaseVm.ConfigVm.AutoCheckModUpdate)
+            {
+                if (GetModRemoteDataCmd.CanExecute(null))
+                    GetModRemoteDataCmd.Execute(null);
             }
         }
 

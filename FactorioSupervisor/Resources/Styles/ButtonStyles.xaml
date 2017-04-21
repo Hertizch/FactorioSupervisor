@@ -31,7 +31,6 @@
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
         <Setter Property="Icon" Value="{StaticResource IconMenu}" />
-        <Setter Property="ViewboxWidth" Value="14" />
         <Setter Property="Width" Value="35" />
         <Setter Property="Template">
             <Setter.Value>
@@ -44,9 +43,8 @@
                             <Setter Property="Background" Value="{StaticResource AccentColorDarkMuted}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Icon" Value="{StaticResource IconArrowTopLeft}" />
+                            <Setter Property="Icon" Value="{StaticResource IconMenuIsOpen}" />
                             <Setter Property="Background" Value="{StaticResource AccentColorDarkMuted}" />
-                            <Setter Property="ViewboxWidth" Value="10" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -157,8 +155,8 @@
             </Setter.Value>
         </Setter>
     </Style>
-    
-        <Style x:Key="NotifyButton" TargetType="{x:Type Button}">
+
+    <Style x:Key="NotifyButton" TargetType="{x:Type Button}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Foreground" Value="#66FFFFFF" />
