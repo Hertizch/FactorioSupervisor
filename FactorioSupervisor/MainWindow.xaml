@@ -67,7 +67,7 @@
                         <c:IconToggleButton x:Name="SettingsButton" Style="{StaticResource SettingsButton}" MarginCustom="10" ToolTip="Settings" IsChecked="False" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
-                        <c:IconButton Style="{StaticResource TitlebarButton}" Icon="{StaticResource IconClose}" MarginCustom="12" Width="35" Command="ApplicationCommands.Close" />
+                        <c:IconButton Style="{StaticResource TitlebarButton}" Icon="{StaticResource IconClose}" MarginCustom="13" Width="35" Command="ApplicationCommands.Close" />
                     </StackPanel>
                 </Grid>
 
@@ -109,34 +109,30 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Height="30" Orientation="Horizontal">
-                            <!--
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconCheckmarkChecked}" Command="{Binding Path=ModsVm.ToggleEnableModsCmd}" ViewboxWidth="18" Width="30" ToolTip="Enable all" />
-                            -->
                             <ComboBox x:Name="ProfilesComboBox" Style="{StaticResource ProfilesComboBox}" ItemContainerStyle="{StaticResource ProfilesComboBoxItem}" ItemsSource="{Binding Path=ProfilesVm.Profiles}" DisplayMemberPath="Name" SelectedItem="{Binding Path=ProfilesVm.SelectedProfile, Mode=OneWay}">
-                                <ComboBox.ContextMenu>
-                                    <ContextMenu x:Name="ProfilesContextMenu">
-                                        <MenuItem Header="New" Command="{Binding Path=ProfilesVm.CreateProfileCmd}" />
-                                    </ContextMenu>
-                                </ComboBox.ContextMenu>
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger SourceObject="{Binding ElementName=ProfilesComboBox}" EventName="SelectionChanged">
                                         <i:InvokeCommandAction Command="{Binding Path=ProfilesVm.SwitchProfileCmd}" CommandParameter="{Binding ElementName=ProfilesComboBox, Path=SelectedItem}" />
                                     </i:EventTrigger>
                                 </i:Interaction.Triggers>
                             </ComboBox>
-                            
+
                             <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconCheckUpdate}" Command="{Binding Path=ModsVm.GetModRemoteDataCmd}" IsEnabled="{Binding Path=ModsVm.IsCheckingForUpdates, Converter={StaticResource InvertedBooleanConverter}}" Width="30" ToolTip="Check for updates" />
                             <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconDownload}" Command="{Binding Path=ModsVm.DownloadModCmd}" IsEnabled="{Binding Path=ModsVm.IsUpdating, Converter={StaticResource InvertedBooleanConverter}}" Width="30" ToolTip="Update all" />
                         </StackPanel>
                         <StackPanel Grid.Column="1" Height="30" Orientation="Horizontal" HorizontalAlignment="Right">
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconDots}" Width="30" ToolTip="Options" />
+                            <ComboBox Style="{StaticResource OptionsComboBox}" ItemContainerStyle="{StaticResource OptionsComboBoxItem}">
+                                <ComboBox.Items>
+                                    <Button Content="Toggle all" Padding="5,4" Command="{Binding Path=ModsVm.ToggleEnableModsCmd}" />
+                                </ComboBox.Items>
+                            </ComboBox>
                         </StackPanel>
                     </Grid>
 
                     <!-- Mod list -->
                     <ScrollViewer Grid.Row="3">
-                        <ListBox Style="{StaticResource GenericListBox}" ItemContainerStyle="{StaticResource GenericListBoxItem}" 
-                             ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}">
+                        <ListBox x:Name="ModsListBox" Style="{StaticResource GenericListBox}" ItemContainerStyle="{StaticResource GenericListBoxItem}" 
+                             ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}" MouseDoubleClick="ListBox_MouseDoubleClick">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid>
@@ -145,19 +141,30 @@
                                             <ColumnDefinition Width="Auto" />
                                         </Grid.ColumnDefinitions>
                                         <StackPanel Orientation="Horizontal">
-                                            <CheckBox Style="{StaticResource GenericCheckBox}" IsChecked="{Binding Path=IsEnabled, Mode=TwoWay}" />
+                                            <CheckBox IsChecked="{Binding Path=IsEnabled, Mode=TwoWay}">
+                                                <CheckBox.Style>
+                                                    <Style BasedOn="{StaticResource GenericCheckBox}" TargetType="{x:Type CheckBox}">
+                                                        <Style.Triggers>
+                                                            <DataTrigger Binding="{Binding Path=HasError}" Value="True">
+                                                                <Setter Property="IsEnabled" Value="False" />
+                                                            </DataTrigger>
+                                                        </Style.Triggers>
+                                                    </Style>
+                                                </CheckBox.Style>
+                                            </CheckBox>
                                             <TextBlock Text="{Binding Path=Title}">
                                                 <TextBlock.Style>
                                                     <Style TargetType="{x:Type TextBlock}">
                                                         <Style.Triggers>
                                                             <DataTrigger Binding="{Binding Path=HasError}" Value="True">
-                                                                <Setter Property="Foreground" Value="Red" />
+                                                                <Setter Property="Foreground" Value="{StaticResource ModErrorColor}" />
+                                                                <Setter Property="IsEnabled" Value="False" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Path=UpdateAvailable}" Value="True">
-                                                                <Setter Property="Foreground" Value="#B2FFFF00" />
+                                                                <Setter Property="Foreground" Value="{StaticResource UpdateAvailableColor}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding Path=IsUpdating}" Value="True">
-                                                                <Setter Property="Foreground" Value="Yellow" />
+                                                                <Setter Property="Foreground" Value="{StaticResource UpdateAvailableColor}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
@@ -166,7 +173,7 @@
                                             <TextBlock Text="{Binding Path=ProgressPercentage, StringFormat={} - Updating {0}%}" Visibility="{Binding Path=IsUpdating, Converter={StaticResource ValueToVisibilityConverter}}" Foreground="Yellow" />
                                         </StackPanel>
 
-                                        <Viewbox Grid.Column="1" Width="8" Visibility="{Binding Path=UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}">
+                                        <Viewbox Grid.Column="1" Width="12" Visibility="{Binding Path=UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" ToolTip="Update available!">
                                             <Path Data="{StaticResource IconExclamation}" Fill="Yellow" />
                                         </Viewbox>
                                     </Grid>
@@ -186,9 +193,26 @@
                     <ScrollViewer Margin="0,0,-15,0" Visibility="{Binding Path=ModsVm.SelectedMod, Converter={StaticResource ValueToVisibilityConverter}}">
                         <StackPanel Margin="0,0,15,0">
                             <TextBlock Text="{Binding Path=ModsVm.SelectedMod.Title, FallbackValue=Title}" Foreground="#B2FFFFFF" FontSize="24" FontFamily="Segoe UI Semilight" TextTrimming="CharacterEllipsis" />
-                            <TextBlock Text="{Binding Path=ModsVm.SelectedMod.Description, FallbackValue=Description}" Foreground="#66FFFFFF" Margin="0,10,0,40" TextWrapping="Wrap" />
+                            <TextBlock TextWrapping="Wrap">
+                                <TextBlock.Style>
+                                    <Style TargetType="{x:Type TextBlock}">
+                                        <Setter Property="Text" Value="{Binding Path=ModsVm.SelectedMod.Description, FallbackValue=Description}" />
+                                        <Setter Property="Foreground" Value="#66FFFFFF" />
+                                        <Setter Property="Margin" Value="0,10,0,40" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=ModsVm.SelectedMod.HasError}" Value="True">
+                                                <Setter Property="Foreground" Value="{StaticResource ModErrorColor}" />
+                                                <Setter Property="Margin" Value="0,10,0,12" />
+                                                <Setter Property="Text" Value="There's an error with this mod. It's not a valid mod archive or the mod-info.json file within is missing, corrupt or contains formatting errors." />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
 
-                            <Grid>
+                            <TextBlock Foreground="{StaticResource ModErrorColor}" TextWrapping="Wrap" Text="{Binding Path=ModsVm.SelectedMod.FullName, StringFormat={}Path: {0}}" Visibility="{Binding Path=ModsVm.SelectedMod.HasError, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,0,0,40" />
+
+                            <Grid Visibility="{Binding Path=ModsVm.SelectedMod.InstalledVersion, Converter={StaticResource ValueToVisibilityConverter}}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1*" />
                                     <ColumnDefinition Width="5*" />
@@ -207,7 +231,21 @@
 
                                         <StackPanel Grid.Column="1" Visibility="{Binding Path=ModsVm.SelectedMod.RemoteVersion, Converter={StaticResource ValueToVisibilityConverter}}">
                                             <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="Latest version" />
-                                            <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.RemoteVersion, FallbackValue=Version}" />
+                                            <StackPanel Orientation="Horizontal">
+                                                <TextBlock Text="{Binding Path=ModsVm.SelectedMod.RemoteVersion, FallbackValue=Version}">
+                                                    <TextBlock.Style>
+                                                        <Style BasedOn="{StaticResource PropertyValueTextBlock}" TargetType="{x:Type TextBlock}">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Path=ModsVm.SelectedMod.UpdateAvailable}" Value="True">
+                                                                    <Setter Property="Foreground" Value="{StaticResource UpdateAvailableColor}" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+                                                <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.ReleasedAt, FallbackValue=ReleasedAt}" Foreground="{StaticResource UpdateAvailableColor}" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" Margin="10,0,0,0" />
+
+                                            </StackPanel>
                                         </StackPanel>
                                     </Grid>
 
@@ -285,24 +323,44 @@
                 </Grid>
             </Grid>
         </Grid>
+        
+        <!-- Message Box -->
+        <AdornerDecorator x:Name="AdornerMessageBox" MaxHeight="200" MinWidth="400" MaxWidth="600" HorizontalAlignment="Center" VerticalAlignment="Center" Grid.RowSpan="2" Visibility="{Binding Path=MessageBoxRelay.ShowMessageBox, Converter={StaticResource ValueToVisibilityConverter}}">
+            <Border Background="#E5111111" CornerRadius="10">
+                <Border.Effect>
+                    <DropShadowEffect BlurRadius="9" Direction="0" Opacity="0.53" RenderingBias="Quality" ShadowDepth="0" />
+                </Border.Effect>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Margin="20">
+                        <TextBlock Text="{Binding Path=MessageBoxRelay.MessageBoxTitle}" Foreground="#B2FFFFFF" Margin="0,0,0,12" FontSize="17" TextWrapping="Wrap" />
+                        <TextBlock Text="{Binding Path=MessageBoxRelay.MessageBoxValue}" Foreground="#7FFFFFFF" TextWrapping="Wrap" />
+                    </StackPanel>
+                    <c:IconButton Grid.Column="1" Style="{StaticResource NotifyButton}" Icon="{StaticResource IconClose}" Command="{Binding Path=MessageBoxRelay.CloseMessageBoxCmd}" VerticalAlignment="Top" Margin="5" ToolTip="Close" />
+                </Grid>
+            </Border>
+        </AdornerDecorator>
 
         <!-- Notify banner -->
-        <AdornerDecorator x:Name="AdornerNotify" Height="35" MinWidth="400" Margin="0,0,0,15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=ModsVm.ShowNotifyBanner, Converter={StaticResource ValueToVisibilityConverter}}" IsVisibleChanged="AdornerNotify_IsVisibleChanged">
+        <AdornerDecorator x:Name="AdornerNotify" Height="35" MinWidth="400" Margin="0,0,0,15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=NotifyBannerRelay.ShowNotifyBanner, Converter={StaticResource ValueToVisibilityConverter}}" IsVisibleChanged="AdornerNotify_IsVisibleChanged">
             <Border Background="#99111111" CornerRadius="12">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Path=ModsVm.NotifyBannerValue}" Foreground="#7FFFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="25,0,0,0" />
-                    <c:IconButton Grid.Column="1" Style="{StaticResource NotifyButton}" Icon="{StaticResource IconClose}" Command="{Binding Path=ModsVm.CloseNotifyBannerCmd}" Margin="0,0,5,0" ToolTip="Close" />
+                    <TextBlock Text="{Binding Path=NotifyBannerRelay.NotifyBannerValue}" Foreground="#7FFFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="25,0,0,0" />
+                    <c:IconButton Grid.Column="1" Style="{StaticResource NotifyButton}" Icon="{StaticResource IconClose}" Command="{Binding Path=NotifyBannerRelay.CloseNotifyBannerCmd}" Margin="0,0,5,0" ToolTip="Close" />
                 </Grid>
             </Border>
         </AdornerDecorator>
 
         <!--  Apply button  -->
         <AdornerDecorator x:Name="AdornerApplyButton" Width="80" Height="80" Margin="0,60,15,0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.RowSpan="2">
-            <c:IconButton Foreground="#FFFEFEFE" Style="{StaticResource ApplyButton}" ToolTip="Launch Factorio!" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
+            <c:IconButton Foreground="#FFFEFEFE" Style="{StaticResource LaunchButton}" ToolTip="Launch Factorio!" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
                 <c:IconButton.Effect>
                     <DropShadowEffect BlurRadius="9" Direction="0" Opacity="0.53" RenderingBias="Quality" ShadowDepth="0" />
                 </c:IconButton.Effect>

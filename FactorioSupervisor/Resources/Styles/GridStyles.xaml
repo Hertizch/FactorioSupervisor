@@ -2,24 +2,24 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style x:Key="GenericGridSplitter" TargetType="{x:Type GridSplitter}">
-        <Setter Property="Background" Value="White"></Setter>
-        <Setter Property="Opacity" Value="0.3"></Setter>
-        <Setter Property="Width" Value="1"></Setter>
+        <Setter Property="Background" Value="White" />
+        <Setter Property="Opacity" Value="0.25" />
+        <Setter Property="Width" Value="1" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type GridSplitter}">
                     <ControlTemplate.Resources>
                         <Storyboard x:Key="StartAction">
-                            <DoubleAnimation Storyboard.TargetName="Border" Storyboard.TargetProperty="Opacity" From="0.3" To="1" Duration="0:0:0.3"/>
+                            <DoubleAnimation Storyboard.TargetName="Border" Storyboard.TargetProperty="Opacity" From="0.25" To="1" Duration="0:0:0.3"/>
                         </Storyboard>
                         <Storyboard x:Key="ExitAction">
-                            <DoubleAnimation Storyboard.TargetName="Border" Storyboard.TargetProperty="Opacity" From="1" To="0.3" Duration="0:0:0.3" />
+                            <DoubleAnimation Storyboard.TargetName="Border" Storyboard.TargetProperty="Opacity" From="1" To="0.25" Duration="0:0:0.3" />
                         </Storyboard>
                     </ControlTemplate.Resources>
                     <Border Name="Border" Background="{TemplateBinding Background}" Opacity="{TemplateBinding Opacity}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" />
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Width" Value="4"></Setter>
+                            <Setter Property="Width" Value="4" />
                             <Trigger.EnterActions>
                                 <BeginStoryboard Storyboard="{StaticResource StartAction}"/>
                             </Trigger.EnterActions>

@@ -1,10 +1,13 @@
 ﻿using FactorioSupervisor.Extensions;
+using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
 using FactorioSupervisor.ViewModels;
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
 
@@ -88,7 +91,7 @@ namespace FactorioSupervisor
                 {
                     timer?.Dispose();
 
-                    if (BaseVm.ModsVm.ShowNotifyBanner == false)
+                    if (BaseVm.NotifyBannerRelay.ShowNotifyBanner == false)
                         return;
 
                     // Called from different thread
@@ -96,13 +99,29 @@ namespace FactorioSupervisor
                     {
                         //DoubleAnimation animation = new DoubleAnimation(0, TimeSpan.FromSeconds(1));
                         //AdornerNotify.BeginAnimation(OpacityProperty, animation);
-                        BaseVm.ModsVm.ShowNotifyBanner = false;
+                        BaseVm.NotifyBannerRelay.ShowNotifyBanner = false;
 
-                        Debug.WriteLine($"Notify banner hidden by timer");
+                        Logger.WriteLine($"Notify banner hidden by timer");
                     });
                 };
 
                 timer.Start();
+            }
+        }
+
+        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            if (ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item)
+            {
+                var mod = item.DataContext as Mod;
+
+                if (mod.HasError)
+                    return;
+
+                if (mod.IsEnabled)
+                    mod.IsEnabled = false;
+                else
+                    mod.IsEnabled = true;
             }
         }
     }

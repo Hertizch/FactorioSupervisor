@@ -2,6 +2,7 @@
 using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
 using FactorioSupervisor.Properties;
+using FactorioSupervisor.Relays;
 using ModsApi;
 using Newtonsoft.Json;
 using System;
@@ -62,8 +63,6 @@ namespace FactorioSupervisor.ViewModels
         private bool _isUpdating;
         private bool _isUpdatesAvailable;
         private bool _showProgressBar;
-        private bool _showNotifyBanner;
-        private string _notifyBannerValue;
         private bool _fileDownloadSucceeded;
         private Stopwatch _stopwatch = null;
         private RelayCommand _getLocalModsCmd;
@@ -71,7 +70,6 @@ namespace FactorioSupervisor.ViewModels
         private RelayCommand _openHyperlinkCmd;
         private RelayCommand _getModRemoteDataCmd;
         private RelayCommand _downloadModCmd;
-        private RelayCommand _closeNotifyBannerCmd;
         private RelayCommand _launchFactorioCmd;
 
         /*
@@ -132,24 +130,6 @@ namespace FactorioSupervisor.ViewModels
             set { if (value == _showProgressBar) return;_showProgressBar = value; OnPropertyChanged(nameof(ShowProgressBar)); }
         }
 
-        /// <summary>
-        /// Gets or sets a boolean value whether the notification banner should be shown
-        /// </summary>
-        public bool ShowNotifyBanner
-        {
-            get { return _showNotifyBanner; }
-            set { if (value == _showNotifyBanner) return; _showNotifyBanner = value; OnPropertyChanged(nameof(ShowNotifyBanner)); }
-        }
-
-        /// <summary>
-        /// Gets or sets a value the notification banner should display
-        /// </summary>
-        public string NotifyBannerValue
-        {
-            get { return _notifyBannerValue; }
-            set { if (value == _notifyBannerValue) return; _notifyBannerValue = value; OnPropertyChanged(nameof(NotifyBannerValue)); }
-        }
-
         /*
          * Commands
          */
@@ -168,9 +148,6 @@ namespace FactorioSupervisor.ViewModels
 
         public RelayCommand DownloadModCmd => _downloadModCmd ??
             (_downloadModCmd = new RelayCommand(Execute_DownloadModCmd, p => IsUpdatesAvailable));
-
-        public RelayCommand CloseNotifyBannerCmd => _closeNotifyBannerCmd ??
-            (_closeNotifyBannerCmd = new RelayCommand(Execute_CloseNotifyBannerCmd, p => true));
 
         public RelayCommand LaunchFactorioCmd => _launchFactorioCmd ??
             (_launchFactorioCmd = new RelayCommand(Execute_LaunchFactorioCmd, p => File.Exists(BaseVm.ConfigVm.FactorioExePath)));
@@ -209,13 +186,10 @@ namespace FactorioSupervisor.ViewModels
                 // If unable to read info from archive - flag an error in file entry
                 if (string.IsNullOrEmpty(infoJsonString))
                 {
-                    Logger.WriteLine($"Error: Could not get infoJsonString from file: {fileEntry} - Flagged as error", true);
+                    Logger.WriteLine($"Error: Could not get infoJsonString from file: {fileEntry} - String is null", true);
 
                     // Add to collection with has error flag
                     Mods.Add(new Mod { Title = fileEntry, FullName = fileEntry, HasError = true });
-
-                    // Show notification
-                    SetNotifyBanner($"There's an error with one or more of your mods!");
 
                     // Skip rest of the execution for this entry
                     continue;
@@ -231,7 +205,7 @@ namespace FactorioSupervisor.ViewModels
                     {
                         Name = infoJson.Name,
                         Title = infoJson.Title,
-                        Description = infoJson.Description.Replace("\n", ""),
+                        Description = infoJson.Description.Replace("\n", ""), // remove newlines
                         FactorioVersion = infoJson.FactorioVersion,
                         InstalledVersion = infoJson.Version,
                         Author = infoJson.Author,
@@ -244,7 +218,15 @@ namespace FactorioSupervisor.ViewModels
                 }
             }
 
-            if (Mods.Count <= 0)
+            if (Mods.Any(x => x.HasError))
+            {
+                var errorCount = Mods.Count(x => x.HasError);
+
+                // Show notification
+                BaseVm.NotifyBannerRelay.SetNotifyBanner($"There's an error with {errorCount} of your mods!");
+            }
+
+            if (Mods.Count == 0)
                 Logger.WriteLine($"No mods found in path: {BaseVm.ConfigVm.ModsPath}", true);
             else
                 SelectedMod = Mods[0];
@@ -274,9 +256,23 @@ namespace FactorioSupervisor.ViewModels
                 Process.Start(SelectedMod.Homepage);
         }
 
-        private void Execute_CloseNotifyBannerCmd(object obj)
+        private string GetTimeSpanDuration(string input)
         {
-            ShowNotifyBanner = false;
+            var dateTimeNow = DateTime.Now;
+            var dateTimeLastUpdate = DateTime.Parse(input);
+
+            var timeSpan = dateTimeNow - dateTimeLastUpdate;
+
+            if (timeSpan.Days == 1)
+                return $"1 day ago";
+
+            if (timeSpan.Days > 1)
+                return $"{timeSpan.Days} days ago";
+
+            if (timeSpan.Days == 0 && timeSpan.Hours <= 24)
+                return $"{timeSpan.Hours} hours ago";
+
+            return $"{timeSpan.Days} days {timeSpan.Hours} hours {timeSpan.Minutes} minutes and {timeSpan.Seconds} seconds";
         }
 
         private async void Execute_GetModRemoteDataCmd(object obj)
@@ -295,7 +291,7 @@ namespace FactorioSupervisor.ViewModels
                 // Build the request string
                 var sb = new StringBuilder();
                 sb.Append("?page_size=max");
-                foreach (var mod in Mods)
+                foreach (var mod in Mods.Where(x => !x.HasError))
                     sb.Append($"&namelist={mod.Name}");
 
                 // Build the Api Data
@@ -310,6 +306,9 @@ namespace FactorioSupervisor.ViewModels
                     mod.RemoteVersion = result.Releases.First().Version;
                     mod.DownloadUrl = result.Releases.First().DownloadUrl;
                     mod.RemoteFilename = result.Releases.First().FileName;
+                    mod.ReleasedAt = GetTimeSpanDuration(result.Releases.First().ReleasedAt);
+
+                    //Debug.WriteLine($"Name: {result.Releases.First().FileName} - Duration: {GetTimeSpanDuration(result.Releases.First().ReleasedAt)}");
 
                     // Check if remote version is greater than installed version
                     if (Version.Parse(mod.RemoteVersion) > Version.Parse(mod.InstalledVersion))
@@ -320,18 +319,26 @@ namespace FactorioSupervisor.ViewModels
                 if (Mods.Any(x => x.UpdateAvailable))
                 {
                     IsUpdatesAvailable = true;
-                    SetNotifyBanner($"{Mods.Count(x => x.UpdateAvailable)} updates available");
+
+                    var updateCount = Mods.Count(x => x.UpdateAvailable);
+
+                    if (updateCount > 1)
+                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"{updateCount} updates available!");
+                    else
+                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"{updateCount} update available!");
+
                     Logger.WriteLine($"{Mods.Count(x => x.UpdateAvailable)} updates available", true);
                 }
                 else
                 {
-                    SetNotifyBanner("No updates available");
+                    BaseVm.NotifyBannerRelay.SetNotifyBanner("No updates available");
                     Logger.WriteLine("No updates available", true);
                 }
             }
             else
             {
-                Logger.WriteLine("Failed to reach host: http://mods.factorio.com", true);
+                BaseVm.MessageBoxRelay.SetMessageBox("Host unreachable", "The updater was unable to reach the mod portal at https://mods.factorio.com/api/mods. It may be temporarily down, or your internet connection is unavailable.");
+                Logger.WriteLine("Failed to reach host: https://mods.factorio.com/api/mods", true);
             }
 
             IsCheckingForUpdates = false;
@@ -414,13 +421,13 @@ namespace FactorioSupervisor.ViewModels
                 else
                 {
                     Logger.WriteLine($"Authentication failed - Error message: {authenticationApi.ErrorMessage}");
-                    SetNotifyBanner("Authentication failed!");
+                    BaseVm.NotifyBannerRelay.SetNotifyBanner("Authentication failed!");
                 }
             }
             else
             {
                 Logger.WriteLine($"Authentication failed - Username and/or password is null", true);
-                SetNotifyBanner("Authentication failed!");
+                BaseVm.NotifyBannerRelay.SetNotifyBanner("Authentication failed!");
             }
 
             ShowProgressBar = false;
@@ -522,12 +529,6 @@ namespace FactorioSupervisor.ViewModels
             }
 
             MethodExecutionHandler(nameof(Execute_LaunchFactorioCmd), false);
-        }
-
-        private void SetNotifyBanner(string value)
-        {
-            ShowNotifyBanner = true;
-            NotifyBannerValue = value;
         }
 
         private void MethodExecutionHandler(string methodName, bool create)

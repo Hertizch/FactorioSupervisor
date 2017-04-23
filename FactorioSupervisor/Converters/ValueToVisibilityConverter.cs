@@ -11,6 +11,10 @@ namespace FactorioSupervisor.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
+            if (parameter != null)
+                if ((string)parameter == "inverted" && (bool)value == true)
+                    return Visibility.Collapsed;
+
             // If object is null
             if (value == null)
                 return Visibility.Collapsed;

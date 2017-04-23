@@ -6,5 +6,7 @@
     <SolidColorBrush x:Key="AccentColorDarkMuted" Color="#FF10242E" />
     <SolidColorBrush x:Key="AccentColorLight" Color="#FF0A6E9E" />
     <SolidColorBrush x:Key="SearchBoxBackgroundColor" Color="#FF2D2D30" />
+    <SolidColorBrush x:Key="UpdateAvailableColor" Color="#FFFFFF00" />
+    <SolidColorBrush x:Key="ModErrorColor" Color="#FFF06969" />
 
 </ResourceDictionary>

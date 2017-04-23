@@ -15,6 +15,7 @@ namespace FactorioSupervisor.Models
         private string _homepage;
         private string _installedVersion;
         private string _remoteVersion;
+        private string _releasedAt;
         private string _remoteFilename;
         private string _downloadUrl;
         private bool _isEnabled;
@@ -113,6 +114,15 @@ namespace FactorioSupervisor.Models
         {
             get { return _remoteVersion; }
             set { if (value == _remoteVersion) return; _remoteVersion = value; OnPropertyChanged(nameof(RemoteVersion)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the latest online version release date
+        /// </summary>
+        public string ReleasedAt
+        {
+            get { return _releasedAt; }
+            set { if (value == _releasedAt) return; _releasedAt = value; OnPropertyChanged(nameof(ReleasedAt)); }
         }
 
         /// <summary>

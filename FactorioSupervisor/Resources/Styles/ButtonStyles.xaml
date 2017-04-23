@@ -76,7 +76,7 @@
         </Setter>
     </Style>
 
-    <Style x:Key="ApplyButton" TargetType="{x:Type Button}">
+    <Style x:Key="LaunchButton" TargetType="{x:Type Button}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Foreground" Value="#FFFEFEFE" />
@@ -95,38 +95,26 @@
                 <ControlTemplate TargetType="{x:Type Button}">
                     <ControlTemplate.Resources>
                         <Storyboard x:Key="OnMouseEnter">
-                            <DoubleAnimation
-                                Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
-                                To="1.2"
-                                Duration="0:0:0.3">
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="1.2" Duration="0:0:0.3">
                                 <DoubleAnimation.EasingFunction>
                                     <CubicEase EasingMode="EaseOut" />
                                 </DoubleAnimation.EasingFunction>
                             </DoubleAnimation>
-                            <DoubleAnimation
-                                Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
-                                To="1.2"
-                                Duration="0:0:0.3">
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="1.2" Duration="0:0:0.3">
                                 <DoubleAnimation.EasingFunction>
                                     <CubicEase EasingMode="EaseOut" />
                                 </DoubleAnimation.EasingFunction>
                             </DoubleAnimation>
                         </Storyboard>
                         <Storyboard x:Key="OnMouseLeave">
-                            <DoubleAnimation
-                                Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)"
-                                To="1"
-                                Duration="0:0:0.1">
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleY)" To="1" Duration="0:0:0.5">
                                 <DoubleAnimation.EasingFunction>
-                                    <CubicEase EasingMode="EaseIn" />
+                                    <CubicEase EasingMode="EaseOut" />
                                 </DoubleAnimation.EasingFunction>
                             </DoubleAnimation>
-                            <DoubleAnimation
-                                Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)"
-                                To="1"
-                                Duration="0:0:0.1">
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(ScaleTransform.ScaleX)" To="1" Duration="0:0:0.5">
                                 <DoubleAnimation.EasingFunction>
-                                    <CubicEase EasingMode="EaseIn" />
+                                    <CubicEase EasingMode="EaseOut" />
                                 </DoubleAnimation.EasingFunction>
                             </DoubleAnimation>
                         </Storyboard>
@@ -135,9 +123,7 @@
                         <Ellipse x:Name="Ellipse" Fill="{TemplateBinding Background}" />
                         <Viewbox Margin="11,6,16,12">
                             <Grid>
-                                <Path
-                                    Data="{StaticResource IconPlay}"
-                                    Fill="{TemplateBinding Foreground}" />
+                                <Path Data="{StaticResource IconPlay}" Fill="{TemplateBinding Foreground}" />
                             </Grid>
                         </Viewbox>
                     </Grid>

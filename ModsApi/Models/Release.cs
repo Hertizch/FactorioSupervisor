@@ -12,5 +12,8 @@ namespace ModsApi.Models
 
         [JsonProperty("file_name")]
         public string FileName { get; set; }
+
+        [JsonProperty("released_at")]
+        public string ReleasedAt { get; set; }
     }
 }
