@@ -1,4 +1,5 @@
-﻿using ModsApi.Models;
+﻿using ModsApi.Extensions;
+using ModsApi.Models;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -59,7 +60,7 @@ namespace ModsApi
             string response = null;
 
             // Create the webclient
-            using (_webClient = new WebClient { Proxy = null })
+            using (_webClient = new PatientWebClient { Proxy = null })
             {
                 try
                 {

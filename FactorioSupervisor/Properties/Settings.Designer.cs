@@ -121,13 +121,13 @@ namespace FactorioSupervisor.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("True")]
-        public bool AutoHideNotifyBanner {
+        [global::System.Configuration.DefaultSettingValueAttribute("")]
+        public string CurrentFactorioBranch {
             get {
-                return ((bool)(this["AutoHideNotifyBanner"]));
+                return ((string)(this["CurrentFactorioBranch"]));
             }
             set {
-                this["AutoHideNotifyBanner"] = value;
+                this["CurrentFactorioBranch"] = value;
             }
         }
     }

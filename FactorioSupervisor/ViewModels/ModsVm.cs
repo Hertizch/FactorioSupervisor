@@ -1,12 +1,9 @@
 ﻿using FactorioSupervisor.Extensions;
 using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
-using FactorioSupervisor.Properties;
-using FactorioSupervisor.Relays;
 using ModsApi;
 using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
@@ -28,7 +25,7 @@ namespace FactorioSupervisor.ViewModels
             if (GetLocalModsCmd.CanExecute(null))
                 GetLocalModsCmd.Execute(null);
 
-            if (Mods.Count <= 0)
+            if (Mods.Count == 0)
             {
                 Mods.Add(new Mod
                 {
@@ -56,7 +53,6 @@ namespace FactorioSupervisor.ViewModels
          * Private fields
          */
 
-        private readonly List<string> _unwantedFileExtensions = new List<string> { ".db", ".json", ".txt", ".rar" };
         private ObservableCollection<Mod> _mods;
         private Mod _selectedMod;
         private bool _isCheckingForUpdates;
@@ -64,13 +60,15 @@ namespace FactorioSupervisor.ViewModels
         private bool _isUpdatesAvailable;
         private bool _showProgressBar;
         private bool _fileDownloadSucceeded;
-        private Stopwatch _stopwatch = null;
+        private bool _hideIncompatibleMods;
+        private FileSystemWatcher _fileSystemWatcher;
         private RelayCommand _getLocalModsCmd;
         private RelayCommand _toggleEnableModsCmd;
         private RelayCommand _openHyperlinkCmd;
         private RelayCommand _getModRemoteDataCmd;
         private RelayCommand _downloadModCmd;
         private RelayCommand _launchFactorioCmd;
+        private RelayCommand _watchModDirChangesCmd;
 
         /*
          * Properties
@@ -130,6 +128,50 @@ namespace FactorioSupervisor.ViewModels
             set { if (value == _showProgressBar) return;_showProgressBar = value; OnPropertyChanged(nameof(ShowProgressBar)); }
         }
 
+        /// <summary>
+        /// Gets or sets a boolean value whether to hide incompatible mods
+        /// </summary>
+        public bool HideIncompatibleMods
+        {
+            get { return _hideIncompatibleMods; }
+            set
+            {
+                if (value == _hideIncompatibleMods)
+                    return;
+
+                _hideIncompatibleMods = value;
+                OnPropertyChanged(nameof(HideIncompatibleMods));
+
+                if (HideIncompatibleMods)
+                {
+                    foreach (var mod in Mods)
+                    {
+                        var modFactorioVersion = Version.Parse(mod.FactorioVersion);
+                        var currentFactorioVersion = Version.Parse(BaseVm.ConfigVm.CurrentFactorioBranch);
+
+                        if (modFactorioVersion != currentFactorioVersion)
+                        {
+                            mod.HideInModList = true;
+
+                            if (mod.IsEnabled)
+                                mod.IsEnabled = false;
+                        }
+                        else
+                        {
+                            mod.HideInModList = false;
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (var mod in Mods)
+                        mod.HideInModList = false;
+                }
+
+                
+            }
+        }
+
         /*
          * Commands
          */
@@ -147,10 +189,13 @@ namespace FactorioSupervisor.ViewModels
             (_getModRemoteDataCmd = new RelayCommand(Execute_GetModRemoteDataCmd, p => true));
 
         public RelayCommand DownloadModCmd => _downloadModCmd ??
-            (_downloadModCmd = new RelayCommand(Execute_DownloadModCmd, p => IsUpdatesAvailable));
+            (_downloadModCmd = new RelayCommand(Execute_DownloadModCmd, p => IsUpdatesAvailable && !IsUpdating));
 
         public RelayCommand LaunchFactorioCmd => _launchFactorioCmd ??
-            (_launchFactorioCmd = new RelayCommand(Execute_LaunchFactorioCmd, p => File.Exists(BaseVm.ConfigVm.FactorioExePath)));
+            (_launchFactorioCmd = new RelayCommand(Execute_LaunchFactorioCmd, p => File.Exists(BaseVm.ConfigVm.FactorioExePath) && !IsUpdating));
+
+        public RelayCommand WatchModDirChangesCmd => _watchModDirChangesCmd ??
+            (_watchModDirChangesCmd = new RelayCommand(Execute_WatchModDirChangesCmd, p => Directory.Exists(BaseVm.ConfigVm.ModsPath)));
 
         /*
          * Methods
@@ -158,14 +203,9 @@ namespace FactorioSupervisor.ViewModels
 
         private void Execute_GetLocalModsCmd(object obj)
         {
-            MethodExecutionHandler(nameof(Execute_GetLocalModsCmd), true);
-
             // Reset collection if reloading
             if (Mods.Count > 0)
                 Mods.Clear();
-
-            if (BaseVm.ConfigVm.ModsPath == null)
-                return;
 
             // Get all filesystementries from mods directory
             var fileEntries = Directory.GetFileSystemEntries(BaseVm.ConfigVm.ModsPath, "*", SearchOption.TopDirectoryOnly).ToList();
@@ -173,12 +213,9 @@ namespace FactorioSupervisor.ViewModels
             // Loop all entries
             foreach (var fileEntry in fileEntries)
             {
-                // Skip unwanted files
-                if (_unwantedFileExtensions.Any(unwantedFileExtension => fileEntry.EndsWith(unwantedFileExtension)))
-                {
-                    Logger.WriteLine($"Skipped entry: {fileEntry}", true);
+                // If the file does not end with .zip, skip it
+                if (!fileEntry.EndsWith(".zip"))
                     continue;
-                }
 
                 // Get info.json as string
                 string infoJsonString = JsonHelpers.GetModInfoJsonString(fileEntry);
@@ -231,7 +268,9 @@ namespace FactorioSupervisor.ViewModels
             else
                 SelectedMod = Mods[0];
 
-            MethodExecutionHandler(nameof(Execute_GetLocalModsCmd), false);
+            // Start filesystemwatcher
+            if (WatchModDirChangesCmd.CanExecute(Directory.Exists(BaseVm.ConfigVm.ModsPath)))
+                WatchModDirChangesCmd.Execute(Directory.Exists(BaseVm.ConfigVm.ModsPath));
         }
 
         private void Execute_ToggleEnableModsCmd(object obj)
@@ -239,13 +278,13 @@ namespace FactorioSupervisor.ViewModels
             // If all mods are enabled, set to false for all
             if (Mods.Where(x => x.IsEnabled).Count() == Mods.Count)
             {
-                foreach (var mod in Mods)
+                foreach (var mod in Mods.Where(x => !x.HasError))
                     mod.IsEnabled = false;
             }
             else
             {
                 // Set enabled for all
-                foreach (var mod in Mods)
+                foreach (var mod in Mods.Where(x => !x.HasError))
                     mod.IsEnabled = true;
             }
         }
@@ -277,17 +316,19 @@ namespace FactorioSupervisor.ViewModels
 
         private async void Execute_GetModRemoteDataCmd(object obj)
         {
-            MethodExecutionHandler(nameof(Execute_GetModRemoteDataCmd), true);
-
             ShowProgressBar = true;
             IsCheckingForUpdates = true;
 
             // Create api class
             var modPortalApi = new ModPortalApi();
 
+            Logger.WriteLine($"Attempting connection with mod portal...");
+
             // Check if api is reachable
             if (await modPortalApi.CanReachApi())
             {
+                Logger.WriteLine($"Connection successfull!");
+
                 // Build the request string
                 var sb = new StringBuilder();
                 sb.Append("?page_size=max");
@@ -307,8 +348,7 @@ namespace FactorioSupervisor.ViewModels
                     mod.DownloadUrl = result.Releases.First().DownloadUrl;
                     mod.RemoteFilename = result.Releases.First().FileName;
                     mod.ReleasedAt = GetTimeSpanDuration(result.Releases.First().ReleasedAt);
-
-                    //Debug.WriteLine($"Name: {result.Releases.First().FileName} - Duration: {GetTimeSpanDuration(result.Releases.First().ReleasedAt)}");
+                    mod.RemoteFactorioVersion = result.Releases.First().FactorioVersion;
 
                     // Check if remote version is greater than installed version
                     if (Version.Parse(mod.RemoteVersion) > Version.Parse(mod.InstalledVersion))
@@ -343,14 +383,10 @@ namespace FactorioSupervisor.ViewModels
 
             IsCheckingForUpdates = false;
             ShowProgressBar = false;
-
-            MethodExecutionHandler(nameof(Execute_GetModRemoteDataCmd), false);
         }
 
         private async void Execute_DownloadModCmd(object obj)
         {
-            MethodExecutionHandler(nameof(Execute_DownloadModCmd), true);
-
             ShowProgressBar = true;
 
             var authenticationApi = new AuthenticationApi();
@@ -362,14 +398,14 @@ namespace FactorioSupervisor.ViewModels
 
             if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
             {
-                Logger.WriteLine($"Aquiring authentication with mod portal...", true);
+                Logger.WriteLine($"Aquiring authentication with mod portal...");
 
                 // Get authentication token
                 var token = await authenticationApi.GetAuthenticationToken(username, password, true);
 
                 if (authenticationApi.Success)
                 {
-                    Logger.WriteLine($"Authentication successful!", true);
+                    Logger.WriteLine($"Authentication successful!");
 
                     // Wait 500 ms
                     await Task.Delay(500);
@@ -378,6 +414,9 @@ namespace FactorioSupervisor.ViewModels
                     foreach (var mod in Mods.Where(x => x.UpdateAvailable))
                     {
                         mod.IsUpdating = true;
+
+                        // Show notification
+                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"Downloading: {mod.Title}...");
 
                         // Execute the download
                         await ExecuteDownload(mod, username, token);
@@ -403,20 +442,28 @@ namespace FactorioSupervisor.ViewModels
                                     Logger.WriteLine($"Deleted old file: {mod.FullName}", true);
                             }
 
-                            // Wait 2 secs
-                            await Task.Delay(2000);
+                            // Wait 1 sec
+                            await Task.Delay(1000);
 
                             // Set new/reset properties
                             mod.UpdateAvailable = false;
                             mod.InstalledVersion = mod.RemoteVersion;
+                            mod.FactorioVersion = mod.RemoteFactorioVersion;
                             mod.FullName = Path.Combine(settings.ModsPath, mod.RemoteFilename);
                             mod.Filename = mod.RemoteFilename;
                             mod.FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(mod.RemoteFilename);
                             mod.ProgressPercentage = 0;
                         }
 
+                        // Show notification
+                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"Updated: {mod.Title}");
+
                         mod.IsUpdating = false;
                     }
+
+                    // Reset IsUpdatesAvailable flag
+                    if (Mods.Count(x => x.UpdateAvailable) == 0)
+                        IsUpdatesAvailable = false;
                 }
                 else
                 {
@@ -431,14 +478,10 @@ namespace FactorioSupervisor.ViewModels
             }
 
             ShowProgressBar = false;
-
-            MethodExecutionHandler(nameof(Execute_DownloadModCmd), false);
         }
 
         private async Task ExecuteDownload(Mod mod, string userName, string token)
         {
-            MethodExecutionHandler(nameof(ExecuteDownload), true);
-
             _fileDownloadSucceeded = false;
             Exception exception = null;
 
@@ -470,14 +513,10 @@ namespace FactorioSupervisor.ViewModels
                     }
                 }
             }
-
-            MethodExecutionHandler(nameof(ExecuteDownload), false);
         }
 
         private async void Execute_LaunchFactorioCmd(object obj)
         {
-            MethodExecutionHandler(nameof(Execute_LaunchFactorioCmd), true);
-
             if (Directory.Exists(BaseVm.ConfigVm.ModsPath))
             {
                 // Select all mods from collection
@@ -527,22 +566,41 @@ namespace FactorioSupervisor.ViewModels
                     process.Start();
                 }
             }
-
-            MethodExecutionHandler(nameof(Execute_LaunchFactorioCmd), false);
         }
 
-        private void MethodExecutionHandler(string methodName, bool create)
+        private void Execute_WatchModDirChangesCmd(object obj)
         {
-            if (create)
+            string watchDir = BaseVm.ConfigVm.ModsPath;
+
+            _fileSystemWatcher = new FileSystemWatcher(watchDir, "*.zip")
             {
-                Logger.WriteLine($"Executing method '{methodName}'", true);
-                _stopwatch = Stopwatch.StartNew();
-            }
-            else
-            {
-                _stopwatch?.Stop();
-                Logger.WriteLine($"Execution of method '{methodName}' completed in {_stopwatch?.ElapsedMilliseconds} ms. ({_stopwatch?.Elapsed})", true);
-            }
+                EnableRaisingEvents = true,
+            };
+
+            _fileSystemWatcher.Renamed += _fileSystemWatcher_Renamed;
+            _fileSystemWatcher.Deleted += _fileSystemWatcher_Deleted;
+            _fileSystemWatcher.Created += _fileSystemWatcher_Created;
+        }
+
+        private void _fileSystemWatcher_Created(object sender, FileSystemEventArgs e)
+        {
+            // on created
+            Logger.WriteLine($"Mod directory change detected: {e.ChangeType.ToString()} file: {e.FullPath}", true);
+            //BaseVm.NotifyBannerRelay.SetNotifyBanner("A new mod has been added - consider reloading the mod list!");
+        }
+
+        private void _fileSystemWatcher_Deleted(object sender, FileSystemEventArgs e)
+        {
+            // on deleted
+            Logger.WriteLine($"Mod directory change detected: {e.ChangeType.ToString()} file: {e.FullPath}", true);
+            //BaseVm.NotifyBannerRelay.SetNotifyBanner("A mod has been deleted - consider reloading the mod list");
+        }
+
+        private void _fileSystemWatcher_Renamed(object sender, RenamedEventArgs e)
+        {
+            // on renamed
+            Logger.WriteLine($"Mod directory change detected: {e.ChangeType.ToString()} file: {e.FullPath}", true);
+            //BaseVm.NotifyBannerRelay.SetNotifyBanner("A mod has been renamed - consider reloading the mod list!");
         }
     }
 }

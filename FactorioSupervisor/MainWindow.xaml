@@ -25,7 +25,7 @@
         <conv:ValueToVisibilityConverter x:Key="ValueToVisibilityConverter" />
         <conv:InvertedBooleanConverter x:Key="InvertedBooleanConverter" />
         
-        <CollectionViewSource x:Key="ModsVs" Source="{Binding Path=ModsVm.Mods}" IsLiveFilteringRequested="True">
+        <CollectionViewSource x:Key="ModsVs" Source="{Binding Path=ModsVm.Mods}" IsLiveFilteringRequested="True" IsLiveSortingRequested="True">
             <CollectionViewSource.SortDescriptions>
                 <componentModel:SortDescription PropertyName="Title" />
             </CollectionViewSource.SortDescriptions>
@@ -124,6 +124,7 @@
                             <ComboBox Style="{StaticResource OptionsComboBox}" ItemContainerStyle="{StaticResource OptionsComboBoxItem}">
                                 <ComboBox.Items>
                                     <Button Content="Toggle all" Padding="5,4" Command="{Binding Path=ModsVm.ToggleEnableModsCmd}" />
+                                    <CheckBox Style="{StaticResource SettingsCheckBox}" Content="Hide incompatible mods" IsChecked="{Binding Path=ModsVm.HideIncompatibleMods, Mode=TwoWay}" />
                                 </ComboBox.Items>
                             </ComboBox>
                         </StackPanel>
@@ -135,7 +136,7 @@
                              ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}" MouseDoubleClick="ListBox_MouseDoubleClick">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid>
+                                    <Grid Margin="6,5,10,5">
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
                                             <ColumnDefinition Width="Auto" />
@@ -172,10 +173,21 @@
                                             </TextBlock>
                                             <TextBlock Text="{Binding Path=ProgressPercentage, StringFormat={} - Updating {0}%}" Visibility="{Binding Path=IsUpdating, Converter={StaticResource ValueToVisibilityConverter}}" Foreground="Yellow" />
                                         </StackPanel>
-
                                         <Viewbox Grid.Column="1" Width="12" Visibility="{Binding Path=UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" ToolTip="Update available!">
                                             <Path Data="{StaticResource IconExclamation}" Fill="Yellow" />
                                         </Viewbox>
+                                        <Grid.Style>
+                                            <Style TargetType="{x:Type Grid}">
+                                                <Style.Triggers>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding Path=HideInModList}" Value="True" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </MultiDataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </Grid.Style>
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
@@ -243,8 +255,7 @@
                                                         </Style>
                                                     </TextBlock.Style>
                                                 </TextBlock>
-                                                <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.ReleasedAt, FallbackValue=ReleasedAt}" Foreground="{StaticResource UpdateAvailableColor}" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" Margin="10,0,0,0" />
-
+                                                <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.RemoteFactorioVersion, FallbackValue=RemoteFactorioVersion, StringFormat={}(Factorio {0})}" Foreground="{StaticResource UpdateAvailableColor}" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" Margin="10,0,0,0" />
                                             </StackPanel>
                                         </StackPanel>
                                     </Grid>
@@ -300,13 +311,16 @@
                     <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,0,12">
                         <c:DescriptionTextBox DescriptionText="Factorio .exe path" Text="{Binding Path=ConfigVm.FactorioExePath, Mode=TwoWay}" />
                         <c:DescriptionTextBox DescriptionText="Mods folder path" Text="{Binding Path=ConfigVm.ModsPath, Mode=TwoWay}" />
+                        <StackPanel Margin="0,0,0,12">
+                            <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="Current Factorio Branch" />
+                            <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ConfigVm.CurrentFactorioBranch}" />
+                        </StackPanel>
                     </StackPanel>
                     
                      <TextBlock Grid.Column="0" Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Application settings" />
                     <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,0,12">
                         <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoCheckModUpdate, Mode=TwoWay}" Content="Check for mod updates at startup" />
                         <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoDownloadModUpdate, Mode=TwoWay}" Content="Update mods automatically" />
-                        <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoHideNotifyBanner, Mode=TwoWay}" Content="Hide the notification banner automatically after 10 seconds" />
                     </StackPanel>
 
                     <TextBlock Grid.Column="0" Grid.Row="2" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Mod portal settings" />
@@ -345,7 +359,7 @@
         </AdornerDecorator>
 
         <!-- Notify banner -->
-        <AdornerDecorator x:Name="AdornerNotify" Height="35" MinWidth="400" Margin="0,0,0,15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=NotifyBannerRelay.ShowNotifyBanner, Converter={StaticResource ValueToVisibilityConverter}}" IsVisibleChanged="AdornerNotify_IsVisibleChanged">
+        <AdornerDecorator x:Name="AdornerNotify" Height="35" MinWidth="400" Margin="0,0,0,15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=NotifyBannerRelay.ShowNotifyBanner, Converter={StaticResource ValueToVisibilityConverter}}">
             <Border Background="#99111111" CornerRadius="12">
                 <Grid>
                     <Grid.ColumnDefinitions>

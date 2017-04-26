@@ -1,7 +1,11 @@
 ﻿using FactorioSupervisor.Extensions;
 using FactorioSupervisor.Helpers;
+using FactorioSupervisor.Models;
 using FactorioSupervisor.Properties;
-using System.Diagnostics;
+using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Text.RegularExpressions;
 
 namespace FactorioSupervisor.ViewModels
 {
@@ -13,6 +17,9 @@ namespace FactorioSupervisor.ViewModels
 
             if (LoadUserSettingsCmd.CanExecute(null))
                 LoadUserSettingsCmd.Execute(null);
+
+            if (GetCurrentFactorioBranchCmd.CanExecute(null))
+                GetCurrentFactorioBranchCmd.Execute(null);
         }
 
         /*
@@ -25,9 +32,10 @@ namespace FactorioSupervisor.ViewModels
         private string _modPortalPassword;
         private bool _autoCheckModUpdate;
         private bool _autoDownloadModUpdate;
-        private bool _autoHideNotifyBanner;
+        private string _currentFactorioBranch;
         private RelayCommand _loadUserSettingsCmd;
         private RelayCommand _saveUserSettingsCmd;
+        private RelayCommand _getCurrentFactorioBranchCmd;
 
         /*
          * Properties
@@ -88,12 +96,12 @@ namespace FactorioSupervisor.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets if the application should automatically hide the notification banner
+        /// Gets or sets the currently installed branch version of factorio
         /// </summary>
-        public bool AutoHideNotifyBanner
+        public string CurrentFactorioBranch
         {
-            get { return _autoHideNotifyBanner; }
-            set { if (value == _autoHideNotifyBanner) return; _autoHideNotifyBanner = value; OnPropertyChanged(nameof(AutoHideNotifyBanner)); }
+            get { return _currentFactorioBranch; }
+            set { if (value == _currentFactorioBranch) return; _currentFactorioBranch = value; OnPropertyChanged(nameof(CurrentFactorioBranch)); }
         }
 
         /*
@@ -105,6 +113,9 @@ namespace FactorioSupervisor.ViewModels
 
         public RelayCommand SaveUserSettingsCmd => _saveUserSettingsCmd ??
             (_saveUserSettingsCmd = new RelayCommand(Execute_SaveUserSettingsCmd, p => true));
+
+        public RelayCommand GetCurrentFactorioBranchCmd => _getCurrentFactorioBranchCmd ??
+            (_getCurrentFactorioBranchCmd = new RelayCommand(Execute_GetCurrentFactorioBranchCmd, p => true));
 
         /*
          * Methods
@@ -128,7 +139,7 @@ namespace FactorioSupervisor.ViewModels
             ModPortalPassword = settings.ModPortalPassword;
             AutoCheckModUpdate = settings.AutoCheckModUpdate;
             AutoDownloadModUpdate = settings.AutoDownloadModUpdate;
-            AutoHideNotifyBanner = settings.AutoHideNotifyBanner;
+            CurrentFactorioBranch = settings.CurrentFactorioBranch;
 
             Logger.WriteLine("Loaded user settings", true);
         }
@@ -144,11 +155,59 @@ namespace FactorioSupervisor.ViewModels
             settings.SelectedProfile = BaseVm.ProfilesVm.SelectedProfile.Name;
             settings.AutoCheckModUpdate = AutoCheckModUpdate;
             settings.AutoDownloadModUpdate = AutoDownloadModUpdate;
-            settings.AutoHideNotifyBanner = AutoHideNotifyBanner;
+            settings.CurrentFactorioBranch = CurrentFactorioBranch;
 
             settings.Save();
 
             Logger.WriteLine("Saved user settings", true);
+        }
+
+        private void Execute_GetCurrentFactorioBranchCmd(object obj)
+        {
+            var factorioBaseFilename = Path.Combine(RegistryHelper.GetSteamPath(), @"steamapps\common\Factorio\data\base\info.json");
+
+            if (File.Exists(factorioBaseFilename))
+            {
+                string infoJsonStr = null;
+                Exception exception = null;
+                InfoJson infoJson = null;
+
+                try
+                {
+                    infoJsonStr = File.ReadAllText(factorioBaseFilename).Trim();
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                    Logger.WriteLine($"Failed to read from file: {factorioBaseFilename}", true, ex);
+                }
+                finally
+                {
+                    Logger.WriteLine(infoJsonStr);
+
+                    if (exception == null)
+                        infoJson = JsonConvert.DeserializeObject<InfoJson>(infoJsonStr);
+                }
+
+                if (infoJson != null)
+                {
+                    // Only get major and minor version number (x.xx)
+                    var match = Regex.Match(infoJson.Version, "(\\d\\.\\d\\d)\\.\\d*");
+
+                    if (match.Success)
+                    {
+                        CurrentFactorioBranch = match.Groups[1].Value;
+                        Logger.WriteLine($"Retreived current Factorio branch version: {CurrentFactorioBranch}", true);
+                    }
+                    else
+                        Logger.WriteLine($"Unable to retreive current Factorio branch version", true);
+                }
+
+            }
+            else
+            {
+                Logger.WriteLine($"Unable to find Factorio base mod info.json file at path: {factorioBaseFilename}", true);
+            }
         }
     }
 }

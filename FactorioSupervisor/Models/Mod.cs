@@ -20,11 +20,13 @@ namespace FactorioSupervisor.Models
         private string _downloadUrl;
         private bool _isEnabled;
         private string _factorioVersion;
+        private string _remoteFactorioVersion;
         private JToken _dependencies;
         private bool _updateAvailable;
         private bool _isUpdating;
         private int _progressPercentage;
         private bool _hasError;
+        private bool _hideInModList;
 
         /// <summary>
         /// Gets or sets the filename with extension
@@ -162,6 +164,15 @@ namespace FactorioSupervisor.Models
         }
 
         /// <summary>
+        /// Gets or sets the latest online factorio version
+        /// </summary>
+        public string RemoteFactorioVersion
+        {
+            get { return _remoteFactorioVersion; }
+            set { if (value == _remoteFactorioVersion) return; _remoteFactorioVersion = value; OnPropertyChanged(nameof(RemoteFactorioVersion)); }
+        }
+
+        /// <summary>
         /// Gets or sets the dependency(ies) as defined in info.json
         /// </summary>
         public JToken Dependencies
@@ -204,6 +215,15 @@ namespace FactorioSupervisor.Models
         {
             get { return _hasError; }
             set { if (value == _hasError) return; _hasError = value; OnPropertyChanged(nameof(HasError)); }
+        }
+
+        /// <summary>
+        /// Gets or sets a boolean value if the mod should be dispalyed in the mod list
+        /// </summary>
+        public bool HideInModList
+        {
+            get { return _hideInModList; }
+            set { if (value == _hideInModList) return; _hideInModList = value; OnPropertyChanged(nameof(HideInModList)); }
         }
     }
 }

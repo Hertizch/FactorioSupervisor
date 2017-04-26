@@ -15,5 +15,8 @@ namespace ModsApi.Models
 
         [JsonProperty("released_at")]
         public string ReleasedAt { get; set; }
+
+        [JsonProperty("factorio_version")]
+        public string FactorioVersion { get; private set; }
     }
 }

@@ -1,10 +1,8 @@
 ﻿using FactorioSupervisor.Extensions;
-using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
 using FactorioSupervisor.ViewModels;
 using System;
 using System.ComponentModel;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
@@ -48,7 +46,7 @@ namespace FactorioSupervisor
 
             if (mod == null)
                 e.Accepted = false;
-            else if (!mod.Title.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase) && !mod.Name.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase))
+            else if (!mod.Title.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase) && !mod.Name.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase) && !mod.HideInModList)
                 e.Accepted = false;
         }
 
@@ -76,37 +74,6 @@ namespace FactorioSupervisor
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        private void AdornerNotify_IsVisibleChanged(object sender, System.Windows.DependencyPropertyChangedEventArgs e)
-        {
-            if ((bool)e.NewValue)
-            {
-                if (!BaseVm.ConfigVm.AutoHideNotifyBanner)
-                    return;
-
-                // Create timer with duration of 10 secs
-                var timer = new System.Timers.Timer(10000);
-                timer.Elapsed += (s, a) =>
-                {
-                    timer?.Dispose();
-
-                    if (BaseVm.NotifyBannerRelay.ShowNotifyBanner == false)
-                        return;
-
-                    // Called from different thread
-                    Dispatcher.Invoke(() =>
-                    {
-                        //DoubleAnimation animation = new DoubleAnimation(0, TimeSpan.FromSeconds(1));
-                        //AdornerNotify.BeginAnimation(OpacityProperty, animation);
-                        BaseVm.NotifyBannerRelay.ShowNotifyBanner = false;
-
-                        Logger.WriteLine($"Notify banner hidden by timer");
-                    });
-                };
-
-                timer.Start();
-            }
         }
 
         private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)

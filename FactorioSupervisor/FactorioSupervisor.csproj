@@ -67,6 +67,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Converters\FactorioVersionVisibilityConverter.cs" />
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
     <Compile Include="Converters\ValueToVisibilityConverter.cs" />
     <Compile Include="Extensions\ObservableObject.cs" />
@@ -76,6 +77,7 @@
     <Compile Include="Helpers\JsonHelpers.cs" />
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\ManagementObjectSearcher.cs" />
+    <Compile Include="Helpers\RegistryHelper.cs" />
     <Compile Include="Models\InfoJson.cs" />
     <Compile Include="Models\Mod.cs" />
     <Compile Include="Models\ModListItem.cs" />
