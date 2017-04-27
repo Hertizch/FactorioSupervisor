@@ -34,6 +34,12 @@
                 <system:String>Name</system:String>
             </CollectionViewSource.LiveFilteringProperties>
         </CollectionViewSource>
+
+        <CollectionViewSource x:Key="DependenciesVs" Source="{Binding Path=ModsVm.SelectedMod.DependenciesCollection}" IsLiveSortingRequested="True">
+            <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="Name" />
+            </CollectionViewSource.SortDescriptions>
+        </CollectionViewSource>
     </Window.Resources>
 
     <Grid>
@@ -227,10 +233,14 @@
                             <Grid Visibility="{Binding Path=ModsVm.SelectedMod.InstalledVersion, Converter={StaticResource ValueToVisibilityConverter}}">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="1*" />
-                                    <ColumnDefinition Width="5*" />
+                                    <ColumnDefinition Width="4*" />
                                 </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
                                 <TextBlock Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Mod info" />
-                                <StackPanel Grid.Column="1">
+                                <StackPanel Grid.Column="1" Margin="0,0,0,12">
                                     <Grid>
                                         <Grid.ColumnDefinitions>
                                             <ColumnDefinition />
@@ -272,22 +282,34 @@
                                             <Run Text="{Binding Path=ModsVm.SelectedMod.Homepage, FallbackValue=Homepage}" />
                                         </Hyperlink>
                                     </TextBlock>
-
-                                    <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="Dependencies" Visibility="{Binding Path=ModsVm.SelectedMod.Dependencies, Converter={StaticResource ValueToVisibilityConverter}}" />
-                                    <ListBox Style="{StaticResource GenericListBox}" ItemContainerStyle="{StaticResource DependeciesListBoxItem}" ItemsSource="{Binding Path=ModsVm.SelectedMod.Dependencies}" Visibility="{Binding Path=ModsVm.SelectedMod.Dependencies, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,0,0,8" />
-
-                                    <StackPanel Margin="0,15" Visibility="Collapsed">
-                                        <Rectangle Height="12" />
-                                        <TextBlock Style="{StaticResource PropertyDebugValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.Filename, StringFormat={}Filename:  {0}}" />
-                                        <TextBlock Style="{StaticResource PropertyDebugValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.FilenameWithoutExtenion, StringFormat={}FilenameWithoutExtenion:  {0}}" />
-                                        <TextBlock Style="{StaticResource PropertyDebugValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.FullName, StringFormat={}FullName:  {0}}" />
-                                        <TextBlock Style="{StaticResource PropertyDebugValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.RemoteFilename, StringFormat={}RemoteFilename:  {0}}" />
-                                        <TextBlock Style="{StaticResource PropertyDebugValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.IsEnabled, StringFormat={}IsEnabled:  {0}}" />
-                                        <TextBlock Style="{StaticResource PropertyDebugValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.IsUpdating, StringFormat={}IsUpdating:  {0}}" />
-                                        <TextBlock Style="{StaticResource PropertyDebugValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, StringFormat={}UpdateAvailable:  {0}}" />
-                                        <TextBlock Style="{StaticResource PropertyDebugValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.ProgressPercentage, StringFormat={}ProgressPercentage:  {0}}" />
-                                        <Rectangle Height="12" />
-                                    </StackPanel>
+                                </StackPanel>
+                                
+                                <TextBlock Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Dependencies" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" />
+                                <StackPanel Grid.Row="1" Grid.Column="1" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,-4,0,0">
+                                    <ListBox Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}" DisplayMemberPath="Name" Margin="0,0,0,8">
+                                        <ListBox.ItemContainerStyle>
+                                            <Style BasedOn="{StaticResource DependeciesListBoxItem}" TargetType="{x:Type ListBoxItem}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Path=IsOptional}" Value="True">
+                                                        <Setter Property="Visibility" Value="Collapsed" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                    </ListBox>
+                                    <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="Optional" />
+                                    <ListBox Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}" DisplayMemberPath="Name">
+                                        <ListBox.ItemContainerStyle>
+                                            <Style BasedOn="{StaticResource DependeciesListBoxItem}" TargetType="{x:Type ListBoxItem}">
+                                                <Setter Property="Visibility" Value="Collapsed" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Path=IsOptional}" Value="True">
+                                                        <Setter Property="Visibility" Value="Visible" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ListBox.ItemContainerStyle>
+                                    </ListBox>
                                 </StackPanel>
                             </Grid>
                         </StackPanel>

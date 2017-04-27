@@ -237,8 +237,46 @@ namespace FactorioSupervisor.ViewModels
 
                 if (infoJson != null)
                 {
+                    Debug.WriteLine($"MOD: {infoJson.Title}");
+
+                    // Get dependencies
+                    var mod = new Mod();
+                    mod.Name = infoJson.Name;
+                    mod.Title = infoJson.Title;
+                    mod.Description = infoJson.Description.Replace("\n", ""); // remove newlines
+                    mod.FactorioVersion = infoJson.FactorioVersion;
+                    mod.InstalledVersion = infoJson.Version;
+                    mod.Author = infoJson.Author;
+                    mod.Homepage = infoJson.Homepage;
+                    mod.Dependencies = infoJson.Dependencies;
+                    mod.FullName = fileEntry;
+                    mod.Filename = Path.GetFileName(fileEntry);
+                    mod.FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(fileEntry);
+
+                    if (mod.Dependencies != null)
+                    {
+                        foreach (var dep in mod.Dependencies)
+                        {
+                            var depStr = dep.ToString();
+
+                            var dependency = new Dependency();
+
+                            if (depStr.StartsWith("?"))
+                            {
+                                dependency.IsOptional = true;
+                                depStr = depStr.Replace("?", "").Trim();
+                            }
+                                
+                            dependency.Name = depStr;
+
+                            mod.DependenciesCollection.Add(dependency);
+                        }
+                    }
+
+                    Mods.Add(mod);
+
                     // Add to mods collection
-                    Mods.Add(new Mod
+                    /*Mods.Add(new Mod
                     {
                         Name = infoJson.Name,
                         Title = infoJson.Title,
@@ -251,7 +289,7 @@ namespace FactorioSupervisor.ViewModels
                         FullName = fileEntry,
                         Filename = Path.GetFileName(fileEntry),
                         FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(fileEntry)
-                    });
+                    });*/
                 }
             }
 

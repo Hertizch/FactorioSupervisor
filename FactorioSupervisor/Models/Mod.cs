@@ -1,10 +1,16 @@
 ﻿using FactorioSupervisor.Extensions;
 using Newtonsoft.Json.Linq;
+using System.Collections.ObjectModel;
 
 namespace FactorioSupervisor.Models
 {
     public class Mod : ObservableObject
     {
+        public Mod()
+        {
+            DependenciesCollection = new ObservableCollection<Dependency>();
+        }
+
         private string _filename;
         private string _filenameWithoutExtenion;
         private string _fullName;
@@ -27,6 +33,7 @@ namespace FactorioSupervisor.Models
         private int _progressPercentage;
         private bool _hasError;
         private bool _hideInModList;
+        private ObservableCollection<Dependency> _dependenciesCollection;
 
         /// <summary>
         /// Gets or sets the filename with extension
@@ -224,6 +231,15 @@ namespace FactorioSupervisor.Models
         {
             get { return _hideInModList; }
             set { if (value == _hideInModList) return; _hideInModList = value; OnPropertyChanged(nameof(HideInModList)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the dependencies collection
+        /// </summary>
+        public ObservableCollection<Dependency> DependenciesCollection
+        {
+            get { return _dependenciesCollection; }
+            set { if (value == _dependenciesCollection) return; _dependenciesCollection = value; OnPropertyChanged(nameof(DependenciesCollection)); }
         }
     }
 }

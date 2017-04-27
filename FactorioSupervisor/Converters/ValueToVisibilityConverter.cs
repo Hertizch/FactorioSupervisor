@@ -33,6 +33,13 @@ namespace FactorioSupervisor.Converters
                     return Visibility.Collapsed;
             }
 
+            // If value is integer
+            if (value is int)
+            {
+                if ((int)value == 0)
+                    return Visibility.Collapsed;
+            }
+
             // If object is JArray
             if (value is JArray)
             {

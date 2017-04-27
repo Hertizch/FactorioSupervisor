@@ -78,6 +78,7 @@
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\ManagementObjectSearcher.cs" />
     <Compile Include="Helpers\RegistryHelper.cs" />
+    <Compile Include="Models\Dependency.cs" />
     <Compile Include="Models\InfoJson.cs" />
     <Compile Include="Models\Mod.cs" />
     <Compile Include="Models\ModListItem.cs" />
