@@ -3,6 +3,7 @@ using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
 using ModsApi;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -27,16 +28,46 @@ namespace FactorioSupervisor.ViewModels
 
             if (Mods.Count == 0)
             {
-                Mods.Add(new Mod
+                // Create mod
+                var mod = new Mod()
                 {
-                    Title = "Mod title",
-                    Description = "Mod description",
-                    InstalledVersion = "0.0.0",
-                    RemoteVersion = "0.0.0",
+                    Name = "example_mod",
+                    Title = "Example Mod",
+                    Description = "Example description to describe this".Replace("\n", ""), // remove newlines
                     FactorioVersion = "0.14",
-                    Homepage = "http://www.mod.com",
-                    Author = "Mod author"
-                });
+                    InstalledVersion = "1.0.0",
+                    Author = "Example Author",
+                    Homepage = "http://www.examplemod.com",
+                    Dependencies = new JArray { "another_example_mod >= 1.0.0", "? optional_example_mod >= 2.0.0" },
+                    FullName = @"C:\mods\example",
+                    FilenameWithoutExtenion = "example_mod"
+                };
+
+                // Set dependencies
+                if (mod.Dependencies != null)
+                {
+                    foreach (var dep in mod.Dependencies)
+                    {
+                        var depStr = dep.ToString();
+
+                        var dependency = new Dependency();
+
+                        if (depStr.StartsWith("?"))
+                        {
+                            dependency.IsOptional = true;
+                            depStr = depStr.Replace("?", "").Trim();
+                        }
+
+                        dependency.Name = depStr;
+
+                        mod.DependenciesCollection.Add(dependency);
+                    }
+
+                    if (mod.DependenciesCollection.Any(x => x.IsOptional))
+                        mod.HasOptionalDependencies = true;
+                }
+
+                Mods.Add(mod);
 
                 SelectedMod = Mods[0];
             }
@@ -183,16 +214,16 @@ namespace FactorioSupervisor.ViewModels
             (_toggleEnableModsCmd = new RelayCommand(Execute_ToggleEnableModsCmd, p => true));
 
         public RelayCommand OpenHyperlinkCmd => _openHyperlinkCmd ??
-            (_openHyperlinkCmd = new RelayCommand(Execute_OpenHyperlinkCmd, p => true));
+            (_openHyperlinkCmd = new RelayCommand(p => Execute_OpenHyperlinkCmd(p as string), p => true));
 
         public RelayCommand GetModRemoteDataCmd => _getModRemoteDataCmd ??
             (_getModRemoteDataCmd = new RelayCommand(Execute_GetModRemoteDataCmd, p => true));
 
         public RelayCommand DownloadModCmd => _downloadModCmd ??
-            (_downloadModCmd = new RelayCommand(Execute_DownloadModCmd, p => IsUpdatesAvailable && !IsUpdating));
+            (_downloadModCmd = new RelayCommand(Execute_DownloadModCmd, p => true));
 
         public RelayCommand LaunchFactorioCmd => _launchFactorioCmd ??
-            (_launchFactorioCmd = new RelayCommand(Execute_LaunchFactorioCmd, p => File.Exists(BaseVm.ConfigVm.FactorioExePath) && !IsUpdating));
+            (_launchFactorioCmd = new RelayCommand(Execute_LaunchFactorioCmd, p => File.Exists(BaseVm.ConfigVm.FactorioExePath)));
 
         public RelayCommand WatchModDirChangesCmd => _watchModDirChangesCmd ??
             (_watchModDirChangesCmd = new RelayCommand(Execute_WatchModDirChangesCmd, p => Directory.Exists(BaseVm.ConfigVm.ModsPath)));
@@ -226,7 +257,7 @@ namespace FactorioSupervisor.ViewModels
                     Logger.WriteLine($"Error: Could not get infoJsonString from file: {fileEntry} - String is null", true);
 
                     // Add to collection with has error flag
-                    Mods.Add(new Mod { Title = fileEntry, FullName = fileEntry, HasError = true });
+                    Mods.Add(new Mod { Title = fileEntry, Name = fileEntry, FullName = fileEntry, HasError = true });
 
                     // Skip rest of the execution for this entry
                     continue;
@@ -237,22 +268,23 @@ namespace FactorioSupervisor.ViewModels
 
                 if (infoJson != null)
                 {
-                    Debug.WriteLine($"MOD: {infoJson.Title}");
+                    // Create mod
+                    var mod = new Mod()
+                    {
+                        Name = infoJson.Name,
+                        Title = infoJson.Title,
+                        Description = infoJson.Description.Replace("\n", ""), // remove newlines
+                        FactorioVersion = infoJson.FactorioVersion,
+                        InstalledVersion = infoJson.Version,
+                        Author = infoJson.Author,
+                        Homepage = infoJson.Homepage != null && infoJson.Homepage.StartsWith("http") ? infoJson.Homepage : null, // add only valid urls
+                        Dependencies = infoJson.Dependencies,
+                        FullName = fileEntry,
+                        Filename = Path.GetFileName(fileEntry),
+                        FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(fileEntry)
+                    };
 
-                    // Get dependencies
-                    var mod = new Mod();
-                    mod.Name = infoJson.Name;
-                    mod.Title = infoJson.Title;
-                    mod.Description = infoJson.Description.Replace("\n", ""); // remove newlines
-                    mod.FactorioVersion = infoJson.FactorioVersion;
-                    mod.InstalledVersion = infoJson.Version;
-                    mod.Author = infoJson.Author;
-                    mod.Homepage = infoJson.Homepage;
-                    mod.Dependencies = infoJson.Dependencies;
-                    mod.FullName = fileEntry;
-                    mod.Filename = Path.GetFileName(fileEntry);
-                    mod.FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(fileEntry);
-
+                    // Set dependencies
                     if (mod.Dependencies != null)
                     {
                         foreach (var dep in mod.Dependencies)
@@ -269,30 +301,39 @@ namespace FactorioSupervisor.ViewModels
                                 
                             dependency.Name = depStr;
 
+                            // Skip base mod
+                            if (dependency.Name.StartsWith("base", StringComparison.OrdinalIgnoreCase))
+                                continue;
+
                             mod.DependenciesCollection.Add(dependency);
                         }
+
+                        if (mod.DependenciesCollection.Any(x => x.IsOptional))
+                            mod.HasOptionalDependencies = true;
                     }
 
+                    // Add to collection
                     Mods.Add(mod);
-
-                    // Add to mods collection
-                    /*Mods.Add(new Mod
-                    {
-                        Name = infoJson.Name,
-                        Title = infoJson.Title,
-                        Description = infoJson.Description.Replace("\n", ""), // remove newlines
-                        FactorioVersion = infoJson.FactorioVersion,
-                        InstalledVersion = infoJson.Version,
-                        Author = infoJson.Author,
-                        Homepage = infoJson.Homepage,
-                        Dependencies = infoJson.Dependencies,
-                        FullName = fileEntry,
-                        Filename = Path.GetFileName(fileEntry),
-                        FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(fileEntry)
-                    });*/
                 }
             }
 
+            // Check for installed dependencies
+            foreach (var mod in Mods)
+            {
+                if (mod.DependenciesCollection.Count == 0)
+                    continue;
+
+                foreach (var dep in mod.DependenciesCollection)
+                {
+                    foreach (var item in Mods)
+                    {
+                        if (dep.Name.Contains(item.Name))
+                            dep.IsInstalled = true;
+                    }
+                }
+            }
+
+            // check for errors
             if (Mods.Any(x => x.HasError))
             {
                 var errorCount = Mods.Count(x => x.HasError);
@@ -301,6 +342,7 @@ namespace FactorioSupervisor.ViewModels
                 BaseVm.NotifyBannerRelay.SetNotifyBanner($"There's an error with {errorCount} of your mods!");
             }
 
+            // Set selected mod
             if (Mods.Count == 0)
                 Logger.WriteLine($"No mods found in path: {BaseVm.ConfigVm.ModsPath}", true);
             else
@@ -309,6 +351,8 @@ namespace FactorioSupervisor.ViewModels
             // Start filesystemwatcher
             if (WatchModDirChangesCmd.CanExecute(Directory.Exists(BaseVm.ConfigVm.ModsPath)))
                 WatchModDirChangesCmd.Execute(Directory.Exists(BaseVm.ConfigVm.ModsPath));
+
+            //todo load profiles when reloading
         }
 
         private void Execute_ToggleEnableModsCmd(object obj)
@@ -327,10 +371,13 @@ namespace FactorioSupervisor.ViewModels
             }
         }
 
-        private void Execute_OpenHyperlinkCmd(object obj)
+        private void Execute_OpenHyperlinkCmd(string param)
         {
-            if (SelectedMod.Homepage != null)
+            if (param == "homepage" && SelectedMod.Homepage != null)
                 Process.Start(SelectedMod.Homepage);
+
+            if (param == "portalpage" && SelectedMod.Name != null)
+                Process.Start($"https://mods.factorio.com/?q={SelectedMod.Name}");
         }
 
         private string GetTimeSpanDuration(string input)
@@ -349,7 +396,13 @@ namespace FactorioSupervisor.ViewModels
             if (timeSpan.Days == 0 && timeSpan.Hours <= 24)
                 return $"{timeSpan.Hours} hours ago";
 
-            return $"{timeSpan.Days} days {timeSpan.Hours} hours {timeSpan.Minutes} minutes and {timeSpan.Seconds} seconds";
+            if (timeSpan.Minutes < 60 && timeSpan.Hours == 0 && timeSpan.Days == 0)
+                return $"{timeSpan} minutes ago";
+
+            if (timeSpan.Days >= 365)
+                return $"1 year ago";
+
+            return $"{timeSpan.Days} d {timeSpan.Hours} h {timeSpan.Minutes} m";
         }
 
         private async void Execute_GetModRemoteDataCmd(object obj)
@@ -426,6 +479,7 @@ namespace FactorioSupervisor.ViewModels
         private async void Execute_DownloadModCmd(object obj)
         {
             ShowProgressBar = true;
+            IsUpdating = true;
 
             var authenticationApi = new AuthenticationApi();
 
@@ -445,7 +499,7 @@ namespace FactorioSupervisor.ViewModels
                 {
                     Logger.WriteLine($"Authentication successful!");
 
-                    // Wait 500 ms
+                    // Wait 500ms
                     await Task.Delay(500);
 
                     // Loop all mods with UpdateAvailable flag
@@ -480,8 +534,8 @@ namespace FactorioSupervisor.ViewModels
                                     Logger.WriteLine($"Deleted old file: {mod.FullName}", true);
                             }
 
-                            // Wait 1 sec
-                            await Task.Delay(1000);
+                            // Wait 500ms
+                            await Task.Delay(500);
 
                             // Set new/reset properties
                             mod.UpdateAvailable = false;
@@ -516,6 +570,7 @@ namespace FactorioSupervisor.ViewModels
             }
 
             ShowProgressBar = false;
+            IsUpdating = false;
         }
 
         private async Task ExecuteDownload(Mod mod, string userName, string token)
@@ -593,8 +648,8 @@ namespace FactorioSupervisor.ViewModels
                 Logger.WriteLine($"Directory does not exist: {BaseVm.ConfigVm.ModsPath} - Launching without mods", true);
             }
 
-            // Wait 1 sec
-            await Task.Delay(1000);
+            // Wait 500ms
+            await Task.Delay(500);
 
             // Create and start process
             using (var process = new Process())
@@ -623,22 +678,19 @@ namespace FactorioSupervisor.ViewModels
         private void _fileSystemWatcher_Created(object sender, FileSystemEventArgs e)
         {
             // on created
-            Logger.WriteLine($"Mod directory change detected: {e.ChangeType.ToString()} file: {e.FullPath}", true);
-            //BaseVm.NotifyBannerRelay.SetNotifyBanner("A new mod has been added - consider reloading the mod list!");
+            Logger.WriteLine($"[INFO]: Mod directory change detected - event: {e.ChangeType.ToString()} file: '{e.FullPath}'", true);
         }
 
         private void _fileSystemWatcher_Deleted(object sender, FileSystemEventArgs e)
         {
             // on deleted
-            Logger.WriteLine($"Mod directory change detected: {e.ChangeType.ToString()} file: {e.FullPath}", true);
-            //BaseVm.NotifyBannerRelay.SetNotifyBanner("A mod has been deleted - consider reloading the mod list");
+            Logger.WriteLine($"[INFO]: Mod directory change detected - event: {e.ChangeType.ToString()} file: '{e.FullPath}'", true);
         }
 
         private void _fileSystemWatcher_Renamed(object sender, RenamedEventArgs e)
         {
             // on renamed
-            Logger.WriteLine($"Mod directory change detected: {e.ChangeType.ToString()} file: {e.FullPath}", true);
-            //BaseVm.NotifyBannerRelay.SetNotifyBanner("A mod has been renamed - consider reloading the mod list!");
+            Logger.WriteLine($"[INFO]: Mod directory change detected - event: {e.ChangeType.ToString()} file: '{e.FullPath}'", true);
         }
     }
 }

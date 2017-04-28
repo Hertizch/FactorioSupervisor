@@ -130,5 +130,77 @@ namespace FactorioSupervisor.Properties {
                 this["CurrentFactorioBranch"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("535")]
+        public double UiPosLeft {
+            get {
+                return ((double)(this["UiPosLeft"]));
+            }
+            set {
+                this["UiPosLeft"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("265")]
+        public double UiPosTop {
+            get {
+                return ((double)(this["UiPosTop"]));
+            }
+            set {
+                this["UiPosTop"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("850")]
+        public double UiDimWidth {
+            get {
+                return ((double)(this["UiDimWidth"]));
+            }
+            set {
+                this["UiDimWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("550")]
+        public double UiDimHeight {
+            get {
+                return ((double)(this["UiDimHeight"]));
+            }
+            set {
+                this["UiDimHeight"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("1.2*")]
+        public global::System.Windows.GridLength UiDimModListWidth {
+            get {
+                return ((global::System.Windows.GridLength)(this["UiDimModListWidth"]));
+            }
+            set {
+                this["UiDimModListWidth"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("2.5*")]
+        public global::System.Windows.GridLength UiDimModDetailsWidth {
+            get {
+                return ((global::System.Windows.GridLength)(this["UiDimModDetailsWidth"]));
+            }
+            set {
+                this["UiDimModDetailsWidth"] = value;
+            }
+        }
     }
 }

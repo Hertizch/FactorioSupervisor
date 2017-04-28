@@ -34,6 +34,7 @@ namespace FactorioSupervisor.Models
         private bool _hasError;
         private bool _hideInModList;
         private ObservableCollection<Dependency> _dependenciesCollection;
+        private bool _hasOptionalDependencies;
 
         /// <summary>
         /// Gets or sets the filename with extension
@@ -240,6 +241,15 @@ namespace FactorioSupervisor.Models
         {
             get { return _dependenciesCollection; }
             set { if (value == _dependenciesCollection) return; _dependenciesCollection = value; OnPropertyChanged(nameof(DependenciesCollection)); }
+        }
+
+        /// <summary>
+        /// Gets or sets a boolean value if the dependencies collection has optional items
+        /// </summary>
+        public bool HasOptionalDependencies
+        {
+            get { return _hasOptionalDependencies; }
+            set { if (value == _hasOptionalDependencies) return; _hasOptionalDependencies = value; OnPropertyChanged(nameof(HasOptionalDependencies)); }
         }
     }
 }

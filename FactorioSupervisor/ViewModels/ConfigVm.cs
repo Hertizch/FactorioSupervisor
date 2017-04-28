@@ -4,8 +4,10 @@ using FactorioSupervisor.Models;
 using FactorioSupervisor.Properties;
 using Newtonsoft.Json;
 using System;
+using System.Configuration;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Windows;
 
 namespace FactorioSupervisor.ViewModels
 {
@@ -33,9 +35,16 @@ namespace FactorioSupervisor.ViewModels
         private bool _autoCheckModUpdate;
         private bool _autoDownloadModUpdate;
         private string _currentFactorioBranch;
+        private double _uiPosLeft;
+        private double _uiPosTop;
+        private double _uiDimWidth;
+        private double _uiDimHeight;
+        private GridLength _uiDimModListWidth;
+        private GridLength _uiDimModDetailsWidth;
         private RelayCommand _loadUserSettingsCmd;
         private RelayCommand _saveUserSettingsCmd;
         private RelayCommand _getCurrentFactorioBranchCmd;
+        private RelayCommand _resetWindowPosDimCmd;
 
         /*
          * Properties
@@ -104,6 +113,60 @@ namespace FactorioSupervisor.ViewModels
             set { if (value == _currentFactorioBranch) return; _currentFactorioBranch = value; OnPropertyChanged(nameof(CurrentFactorioBranch)); }
         }
 
+        /// <summary>
+        /// Gets or sets the UI window position left
+        /// </summary>
+        public double UiPosLeft
+        {
+            get { return _uiPosLeft; }
+            set { if (value == _uiPosLeft) return; _uiPosLeft = value; OnPropertyChanged(nameof(UiPosLeft)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the UI window position top
+        /// </summary>
+        public double UiPosTop
+        {
+            get { return _uiPosTop; }
+            set { if (value == _uiPosTop) return; _uiPosTop = value; OnPropertyChanged(nameof(UiPosTop)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the UI window width
+        /// </summary>
+        public double UiDimWidth
+        {
+            get { return _uiDimWidth; }
+            set { if (value == _uiDimWidth) return; _uiDimWidth = value; OnPropertyChanged(nameof(UiDimWidth)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the UI window height
+        /// </summary>
+        public double UiDimHeight
+        {
+            get { return _uiDimHeight; }
+            set { if (value == _uiDimHeight) return; _uiDimHeight = value; OnPropertyChanged(nameof(UiDimHeight)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the UI mod list width
+        /// </summary>
+        public GridLength UiDimModListWidth
+        {
+            get { return _uiDimModListWidth; }
+            set { if (value == _uiDimModListWidth) return; _uiDimModListWidth = value; OnPropertyChanged(nameof(UiDimModListWidth)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the UI mod details width
+        /// </summary>
+        public GridLength UiDimModDetailsWidth
+        {
+            get { return _uiDimModDetailsWidth; }
+            set { if (value == _uiDimModDetailsWidth) return; _uiDimModDetailsWidth = value; OnPropertyChanged(nameof(UiDimModDetailsWidth)); }
+        }
+
         /*
          * Commands
          */
@@ -116,6 +179,9 @@ namespace FactorioSupervisor.ViewModels
 
         public RelayCommand GetCurrentFactorioBranchCmd => _getCurrentFactorioBranchCmd ??
             (_getCurrentFactorioBranchCmd = new RelayCommand(Execute_GetCurrentFactorioBranchCmd, p => true));
+
+        public RelayCommand ResetWindowPosDimCmd => _resetWindowPosDimCmd ??
+            (_resetWindowPosDimCmd = new RelayCommand(Execute_ResetWindowPosDimCmd, p => true));
 
         /*
          * Methods
@@ -133,6 +199,14 @@ namespace FactorioSupervisor.ViewModels
                 settings.Save();
             }
 
+            // UI
+            UiPosLeft = settings.UiPosLeft;
+            UiPosTop = settings.UiPosTop;
+            UiDimWidth = settings.UiDimWidth;
+            UiDimHeight = settings.UiDimHeight;
+            UiDimModListWidth = settings.UiDimModListWidth;
+            UiDimModDetailsWidth = settings.UiDimModDetailsWidth;
+
             FactorioExePath = settings.FactorioExePath;
             ModsPath = settings.ModsPath;
             ModPortalUsername = settings.ModPortalUsername;
@@ -147,6 +221,14 @@ namespace FactorioSupervisor.ViewModels
         private void Execute_SaveUserSettingsCmd(object obj)
         {
             var settings = Settings.Default;
+
+            // UI
+            settings.UiPosLeft = UiPosLeft;
+            settings.UiPosTop = UiPosTop;
+            settings.UiDimWidth = UiDimWidth;
+            settings.UiDimHeight = UiDimHeight;
+            settings.UiDimModListWidth = UiDimModListWidth;
+            settings.UiDimModDetailsWidth = UiDimModDetailsWidth;
 
             settings.FactorioExePath = FactorioExePath;
             settings.ModsPath = ModsPath;
@@ -208,6 +290,18 @@ namespace FactorioSupervisor.ViewModels
             {
                 Logger.WriteLine($"Unable to find Factorio base mod info.json file at path: {factorioBaseFilename}", true);
             }
+        }
+
+        private void Execute_ResetWindowPosDimCmd(object obj)
+        {
+            var settings = Settings.Default;
+
+            UiPosLeft = settings.Properties.GetDefault<double>("UiPosLeft");
+            UiPosTop = settings.Properties.GetDefault<double>("UiPosTop");
+            UiDimWidth = settings.Properties.GetDefault<double>("UiDimWidth");
+            UiDimHeight = settings.Properties.GetDefault<double>("UiDimHeight");
+            UiDimModListWidth = new GridLength(1.2, GridUnitType.Star);
+            UiDimModDetailsWidth = new GridLength(2.5, GridUnitType.Star);
         }
     }
 }

@@ -69,9 +69,11 @@
     </ApplicationDefinition>
     <Compile Include="Converters\FactorioVersionVisibilityConverter.cs" />
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
+    <Compile Include="Converters\InvertedBooleanMultiConverter.cs" />
     <Compile Include="Converters\ValueToVisibilityConverter.cs" />
     <Compile Include="Extensions\ObservableObject.cs" />
     <Compile Include="Extensions\RelayCommand.cs" />
+    <Compile Include="Extensions\SettingsPropertyCollectionExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Helpers\EnvironmentHelpers.cs" />
     <Compile Include="Helpers\JsonHelpers.cs" />

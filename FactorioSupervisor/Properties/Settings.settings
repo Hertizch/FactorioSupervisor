@@ -29,5 +29,23 @@
     <Setting Name="CurrentFactorioBranch" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
+    <Setting Name="UiPosLeft" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">535</Value>
+    </Setting>
+    <Setting Name="UiPosTop" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">265</Value>
+    </Setting>
+    <Setting Name="UiDimWidth" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">850</Value>
+    </Setting>
+    <Setting Name="UiDimHeight" Type="System.Double" Scope="User">
+      <Value Profile="(Default)">550</Value>
+    </Setting>
+    <Setting Name="UiDimModListWidth" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">1.2*</Value>
+    </Setting>
+    <Setting Name="UiDimModDetailsWidth" Type="System.Windows.GridLength" Scope="User">
+      <Value Profile="(Default)">2.5*</Value>
+    </Setting>
   </Settings>
 </SettingsFile>
