@@ -33,6 +33,9 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>appIcon01.ico</ApplicationIcon>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="DotNetZip, Version=1.10.1.0, Culture=neutral, PublicKeyToken=6583c7c814667745, processorArchitecture=MSIL">
       <HintPath>..\packages\DotNetZip.1.10.1\lib\net20\DotNetZip.dll</HintPath>
@@ -80,6 +83,7 @@
     <Compile Include="Helpers\Logger.cs" />
     <Compile Include="Helpers\ManagementObjectSearcher.cs" />
     <Compile Include="Helpers\RegistryHelper.cs" />
+    <Compile Include="Helpers\TimeHelpers.cs" />
     <Compile Include="Models\Dependency.cs" />
     <Compile Include="Models\InfoJson.cs" />
     <Compile Include="Models\Mod.cs" />
@@ -205,6 +209,9 @@
       <Project>{4FB1C011-C07B-438B-9354-DD7BDC3D7F0A}</Project>
       <Name>ModsApi</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="appIcon01.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

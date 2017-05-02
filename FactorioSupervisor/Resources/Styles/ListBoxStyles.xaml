@@ -35,7 +35,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{StaticResource AccentColorLight}" />
+                            <Setter Property="Background" Value="{StaticResource AccentColorLightMuted}" />
                             <Setter Property="Foreground" Value="#B2FFFFFF" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">

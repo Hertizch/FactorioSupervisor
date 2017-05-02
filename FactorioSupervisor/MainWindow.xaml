@@ -209,6 +209,11 @@
                                     </Grid>
                                 </DataTemplate>
                             </ListBox.ItemTemplate>
+                            <ListBox.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Delete" Command="{Binding Path=ModsVm.DeleteModCmd}" />
+                                </ContextMenu>
+                            </ListBox.ContextMenu>
                         </ListBox>
                     </ScrollViewer>
                 </Grid>
@@ -225,7 +230,7 @@
                             <TextBlock Text="{Binding Path=ModsVm.SelectedMod.Title, FallbackValue=Title}" Foreground="#B2FFFFFF" FontSize="24" FontFamily="Segoe UI Semilight" TextTrimming="CharacterEllipsis" />
                             
                             <!-- description -->
-                            <TextBlock TextWrapping="Wrap" Margin="0,10,0,40">
+                            <TextBlock TextWrapping="Wrap" Margin="0,12,0,40">
                                 <Run>
                                     <Run.Style>
                                         <Style TargetType="{x:Type Run}">
@@ -490,7 +495,7 @@
 
         <!--  Apply button  -->
         <AdornerDecorator x:Name="AdornerApplyButton" Width="80" Height="80" Margin="0,60,15,0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.RowSpan="2">
-            <c:IconButton Foreground="#FFFEFEFE" Style="{StaticResource LaunchButton}" ToolTip="Launch Factorio!" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
+            <c:IconButton Style="{StaticResource LaunchButton}" ToolTip="Launch Factorio!" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
                 <c:IconButton.Effect>
                     <DropShadowEffect BlurRadius="9" Direction="0" Opacity="0.53" RenderingBias="Quality" ShadowDepth="0" />
                 </c:IconButton.Effect>

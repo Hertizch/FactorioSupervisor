@@ -28,19 +28,36 @@ namespace FactorioSupervisor.ViewModels
 
             if (Mods.Count == 0)
             {
-                // Create mod
+                /* Create example mod */
                 var mod = new Mod()
                 {
-                    Name = "example_mod",
-                    Title = "Example Mod",
-                    Description = "Example description to describe this".Replace("\n", ""), // remove newlines
-                    FactorioVersion = "0.14",
-                    InstalledVersion = "1.0.0",
-                    Author = "Example Author",
-                    Homepage = "http://www.examplemod.com",
-                    Dependencies = new JArray { "another_example_mod >= 1.0.0", "? optional_example_mod >= 2.0.0" },
+                    Name = "aai-programmable-vehicles",
+                    Title = "AAI Programmable Vehicles",
+                    Description = "Program and control autonomous vehicles using a remote control handset, or circuit conditions and zones. Can be used for base enemy base assault, patrols, friendly base navigation, vehicle-based mining, and more advanced applications. Works with vanilla and modded vehicles.",
+                    FactorioVersion = "0.15",
+                    InstalledVersion = "0.3.2",
+                    Author = "Earendel",
+                    Homepage = "https://forums.factorio.com/viewtopic.php?f=93&t=38475",
+                    Dependencies = new JArray
+                    {
+                        "base >= 0.14.21",
+                        "data-raw-prototypes >= 0.2.1",
+                        "?aai-vehicles-flame-tumbler >= 0.2.1",
+                        "?aai-vehicles-laser-tank >= 0.2.1",
+                        "?bullet-trails >= 0.2.1",
+                        "aai-programmable-structures >= 0.3.1",
+                        "aai-zones >= 0.2.1",
+                        "detached-gun-sounds >= 0.2.1",
+                        "off-grid-effects >= 0.2.1",
+                        "aai-signals >= 0.2.1",
+                        "aai-vehicles-miner >= 0.2.1",
+                        "aai-vehicles-hauler >= 0.2.1",
+                        "?aai-vehicles-chaingunner >= 0.2.1"
+                    },
                     FullName = @"C:\mods\example",
-                    FilenameWithoutExtenion = "example_mod"
+                    FilenameWithoutExtenion = "example_mod",
+                    ReleasedAt = TimeHelpers.GetTimeSpanDuration("2017-04-28T07:47:58.903536Z"),
+                    RemoteVersion = "0.3.2"
                 };
 
                 // Set dependencies
@@ -70,6 +87,8 @@ namespace FactorioSupervisor.ViewModels
                 Mods.Add(mod);
 
                 SelectedMod = Mods[0];
+
+                /* Create example mod END */
             }
 
             // Auto check for mod updates - if user specified
@@ -100,6 +119,7 @@ namespace FactorioSupervisor.ViewModels
         private RelayCommand _downloadModCmd;
         private RelayCommand _launchFactorioCmd;
         private RelayCommand _watchModDirChangesCmd;
+        private RelayCommand _deleteModCmd;
 
         /*
          * Properties
@@ -228,6 +248,9 @@ namespace FactorioSupervisor.ViewModels
         public RelayCommand WatchModDirChangesCmd => _watchModDirChangesCmd ??
             (_watchModDirChangesCmd = new RelayCommand(Execute_WatchModDirChangesCmd, p => Directory.Exists(BaseVm.ConfigVm.ModsPath)));
 
+        public RelayCommand DeleteModCmd => _deleteModCmd ??
+            (_deleteModCmd = new RelayCommand(Execute_DeleteModCmd, p => true));
+
         /*
          * Methods
          */
@@ -293,12 +316,14 @@ namespace FactorioSupervisor.ViewModels
 
                             var dependency = new Dependency();
 
+                            // set optional deps
                             if (depStr.StartsWith("?"))
                             {
                                 dependency.IsOptional = true;
                                 depStr = depStr.Replace("?", "").Trim();
                             }
-                                
+                            
+                            // set name
                             dependency.Name = depStr;
 
                             // Skip base mod
@@ -308,6 +333,7 @@ namespace FactorioSupervisor.ViewModels
                             mod.DependenciesCollection.Add(dependency);
                         }
 
+                        // check if any optional deps
                         if (mod.DependenciesCollection.Any(x => x.IsOptional))
                             mod.HasOptionalDependencies = true;
                     }
@@ -380,31 +406,6 @@ namespace FactorioSupervisor.ViewModels
                 Process.Start($"https://mods.factorio.com/?q={SelectedMod.Name}");
         }
 
-        private string GetTimeSpanDuration(string input)
-        {
-            var dateTimeNow = DateTime.Now;
-            var dateTimeLastUpdate = DateTime.Parse(input);
-
-            var timeSpan = dateTimeNow - dateTimeLastUpdate;
-
-            if (timeSpan.Days == 1)
-                return $"1 day ago";
-
-            if (timeSpan.Days > 1)
-                return $"{timeSpan.Days} days ago";
-
-            if (timeSpan.Days == 0 && timeSpan.Hours <= 24)
-                return $"{timeSpan.Hours} hours ago";
-
-            if (timeSpan.Minutes < 60 && timeSpan.Hours == 0 && timeSpan.Days == 0)
-                return $"{timeSpan} minutes ago";
-
-            if (timeSpan.Days >= 365)
-                return $"1 year ago";
-
-            return $"{timeSpan.Days} d {timeSpan.Hours} h {timeSpan.Minutes} m";
-        }
-
         private async void Execute_GetModRemoteDataCmd(object obj)
         {
             ShowProgressBar = true;
@@ -438,7 +439,7 @@ namespace FactorioSupervisor.ViewModels
                     mod.RemoteVersion = result.Releases.First().Version;
                     mod.DownloadUrl = result.Releases.First().DownloadUrl;
                     mod.RemoteFilename = result.Releases.First().FileName;
-                    mod.ReleasedAt = GetTimeSpanDuration(result.Releases.First().ReleasedAt);
+                    mod.ReleasedAt = TimeHelpers.GetTimeSpanDuration(result.Releases.First().ReleasedAt);
                     mod.RemoteFactorioVersion = result.Releases.First().FactorioVersion;
 
                     // Check if remote version is greater than installed version
@@ -468,7 +469,7 @@ namespace FactorioSupervisor.ViewModels
             }
             else
             {
-                BaseVm.MessageBoxRelay.SetMessageBox("Host unreachable", "The updater was unable to reach the mod portal at https://mods.factorio.com/api/mods. It may be temporarily down, or your internet connection is unavailable.");
+                BaseVm.MessageBoxRelay.SetMessageBox("Host unreachable", "The updater was unable to reach the mod portal. It may be temporarily down, or experiencing heavy load. Try agin later.");
                 Logger.WriteLine("Failed to reach host: https://mods.factorio.com/api/mods", true);
             }
 
@@ -661,15 +662,37 @@ namespace FactorioSupervisor.ViewModels
             }
         }
 
+        private void Execute_DeleteModCmd(object obj)
+        {
+            Exception exception = null;
+
+            try
+            {
+                File.Delete(SelectedMod.FullName);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+                Logger.WriteLine($"Failed to delete file: {SelectedMod.FullName}", true, ex);
+            }
+            finally
+            {
+                if (exception == null)
+                {
+                    Logger.WriteLine($"Deleted file: {SelectedMod.FullName}", true);
+                    Mods.RemoveAt(Mods.IndexOf(SelectedMod));
+                }
+            }
+        }
+
         private void Execute_WatchModDirChangesCmd(object obj)
         {
             string watchDir = BaseVm.ConfigVm.ModsPath;
 
-            _fileSystemWatcher = new FileSystemWatcher(watchDir, "*.zip")
-            {
-                EnableRaisingEvents = true,
-            };
+            // create and start watcher
+            _fileSystemWatcher = new FileSystemWatcher(watchDir, "*.zip") { EnableRaisingEvents = true };
 
+            // create event handlers
             _fileSystemWatcher.Renamed += _fileSystemWatcher_Renamed;
             _fileSystemWatcher.Deleted += _fileSystemWatcher_Deleted;
             _fileSystemWatcher.Created += _fileSystemWatcher_Created;

@@ -1,12 +1,27 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
+    <!-- #FF1E1E1E -->
     <SolidColorBrush x:Key="BaseBackgroundColor" Color="#FF1E1E1E" />
-    <SolidColorBrush x:Key="AccentColorDark" Color="#FF113344" />
-    <SolidColorBrush x:Key="AccentColorDarkMuted" Color="#FF10242E" />
-    <SolidColorBrush x:Key="AccentColorLight" Color="#FF0A6E9E" />
-    <SolidColorBrush x:Key="SearchBoxBackgroundColor" Color="#FF2D2D30" />
+
+    <!-- #FF113344 -->
+    <SolidColorBrush x:Key="AccentColorDark" Color="#FF252525" />
+
+    <!-- #FF10242E -->
+    <SolidColorBrush x:Key="AccentColorDarkMuted" Color="#FF1E1E1E" />
+
+    <!-- #FF0A6E9E -->
+    <SolidColorBrush x:Key="AccentColorLight" Color="#FFAA6075" />
+
+    <SolidColorBrush x:Key="AccentColorLightMuted" Color="#FF865664" />
+
+    <!-- #FF2D2D30 -->
+    <SolidColorBrush x:Key="SearchBoxBackgroundColor" Color="#FF272727" />
+
+    <!-- #FFFFFF00 -->
     <SolidColorBrush x:Key="UpdateAvailableColor" Color="#FFFFFF00" />
+
+    <!-- #FFF06969 -->
     <SolidColorBrush x:Key="ModErrorColor" Color="#FFF06969" />
 
 </ResourceDictionary>

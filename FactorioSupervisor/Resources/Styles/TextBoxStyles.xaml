@@ -20,7 +20,7 @@
                             </Grid.ColumnDefinitions>
                             <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Padding="{TemplateBinding Padding}" />
                             <Viewbox Grid.Column="1" Width="14">
-                                <Path Data="{StaticResource IconSearch}" Fill="{StaticResource AccentColorLight}" />
+                                <Path Data="{StaticResource IconSearch}" Fill="{StaticResource AccentColorLightMuted}" />
                             </Viewbox>
                         </Grid>
                     </Border>

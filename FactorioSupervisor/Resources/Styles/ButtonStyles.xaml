@@ -80,7 +80,7 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Foreground" Value="#FFFEFEFE" />
-        <Setter Property="Background" Value="{StaticResource AccentColorLight}" />
+        <Setter Property="Background" Value="{StaticResource AccentColorLightMuted}" />
         <Setter Property="Height" Value="50" />
         <Setter Property="Width" Value="50" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />

@@ -16,7 +16,8 @@ namespace ModsApi
         }
 
         private static WebClient _webClient;
-        private const string AuthenticationUrl = "https://auth.factorio.com/api-login";
+        private const string AuthenticationBaseUrl = "https://auth.factorio.com/api-login";
+
         public bool Success { get; set; }
         public string ErrorMessage { get; set; }
 
@@ -40,7 +41,7 @@ namespace ModsApi
             {
                 try
                 {
-                    response = await _webClient.UploadValuesTaskAsync(AuthenticationUrl, nameValues);
+                    response = await _webClient.UploadValuesTaskAsync(AuthenticationBaseUrl, nameValues);
                 }
                 catch (Exception ex)
                 {

@@ -8,8 +8,8 @@ using System.Threading.Tasks;
 
 namespace ModsApi
 {
-    /*
-     * https://mods.factorio.com/api/mods?namelist=orechaos&namelist=power-armor
+    /* example request string
+     * https://mods.factorio.com/api/mods?page_size=max&namelist=aai-programmable-vehicles
      */
 
     public class ModPortalApi
@@ -22,6 +22,7 @@ namespace ModsApi
         private WebClient _webClient;
         private string _json;
         private const string ApiResponseUrl = "https://mods.factorio.com/api/mods";
+
         public ApiData ApiData { get; set; }
 
         public async Task BuildApiData(string request)
