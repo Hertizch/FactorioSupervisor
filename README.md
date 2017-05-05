@@ -3,5 +3,5 @@ A Factorio launcher and mod manager
 
 ## Features
 - Automatically download mod updates.
-- Import/export mod sets (profiles) and download missing mods automatically.
+- Import/export mod-sets (profiles) and download missing mods automatically.
 - One-click download of dependencies.
