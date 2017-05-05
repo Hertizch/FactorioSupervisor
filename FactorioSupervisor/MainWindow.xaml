@@ -24,6 +24,7 @@
         <conv:ValueToVisibilityConverter x:Key="ValueToVisibilityConverter" />
         <conv:InvertedBooleanConverter x:Key="InvertedBooleanConverter" />
         <conv:InvertedBooleanMultiConverter x:Key="InvertedBooleanMultiConverter" />
+        <conv:IsUpdatingToNotifyValueConverter x:Key="IsUpdatingToNotifyValueConverter" />
 
         <CollectionViewSource x:Key="ModsVs" Source="{Binding Path=ModsVm.Mods}" IsLiveFilteringRequested="True" IsLiveSortingRequested="True">
             <CollectionViewSource.SortDescriptions>
@@ -154,7 +155,7 @@
                     <!-- Mod list -->
                     <ScrollViewer Grid.Row="3">
                         <ListBox x:Name="ModsListBox" Style="{StaticResource GenericListBox}" ItemContainerStyle="{StaticResource GenericListBoxItem}" 
-                             ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}" MouseDoubleClick="ListBox_MouseDoubleClick">
+                             ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}" PreviewMouseDoubleClick="ListBox_PreviewMouseDoubleClick" PreviewKeyDown="ModsListBox_PreviewKeyDown">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="6,5,10,5">
@@ -489,6 +490,29 @@
                     </Grid.ColumnDefinitions>
                     <TextBlock Text="{Binding Path=NotifyBannerRelay.NotifyBannerValue}" Foreground="#7FFFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="25,0,0,0" />
                     <c:IconButton Grid.Column="1" Style="{StaticResource NotifyButton}" Icon="{StaticResource IconClose}" Command="{Binding Path=NotifyBannerRelay.CloseNotifyBannerCmd}" Margin="0,0,5,0" ToolTip="Close" />
+                </Grid>
+            </Border>
+        </AdornerDecorator>
+
+        <!-- Update notify banner -->
+        <AdornerDecorator x:Name="AdornerUpdateNotify" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=ModsVm.IsUpdating, Converter={StaticResource ValueToVisibilityConverter}}">
+            <Border Background="#CC111111">
+                <Grid>
+                    <StackPanel Margin="50,15">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Foreground="#B2FFFFFF" Margin="0,0,0,5" TextTrimming="CharacterEllipsis">
+                                <Run Text="{Binding Path=ModsVm.CurrentUpdatingMod.Title, StringFormat={}Updating: {0}, TargetNullValue=Warming up...}" />
+                                <Run Text="{Binding Path=ModsVm.CurrentUpdatingMod.ProgressPercentage, StringFormat={} - {0}%}" />
+                            </TextBlock>
+                            <TextBlock Grid.Column="1" Text="{Binding Path=ModsVm.UpdateTotalProgress, StringFormat={}Total: {0}%}" Foreground="#B2FFFFFF" HorizontalAlignment="Right" Margin="0,0,0,5" />
+                        </Grid>
+                        <ProgressBar Foreground="{StaticResource AccentColorLightMuted}" Height="2" BorderBrush="Transparent" Background="Transparent" Value="{Binding Path=ModsVm.CurrentUpdatingMod.ProgressPercentage}" Margin="0,0,0,1" />
+                        <ProgressBar Foreground="{StaticResource AccentColorLight}" Height="4" BorderBrush="Transparent" Background="Transparent" Value="{Binding Path=ModsVm.UpdateTotalProgress}" />
+                    </StackPanel>
                 </Grid>
             </Border>
         </AdornerDecorator>

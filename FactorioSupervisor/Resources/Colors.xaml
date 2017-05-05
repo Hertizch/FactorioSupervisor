@@ -24,4 +24,6 @@
     <!-- #FFF06969 -->
     <SolidColorBrush x:Key="ModErrorColor" Color="#FFF06969" />
 
+    <SolidColorBrush x:Key="SubTitlebarButtonBackgroundHoverColor" Color="#FF272727" />
+
 </ResourceDictionary>

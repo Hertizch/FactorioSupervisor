@@ -23,7 +23,7 @@ namespace ModsApi
         private string _json;
         private const string ApiResponseUrl = "https://mods.factorio.com/api/mods";
 
-        public ApiData ApiData { get; set; }
+        public ApiData ApiData { get; set; } = new ApiData();
 
         public async Task BuildApiData(string request)
         {
@@ -31,10 +31,9 @@ namespace ModsApi
 
             Exception exception = null;
 
-            // Get the api json response string
             try
             {
-                _json = await GetApiResponseJson(request);
+                _json = await GetApiResponseJsonString(request);
             }
             catch (Exception ex)
             {
@@ -47,20 +46,17 @@ namespace ModsApi
                     Debug.WriteLine($"Method execution succeeded: {nameof(BuildApiData)}");
             }
 
-            // Deserialize the json
-            ApiData = JsonConvert.DeserializeObject<ApiData>(_json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            if (!string.IsNullOrEmpty(_json))
+                ApiData = JsonConvert.DeserializeObject<ApiData>(_json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
         }
 
-        private async Task<string> GetApiResponseJson(string request)
+        private async Task<string> GetApiResponseJsonString(string request)
         {
-            Debug.WriteLine($"Method called: {nameof(GetApiResponseJson)}, param name: {nameof(request)}, value: {request}");
+            Debug.WriteLine($"Method called: {nameof(GetApiResponseJsonString)}, param name: {nameof(request)}, value: {request}");
 
             Exception exception = null;
-
-            // Initialize our response string
             string response = null;
 
-            // Create the webclient
             using (_webClient = new PatientWebClient { Proxy = null })
             {
                 try
@@ -70,16 +66,15 @@ namespace ModsApi
                 catch (Exception ex)
                 {
                     exception = ex;
-                    Debug.WriteLine($"Method execution failed: {nameof(GetApiResponseJson)}, exception message: {ex.Message}");
+                    Debug.WriteLine($"Method execution failed: {nameof(GetApiResponseJsonString)}, exception message: {ex.Message}");
                 }
                 finally
                 {
                     if (exception == null)
-                        Debug.WriteLine($"Method execution succeeded: {nameof(GetApiResponseJson)}");
+                        Debug.WriteLine($"Method execution succeeded: {nameof(GetApiResponseJsonString)}");
                 }
             }
 
-            // Return the response
             return response;
         }
 

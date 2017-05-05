@@ -4,7 +4,6 @@ using FactorioSupervisor.Models;
 using FactorioSupervisor.Properties;
 using Newtonsoft.Json;
 using System;
-using System.Configuration;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
@@ -215,7 +214,7 @@ namespace FactorioSupervisor.ViewModels
             AutoDownloadModUpdate = settings.AutoDownloadModUpdate;
             CurrentFactorioBranch = settings.CurrentFactorioBranch;
 
-            Logger.WriteLine("Loaded user settings", true);
+            Logger.WriteLine("Loaded user settings");
         }
 
         private void Execute_SaveUserSettingsCmd(object obj)
@@ -241,7 +240,7 @@ namespace FactorioSupervisor.ViewModels
 
             settings.Save();
 
-            Logger.WriteLine("Saved user settings", true);
+            Logger.WriteLine("Saved user settings");
         }
 
         private void Execute_GetCurrentFactorioBranchCmd(object obj)

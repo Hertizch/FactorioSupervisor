@@ -82,6 +82,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="#FFFFFFFF" />
+                            <Setter Property="Background" Value="{StaticResource SubTitlebarButtonBackgroundHoverColor}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter Property="Background" Value="#FF0E0E0E" />
@@ -113,6 +114,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="#FFFFFFFF" />
+                            <Setter Property="Background" Value="{StaticResource BaseBackgroundColor}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="#33FFFFFF" />
@@ -185,6 +187,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="#FFFFFFFF" />
+                            <Setter Property="Background" Value="{StaticResource SubTitlebarButtonBackgroundHoverColor}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter Property="Background" Value="#FF0E0E0E" />

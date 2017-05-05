@@ -76,9 +76,25 @@ namespace FactorioSupervisor
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        private void ListBox_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void ListBox_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item)
+            {
+                var mod = item.DataContext as Mod;
+
+                if (mod.HasError)
+                    return;
+
+                if (mod.IsEnabled)
+                    mod.IsEnabled = false;
+                else
+                    mod.IsEnabled = true;
+            }
+        }
+
+        private void ModsListBox_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item && e.Key == Key.Return)
             {
                 var mod = item.DataContext as Mod;
 

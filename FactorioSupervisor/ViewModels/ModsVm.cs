@@ -1,17 +1,21 @@
 ﻿using FactorioSupervisor.Extensions;
 using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
+using FactorioSupervisor.ObservableImmutable;
 using ModsApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Threading;
 
 namespace FactorioSupervisor.ViewModels
 {
@@ -21,7 +25,7 @@ namespace FactorioSupervisor.ViewModels
         {
             Logger.WriteLine($"Class created: {nameof(ModsVm)}");
 
-            Mods = new ObservableCollection<Mod>();
+            Mods = new ObservableImmutableList<Mod>();
 
             if (GetLocalModsCmd.CanExecute(null))
                 GetLocalModsCmd.Execute(null);
@@ -103,11 +107,13 @@ namespace FactorioSupervisor.ViewModels
          * Private fields
          */
 
-        private ObservableCollection<Mod> _mods;
+        private ObservableImmutableList<Mod> _mods;
         private Mod _selectedMod;
         private bool _isCheckingForUpdates;
         private bool _isUpdating;
+        private double _updateTotalProgress;
         private bool _isUpdatesAvailable;
+        private Mod _currentUpdatingMod;
         private bool _showProgressBar;
         private bool _fileDownloadSucceeded;
         private bool _hideIncompatibleMods;
@@ -128,7 +134,7 @@ namespace FactorioSupervisor.ViewModels
         /// <summary>
         /// Gets or sets the collection of mods
         /// </summary>
-        public ObservableCollection<Mod> Mods
+        public ObservableImmutableList<Mod> Mods
         {
             get { return _mods; }
             set { if (value == _mods) return; _mods = value; OnPropertyChanged(nameof(Mods)); }
@@ -149,7 +155,14 @@ namespace FactorioSupervisor.ViewModels
         public bool IsCheckingForUpdates
         {
             get { return _isCheckingForUpdates; }
-            set { if (value == _isCheckingForUpdates) return; _isCheckingForUpdates = value; OnPropertyChanged(nameof(IsCheckingForUpdates)); }
+            set
+            {
+                if (value == _isCheckingForUpdates) return; _isCheckingForUpdates = value; OnPropertyChanged(nameof(IsCheckingForUpdates));
+                if (IsCheckingForUpdates)
+                    ShowProgressBar = true;
+                else
+                    ShowProgressBar = false;
+            }
         }
 
         /// <summary>
@@ -158,7 +171,23 @@ namespace FactorioSupervisor.ViewModels
         public bool IsUpdating
         {
             get { return _isUpdating; }
-            set { if (value == _isUpdating) return; _isUpdating = value; OnPropertyChanged(nameof(IsUpdating)); }
+            set
+            {
+                if (value == _isUpdating) return; _isUpdating = value; OnPropertyChanged(nameof(IsUpdating));
+                if (IsUpdating)
+                    ShowProgressBar = true;
+                else
+                    ShowProgressBar = false;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the update total progress value
+        /// </summary>
+        public double UpdateTotalProgress
+        {
+            get { return _updateTotalProgress; }
+            set { if (value == _updateTotalProgress) return; _updateTotalProgress = value; OnPropertyChanged(nameof(UpdateTotalProgress)); }
         }
 
         /// <summary>
@@ -171,12 +200,21 @@ namespace FactorioSupervisor.ViewModels
         }
 
         /// <summary>
+        /// Gets or sets the currently updating mod object
+        /// </summary>
+        public Mod CurrentUpdatingMod
+        {
+            get { return _currentUpdatingMod; }
+            set { if (value == _currentUpdatingMod) return; _currentUpdatingMod = value; OnPropertyChanged(nameof(CurrentUpdatingMod)); }
+        }
+
+        /// <summary>
         /// Gets or sets a boolean value whether the progress bar should appear
         /// </summary>
         public bool ShowProgressBar
         {
             get { return _showProgressBar; }
-            set { if (value == _showProgressBar) return;_showProgressBar = value; OnPropertyChanged(nameof(ShowProgressBar)); }
+            set { if (value == _showProgressBar) return; _showProgressBar = value; OnPropertyChanged(nameof(ShowProgressBar)); }
         }
 
         /// <summary>
@@ -208,9 +246,7 @@ namespace FactorioSupervisor.ViewModels
                                 mod.IsEnabled = false;
                         }
                         else
-                        {
                             mod.HideInModList = false;
-                        }
                     }
                 }
                 else
@@ -219,7 +255,7 @@ namespace FactorioSupervisor.ViewModels
                         mod.HideInModList = false;
                 }
 
-                
+
             }
         }
 
@@ -264,84 +300,9 @@ namespace FactorioSupervisor.ViewModels
             // Get all filesystementries from mods directory
             var fileEntries = Directory.GetFileSystemEntries(BaseVm.ConfigVm.ModsPath, "*", SearchOption.TopDirectoryOnly).ToList();
 
-            // Loop all entries
+            // Loop all entries and add to collection
             foreach (var fileEntry in fileEntries)
-            {
-                // If the file does not end with .zip, skip it
-                if (!fileEntry.EndsWith(".zip"))
-                    continue;
-
-                // Get info.json as string
-                string infoJsonString = JsonHelpers.GetModInfoJsonString(fileEntry);
-
-                // If unable to read info from archive - flag an error in file entry
-                if (string.IsNullOrEmpty(infoJsonString))
-                {
-                    Logger.WriteLine($"Error: Could not get infoJsonString from file: {fileEntry} - String is null", true);
-
-                    // Add to collection with has error flag
-                    Mods.Add(new Mod { Title = fileEntry, Name = fileEntry, FullName = fileEntry, HasError = true });
-
-                    // Skip rest of the execution for this entry
-                    continue;
-                }
-
-                // Deserialize the json string to infojson object
-                var infoJson = JsonConvert.DeserializeObject<InfoJson>(infoJsonString);
-
-                if (infoJson != null)
-                {
-                    // Create mod
-                    var mod = new Mod()
-                    {
-                        Name = infoJson.Name,
-                        Title = infoJson.Title,
-                        Description = infoJson.Description.Replace("\n", ""), // remove newlines
-                        FactorioVersion = infoJson.FactorioVersion,
-                        InstalledVersion = infoJson.Version,
-                        Author = infoJson.Author,
-                        Homepage = infoJson.Homepage != null && infoJson.Homepage.StartsWith("http") ? infoJson.Homepage : null, // add only valid urls
-                        Dependencies = infoJson.Dependencies,
-                        FullName = fileEntry,
-                        Filename = Path.GetFileName(fileEntry),
-                        FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(fileEntry)
-                    };
-
-                    // Set dependencies
-                    if (mod.Dependencies != null)
-                    {
-                        foreach (var dep in mod.Dependencies)
-                        {
-                            var depStr = dep.ToString();
-
-                            var dependency = new Dependency();
-
-                            // set optional deps
-                            if (depStr.StartsWith("?"))
-                            {
-                                dependency.IsOptional = true;
-                                depStr = depStr.Replace("?", "").Trim();
-                            }
-                            
-                            // set name
-                            dependency.Name = depStr;
-
-                            // Skip base mod
-                            if (dependency.Name.StartsWith("base", StringComparison.OrdinalIgnoreCase))
-                                continue;
-
-                            mod.DependenciesCollection.Add(dependency);
-                        }
-
-                        // check if any optional deps
-                        if (mod.DependenciesCollection.Any(x => x.IsOptional))
-                            mod.HasOptionalDependencies = true;
-                    }
-
-                    // Add to collection
-                    Mods.Add(mod);
-                }
-            }
+                ModEntryAdd(fileEntry);
 
             // Check for installed dependencies
             foreach (var mod in Mods)
@@ -408,13 +369,12 @@ namespace FactorioSupervisor.ViewModels
 
         private async void Execute_GetModRemoteDataCmd(object obj)
         {
-            ShowProgressBar = true;
             IsCheckingForUpdates = true;
 
             // Create api class
             var modPortalApi = new ModPortalApi();
 
-            Logger.WriteLine($"Attempting connection with mod portal...");
+            Logger.WriteLine($"Attempting connection with mod portal (https://mods.factorio.com/api/mods)...");
 
             // Check if api is reachable
             if (await modPortalApi.CanReachApi())
@@ -426,6 +386,8 @@ namespace FactorioSupervisor.ViewModels
                 sb.Append("?page_size=max");
                 foreach (var mod in Mods.Where(x => !x.HasError))
                     sb.Append($"&namelist={mod.Name}");
+
+                Logger.WriteLine($"Created Mod Portal Api request: {sb.ToString()}", true);
 
                 // Build the Api Data
                 await modPortalApi.BuildApiData(sb.ToString());
@@ -455,32 +417,33 @@ namespace FactorioSupervisor.ViewModels
                     var updateCount = Mods.Count(x => x.UpdateAvailable);
 
                     if (updateCount > 1)
-                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"{updateCount} updates available!");
+                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"{updateCount} updates are available!");
                     else
-                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"{updateCount} update available!");
+                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"{updateCount} update are available!");
 
-                    Logger.WriteLine($"{Mods.Count(x => x.UpdateAvailable)} updates available", true);
+                    Logger.WriteLine($"{Mods.Count(x => x.UpdateAvailable)} updates are available", true);
                 }
                 else
                 {
-                    BaseVm.NotifyBannerRelay.SetNotifyBanner("No updates available");
+                    BaseVm.NotifyBannerRelay.SetNotifyBanner("There are currently no updates available");
                     Logger.WriteLine("No updates available", true);
                 }
             }
             else
             {
                 BaseVm.MessageBoxRelay.SetMessageBox("Host unreachable", "The updater was unable to reach the mod portal. It may be temporarily down, or experiencing heavy load. Try agin later.");
-                Logger.WriteLine("Failed to reach host: https://mods.factorio.com/api/mods", true);
+                Logger.WriteLine("Connection failed!", true);
             }
 
             IsCheckingForUpdates = false;
-            ShowProgressBar = false;
         }
 
         private async void Execute_DownloadModCmd(object obj)
         {
-            ShowProgressBar = true;
             IsUpdating = true;
+            CurrentUpdatingMod = null;
+
+            var totalUpdateCount = Mods.Count(x => x.UpdateAvailable);
 
             var authenticationApi = new AuthenticationApi();
 
@@ -506,10 +469,8 @@ namespace FactorioSupervisor.ViewModels
                     // Loop all mods with UpdateAvailable flag
                     foreach (var mod in Mods.Where(x => x.UpdateAvailable))
                     {
+                        CurrentUpdatingMod = mod;
                         mod.IsUpdating = true;
-
-                        // Show notification
-                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"Downloading: {mod.Title}...");
 
                         // Execute the download
                         await ExecuteDownload(mod, username, token);
@@ -548,10 +509,10 @@ namespace FactorioSupervisor.ViewModels
                             mod.ProgressPercentage = 0;
                         }
 
-                        // Show notification
-                        BaseVm.NotifyBannerRelay.SetNotifyBanner($"Updated: {mod.Title}");
-
                         mod.IsUpdating = false;
+
+                        // Calculate UpdateTotalProgress
+                        UpdateTotalProgress = ((double)Mods.Count(x => x.UpdateAvailable) / totalUpdateCount) * 100;
                     }
 
                     // Reset IsUpdatesAvailable flag
@@ -570,7 +531,6 @@ namespace FactorioSupervisor.ViewModels
                 BaseVm.NotifyBannerRelay.SetNotifyBanner("Authentication failed!");
             }
 
-            ShowProgressBar = false;
             IsUpdating = false;
         }
 
@@ -585,7 +545,11 @@ namespace FactorioSupervisor.ViewModels
                 Logger.WriteLine($"Started download of: {mod.DownloadUrl}", true);
 
                 // Report progress to mod object
-                webClient.DownloadProgressChanged += (sender, args) => mod.ProgressPercentage = args.ProgressPercentage;
+                webClient.DownloadProgressChanged += (sender, args) =>
+                {
+                    CurrentUpdatingMod.ProgressPercentage = args.ProgressPercentage;
+                    mod.ProgressPercentage = args.ProgressPercentage;
+                };
 
                 // Execute download
                 try
@@ -702,18 +666,130 @@ namespace FactorioSupervisor.ViewModels
         {
             // on created
             Logger.WriteLine($"[INFO]: Mod directory change detected - event: {e.ChangeType.ToString()} file: '{e.FullPath}'", true);
+
+            if (IsUpdating)
+                return;
+
+            ModEntryAdd(e.FullPath);
         }
 
         private void _fileSystemWatcher_Deleted(object sender, FileSystemEventArgs e)
         {
             // on deleted
             Logger.WriteLine($"[INFO]: Mod directory change detected - event: {e.ChangeType.ToString()} file: '{e.FullPath}'", true);
+
+            if (IsUpdating)
+                return;
         }
 
         private void _fileSystemWatcher_Renamed(object sender, RenamedEventArgs e)
         {
             // on renamed
             Logger.WriteLine($"[INFO]: Mod directory change detected - event: {e.ChangeType.ToString()} file: '{e.FullPath}'", true);
+        }
+
+        private void ModEntryDelete(Mod mod)
+        {
+            Exception exception = null;
+
+            try
+            {
+                File.Delete(mod.FullName);
+            }
+            catch (Exception ex)
+            {
+                exception = ex;
+                Logger.WriteLine($"Failed to delete file: {mod.FullName}", true, ex);
+            }
+            finally
+            {
+                if (exception == null)
+                {
+                    Logger.WriteLine($"Deleted file: {mod.FullName}", true);
+                    Mods.RemoveAt(Mods.IndexOf(mod));
+                }
+            }
+        }
+
+        private void ModEntryAdd(string filename)
+        {
+            // If the file does not end with .zip, skip it
+            if (!filename.EndsWith(".zip"))
+                return;
+
+            // Get info.json as string
+            string infoJsonString = JsonHelpers.GetModInfoJsonString(filename);
+
+            // If unable to read info from archive - flag an error in file entry
+            if (string.IsNullOrEmpty(infoJsonString))
+            {
+                Logger.WriteLine($"Error: Could not get infoJsonString from file: {filename} - String is null", true);
+
+                // Add to collection with has error flag
+                Mods.Add(new Mod { Title = filename, Name = filename, FullName = filename, HasError = true });
+
+                // Skip rest of the execution
+                return;
+            }
+
+            // Deserialize the json string to infojson object
+            var infoJson = JsonConvert.DeserializeObject<InfoJson>(infoJsonString);
+
+            if (infoJson != null)
+            {
+                // Check for duplicates
+                if (Mods.Any(x => x.Name == infoJson.Name))
+                {
+                    Logger.WriteLine($"Duplicated mod found: {infoJson.Name}");
+                }
+
+                // Create mod
+                var mod = new Mod()
+                {
+                    Name = infoJson.Name,
+                    Title = infoJson.Title,
+                    Description = infoJson.Description.Replace("\n", ""), // remove newlines
+                    FactorioVersion = infoJson.FactorioVersion,
+                    InstalledVersion = infoJson.Version,
+                    Author = infoJson.Author,
+                    Homepage = infoJson.Homepage != null && infoJson.Homepage.StartsWith("http") ? infoJson.Homepage : null, // add only valid urls
+                    Dependencies = infoJson.Dependencies,
+                    FullName = filename,
+                    Filename = Path.GetFileName(filename),
+                    FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(filename)
+                };
+
+                // Set dependencies
+                if (mod.Dependencies != null)
+                {
+                    foreach (var dep in mod.Dependencies)
+                    {
+                        var depStr = dep.ToString();
+
+                        var dependency = new Dependency();
+
+                        // set optional deps
+                        if (depStr.StartsWith("?"))
+                        {
+                            dependency.IsOptional = true;
+                            mod.HasOptionalDependencies = true;
+                            depStr = depStr.Replace("?", "").Trim();
+                        }
+
+                        // set name
+                        dependency.Name = depStr;
+
+                        // Skip base mod
+                        if (dependency.Name.StartsWith("base", StringComparison.OrdinalIgnoreCase))
+                            continue;
+
+                        mod.DependenciesCollection.Add(dependency);
+                    }
+                }
+
+                // Add to collection
+                Mods.Add(mod);
+            }
         }
     }
 }
