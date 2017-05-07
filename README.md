@@ -1,5 +1,5 @@
-# FactorioSupervisor
-A Factorio launcher and mod manager
+# Factorio Supervisor
+A Factorio mod manager and launcher
 
 ## Features
 - Automatically download mod updates.
