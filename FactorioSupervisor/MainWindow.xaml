@@ -38,6 +38,7 @@
 
         <CollectionViewSource x:Key="DependenciesVs" Source="{Binding Path=ModsVm.SelectedMod.DependenciesCollection}" IsLiveSortingRequested="True">
             <CollectionViewSource.SortDescriptions>
+                <componentModel:SortDescription PropertyName="IsOptional" />
                 <componentModel:SortDescription PropertyName="Name" />
             </CollectionViewSource.SortDescriptions>
         </CollectionViewSource>
@@ -334,77 +335,61 @@
                                 <StackPanel Grid.Row="1" Grid.Column="1" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,-4,0,0">
                                     
                                     <!-- required -->
-                                    <ListBox Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}" Margin="0,0,0,8">
+                                    <ListBox Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}" SelectedItem="{Binding Path=ModsVm.SelectedDependency}" Margin="0,0,0,8">
                                         <ListBox.ItemContainerStyle>
                                             <Style BasedOn="{StaticResource DependeciesListBoxItem}" TargetType="{x:Type ListBoxItem}">
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Path=IsOptional}" Value="True">
-                                                        <Setter Property="Visibility" Value="Collapsed" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
+                                                <!-- null -->
                                             </Style>
                                         </ListBox.ItemContainerStyle>
                                         <ListBox.ItemTemplate>
                                             <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Rectangle Width="5" Height="5" Margin="0,3,8,0">
-                                                        <Rectangle.Style>
-                                                            <Style TargetType="{x:Type Rectangle}">
-                                                                <Setter Property="Fill" Value="#FF404040" />
+                                                <Grid Margin="8,4">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition />
+                                                        <ColumnDefinition Width="Auto" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <StackPanel Orientation="Horizontal">
+
+                                                        <!-- Optional -->
+                                                        <TextBlock>
+                                                            <TextBlock.Style>
+                                                                <Style BasedOn="{StaticResource PropertyDescriptorTextBlock}" TargetType="{x:Type TextBlock}">
+                                                                    <Style.Triggers>
+                                                                        <DataTrigger Binding="{Binding Path=IsOptional}" Value="True">
+                                                                            <Setter Property="Text" Value="OPTIONAL:" />
+                                                                            <Setter Property="Margin" Value="0,0,8,0" />
+                                                                        </DataTrigger>
+                                                                    </Style.Triggers>
+                                                                </Style>
+                                                            </TextBlock.Style>
+                                                        </TextBlock>
+
+                                                        <!-- Name -->
+                                                        <TextBlock Text="{Binding Path=Name}" />
+
+                                                    </StackPanel>
+
+                                                    <!-- Is installed -->
+                                                    <TextBlock Grid.Column="1">
+                                                        <TextBlock.Style>
+                                                            <Style BasedOn="{StaticResource PropertyDescriptorTextBlock}" TargetType="{x:Type TextBlock}">
+                                                                <Setter Property="Text" Value="Not installed" />
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding Path=IsInstalled}" Value="True">
-                                                                        <Setter Property="Fill" Value="{StaticResource AccentColorLight}" />
+                                                                        <Setter Property="Text" Value="Installed" />
+                                                                        <Setter Property="Foreground" Value="#B2FFFFFF" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
-                                                        </Rectangle.Style>
-                                                    </Rectangle>
-                                                    <TextBlock Text="{Binding Path=Name}" />
-                                                </StackPanel>
+                                                        </TextBlock.Style>
+                                                    </TextBlock>
+
+                                                </Grid>
                                             </DataTemplate>
                                         </ListBox.ItemTemplate>
                                         <ListBox.ContextMenu>
                                             <ContextMenu>
-                                                <MenuItem Header="Install (coming...)" />
-                                            </ContextMenu>
-                                        </ListBox.ContextMenu>
-                                    </ListBox>
-                                    
-                                    <!-- optional -->
-                                    <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="Optional" Visibility="{Binding Path=ModsVm.SelectedMod.HasOptionalDependencies, Converter={StaticResource ValueToVisibilityConverter}}" />
-                                    <ListBox Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}">
-                                        <ListBox.ItemContainerStyle>
-                                            <Style BasedOn="{StaticResource DependeciesListBoxItem}" TargetType="{x:Type ListBoxItem}">
-                                                <Setter Property="Visibility" Value="Collapsed" />
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Path=IsOptional}" Value="True">
-                                                        <Setter Property="Visibility" Value="Visible" />
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </ListBox.ItemContainerStyle>
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <Rectangle Width="5" Height="5" Margin="0,3,8,0">
-                                                        <Rectangle.Style>
-                                                            <Style TargetType="{x:Type Rectangle}">
-                                                                <Setter Property="Fill" Value="#FF404040" />
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Path=IsInstalled}" Value="True">
-                                                                        <Setter Property="Fill" Value="{StaticResource AccentColorLight}" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </Rectangle.Style>
-                                                    </Rectangle>
-                                                    <TextBlock Text="{Binding Path=Name}" />
-                                                </StackPanel>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                        <ListBox.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Install (coming...)" />
+                                                <MenuItem Header="Install mod" Command="{Binding Path=ModsVm.InstallDependencyModCmd}" IsEnabled="{Binding Path=ModsVm.SelectedDependency.IsInstalled, Converter={StaticResource InvertedBooleanConverter}}" />
                                             </ContextMenu>
                                         </ListBox.ContextMenu>
                                     </ListBox>
@@ -505,7 +490,7 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Foreground="#B2FFFFFF" Margin="0,0,0,5" TextTrimming="CharacterEllipsis">
-                                <Run Text="{Binding Path=ModsVm.CurrentUpdatingMod.Title, StringFormat={}Updating: {0}, TargetNullValue=Warming up...}" />
+                                <Run Text="{Binding Path=ModsVm.CurrentUpdatingMod.Title, StringFormat={}Updating: {0}, TargetNullValue='Warming up...', FallbackValue='Warming up...'}" />
                                 <Run Text="{Binding Path=ModsVm.CurrentUpdatingMod.ProgressPercentage, StringFormat={} - {0}%}" />
                             </TextBlock>
                             <TextBlock Grid.Column="1" Text="{Binding Path=ModsVm.UpdateTotalProgress, StringFormat={}Total: {0}%}" Foreground="#B2FFFFFF" HorizontalAlignment="Right" Margin="0,0,0,5" />

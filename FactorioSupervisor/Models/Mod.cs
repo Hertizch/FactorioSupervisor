@@ -1,4 +1,5 @@
 ﻿using FactorioSupervisor.Extensions;
+using FactorioSupervisor.ObservableImmutable;
 using Newtonsoft.Json.Linq;
 using System.Collections.ObjectModel;
 
@@ -8,7 +9,7 @@ namespace FactorioSupervisor.Models
     {
         public Mod()
         {
-            DependenciesCollection = new ObservableCollection<Dependency>();
+            DependenciesCollection = new ObservableImmutableList<Dependency>();
         }
 
         private string _filename;
@@ -33,7 +34,7 @@ namespace FactorioSupervisor.Models
         private int _progressPercentage;
         private bool _hasError;
         private bool _hideInModList;
-        private ObservableCollection<Dependency> _dependenciesCollection;
+        private ObservableImmutableList<Dependency> _dependenciesCollection;
         private bool _hasOptionalDependencies;
 
         /// <summary>
@@ -237,7 +238,7 @@ namespace FactorioSupervisor.Models
         /// <summary>
         /// Gets or sets the dependencies collection
         /// </summary>
-        public ObservableCollection<Dependency> DependenciesCollection
+        public ObservableImmutableList<Dependency> DependenciesCollection
         {
             get { return _dependenciesCollection; }
             set { if (value == _dependenciesCollection) return; _dependenciesCollection = value; OnPropertyChanged(nameof(DependenciesCollection)); }

@@ -33,7 +33,7 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border Name="Scroller" Background="#CC5F5F5F" />
+                    <Border Name="Scroller" Background="#FF303030" />
                     <ControlTemplate.Triggers>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>

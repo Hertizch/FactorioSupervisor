@@ -7,6 +7,8 @@ namespace FactorioSupervisor.Models
         private string _name;
         private bool _isOptional;
         private bool _isInstalled;
+        private string _remoteFilename;
+        private string _downloadUrl;
 
         /// <summary>
         /// Gets or sets the name of the dependency
@@ -33,6 +35,24 @@ namespace FactorioSupervisor.Models
         {
             get { return _isInstalled; }
             set { if (value == _isInstalled) return; _isInstalled = value; OnPropertyChanged(nameof(IsInstalled)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the filename of the latest release
+        /// </summary>
+        public string RemoteFilename
+        {
+            get { return _remoteFilename; }
+            set { if (value == _remoteFilename) return; _remoteFilename = value; OnPropertyChanged(nameof(RemoteFilename)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the latest version download url
+        /// </summary>
+        public string DownloadUrl
+        {
+            get { return _downloadUrl; }
+            set { if (value == _downloadUrl) return; _downloadUrl = value; OnPropertyChanged(nameof(DownloadUrl)); }
         }
     }
 }

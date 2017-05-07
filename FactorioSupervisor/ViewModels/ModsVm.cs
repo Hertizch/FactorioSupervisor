@@ -13,6 +13,7 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Threading;
@@ -44,17 +45,10 @@ namespace FactorioSupervisor.ViewModels
                     Homepage = "https://forums.factorio.com/viewtopic.php?f=93&t=38475",
                     Dependencies = new JArray
                     {
-                        "base >= 0.14.21",
-                        "data-raw-prototypes >= 0.2.1",
                         "?aai-vehicles-flame-tumbler >= 0.2.1",
                         "?aai-vehicles-laser-tank >= 0.2.1",
                         "?bullet-trails >= 0.2.1",
                         "aai-programmable-structures >= 0.3.1",
-                        "aai-zones >= 0.2.1",
-                        "detached-gun-sounds >= 0.2.1",
-                        "off-grid-effects >= 0.2.1",
-                        "aai-signals >= 0.2.1",
-                        "aai-vehicles-miner >= 0.2.1",
                         "aai-vehicles-hauler >= 0.2.1",
                         "?aai-vehicles-chaingunner >= 0.2.1"
                     },
@@ -109,6 +103,7 @@ namespace FactorioSupervisor.ViewModels
 
         private ObservableImmutableList<Mod> _mods;
         private Mod _selectedMod;
+        private Dependency _selectedDependency;
         private bool _isCheckingForUpdates;
         private bool _isUpdating;
         private double _updateTotalProgress;
@@ -126,6 +121,7 @@ namespace FactorioSupervisor.ViewModels
         private RelayCommand _launchFactorioCmd;
         private RelayCommand _watchModDirChangesCmd;
         private RelayCommand _deleteModCmd;
+        private RelayCommand _installDependencyModCmd;
 
         /*
          * Properties
@@ -147,6 +143,15 @@ namespace FactorioSupervisor.ViewModels
         {
             get { return _selectedMod; }
             set { if (value == _selectedMod) return; _selectedMod = value; OnPropertyChanged(nameof(SelectedMod)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the currently selected mod dependency
+        /// </summary>
+        public Dependency SelectedDependency
+        {
+            get { return _selectedDependency; }
+            set { if (value == _selectedDependency) return; _selectedDependency = value; OnPropertyChanged(nameof(SelectedDependency)); }
         }
 
         /// <summary>
@@ -287,9 +292,113 @@ namespace FactorioSupervisor.ViewModels
         public RelayCommand DeleteModCmd => _deleteModCmd ??
             (_deleteModCmd = new RelayCommand(Execute_DeleteModCmd, p => true));
 
+        public RelayCommand InstallDependencyModCmd => _installDependencyModCmd ??
+            (_installDependencyModCmd = new RelayCommand(p => Execute_InstallDependencyModCmd(p as Dependency), p => true));
+
         /*
          * Methods
          */
+
+        private async void Execute_InstallDependencyModCmd(Dependency dependency)
+        {
+            Logger.WriteLine($"Selected dep: {dependency.Name}");
+
+            IsUpdating = true;
+
+            string downloadUrl = null;
+            string remoteFilename = null;
+            Mod selectedMod = SelectedMod;
+
+            // Create api class
+            var modPortalApi = new ModPortalApi();
+
+            Logger.WriteLine($"Attempting connection with mod portal (https://mods.factorio.com/api/mods)...");
+
+            // Check if api is reachable
+            if (await modPortalApi.CanReachApi())
+            {
+                Logger.WriteLine($"Connection successfull!");
+
+                // Build the request string
+                var sb = new StringBuilder();
+                sb.Append("?page_size=max");
+                sb.Append($"&namelist={selectedMod.DependenciesCollection.First(x => x.Name == dependency.Name).Name}");
+
+                Logger.WriteLine($"Created Mod Portal Api request: {sb.ToString()}", true);
+
+                // Build the Api Data
+                await modPortalApi.BuildApiData(sb.ToString());
+
+                // Get download link and remote filename
+                downloadUrl = modPortalApi.ApiData.Results.First().Releases.First().DownloadUrl;
+                remoteFilename = modPortalApi.ApiData.Results.First().Releases.First().FileName;
+            }
+
+            var authenticationApi = new AuthenticationApi();
+
+            // Get vars from configVm
+            var settings = BaseVm.ConfigVm;
+            var username = settings.ModPortalUsername;
+            var password = settings.ModPortalPassword;
+
+            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+            {
+                Logger.WriteLine($"Aquiring authentication with mod portal...");
+
+                // Get authentication token
+                var token = await authenticationApi.GetAuthenticationToken(username, password, true);
+
+                if (authenticationApi.Success)
+                {
+                    Logger.WriteLine($"Authentication successful!");
+
+                    // Wait 500ms
+                    await Task.Delay(500);
+
+                    Exception exception = null;
+
+                    // Create the webclient
+                    using (var webClient = new WebClient { Proxy = null })
+                    {
+                        Logger.WriteLine($"Started download of: {downloadUrl}", true);
+
+                        // Report progress to mod object
+                        webClient.DownloadProgressChanged += (sender, args) =>
+                        {
+                            //
+                        };
+
+                        // Execute download
+                        try
+                        {
+                            await webClient.DownloadFileTaskAsync($"https://mods.factorio.com{downloadUrl}?username={username}&token={token}", Path.Combine(BaseVm.ConfigVm.ModsPath, remoteFilename));
+                        }
+                        catch (Exception ex)
+                        {
+                            exception = ex;
+                            Logger.WriteLine($"Error in method {nameof(ExecuteDownload)}", true, ex);
+                            Logger.WriteLine($"File download failed of: {downloadUrl}", true, ex);
+                        }
+                        finally
+                        {
+                            if (exception == null)
+                            {
+                                _fileDownloadSucceeded = true;
+                                Logger.WriteLine($"Successfully downloaded file: {downloadUrl}", true);
+
+                                await Task.Delay(500);
+
+                                ModEntryAdd(Path.Combine(BaseVm.ConfigVm.ModsPath, remoteFilename));
+
+                                selectedMod.DependenciesCollection.First(x => x.Name == dependency.Name).IsInstalled = true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            IsUpdating = false;
+        }
 
         private void Execute_GetLocalModsCmd(object obj)
         {
@@ -444,6 +553,7 @@ namespace FactorioSupervisor.ViewModels
             CurrentUpdatingMod = null;
 
             var totalUpdateCount = Mods.Count(x => x.UpdateAvailable);
+            double updateCount = 0;
 
             var authenticationApi = new AuthenticationApi();
 
@@ -512,7 +622,8 @@ namespace FactorioSupervisor.ViewModels
                         mod.IsUpdating = false;
 
                         // Calculate UpdateTotalProgress
-                        UpdateTotalProgress = ((double)Mods.Count(x => x.UpdateAvailable) / totalUpdateCount) * 100;
+                        updateCount++;
+                        UpdateTotalProgress = (updateCount / totalUpdateCount) * 100;
                     }
 
                     // Reset IsUpdatesAvailable flag
@@ -568,6 +679,12 @@ namespace FactorioSupervisor.ViewModels
                     {
                         _fileDownloadSucceeded = true;
                         Logger.WriteLine($"Successfully downloaded file: {mod.DownloadUrl}", true);
+                    }
+                    else
+                    {
+                        // Delete partial file if error downloading
+                        if (File.Exists(Path.Combine(BaseVm.ConfigVm.ModsPath, mod.RemoteFilename)))
+                            File.Delete(Path.Combine(BaseVm.ConfigVm.ModsPath, mod.RemoteFilename));
                     }
                 }
             }
@@ -765,6 +882,18 @@ namespace FactorioSupervisor.ViewModels
                     foreach (var dep in mod.Dependencies)
                     {
                         var depStr = dep.ToString();
+
+                        if (depStr.Contains(">="))
+                        {
+                            depStr = Regex.Replace(depStr, ">=(?:.*)", "");
+                            depStr.Trim();
+                        }
+
+                        if (depStr.Contains("<"))
+                        {
+                            depStr = Regex.Replace(depStr, "<(?:.*)", "");
+                            depStr.Trim();
+                        }
 
                         var dependency = new Dependency();
 
