@@ -26,12 +26,12 @@ namespace FactorioSupervisor.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string FactorioExePath {
+        public string FactorioPath {
             get {
-                return ((string)(this["FactorioExePath"]));
+                return ((string)(this["FactorioPath"]));
             }
             set {
-                this["FactorioExePath"] = value;
+                this["FactorioPath"] = value;
             }
         }
         
@@ -62,12 +62,12 @@ namespace FactorioSupervisor.Properties {
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string ModPortalPassword {
+        public string ModPortalAuthToken {
             get {
-                return ((string)(this["ModPortalPassword"]));
+                return ((string)(this["ModPortalAuthToken"]));
             }
             set {
-                this["ModPortalPassword"] = value;
+                this["ModPortalAuthToken"] = value;
             }
         }
         

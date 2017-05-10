@@ -122,6 +122,7 @@ namespace FactorioSupervisor.ViewModels
         private RelayCommand _watchModDirChangesCmd;
         private RelayCommand _deleteModCmd;
         private RelayCommand _installDependencyModCmd;
+        private RelayCommand _itemEntryUpdateCmd;
 
         /*
          * Properties
@@ -236,7 +237,7 @@ namespace FactorioSupervisor.ViewModels
                 _hideIncompatibleMods = value;
                 OnPropertyChanged(nameof(HideIncompatibleMods));
 
-                if (HideIncompatibleMods)
+                if (HideIncompatibleMods && BaseVm.ConfigVm.CurrentFactorioBranch != null)
                 {
                     foreach (var mod in Mods)
                     {
@@ -254,13 +255,11 @@ namespace FactorioSupervisor.ViewModels
                             mod.HideInModList = false;
                     }
                 }
-                else
+                else if(!HideIncompatibleMods && BaseVm.ConfigVm.CurrentFactorioBranch != null)
                 {
                     foreach (var mod in Mods)
                         mod.HideInModList = false;
                 }
-
-
             }
         }
 
@@ -284,7 +283,7 @@ namespace FactorioSupervisor.ViewModels
             (_downloadModCmd = new RelayCommand(Execute_DownloadModCmd, p => true));
 
         public RelayCommand LaunchFactorioCmd => _launchFactorioCmd ??
-            (_launchFactorioCmd = new RelayCommand(Execute_LaunchFactorioCmd, p => File.Exists(BaseVm.ConfigVm.FactorioExePath)));
+            (_launchFactorioCmd = new RelayCommand(Execute_LaunchFactorioCmd, p => File.Exists(BaseVm.ConfigVm.FactorioPath)));
 
         public RelayCommand WatchModDirChangesCmd => _watchModDirChangesCmd ??
             (_watchModDirChangesCmd = new RelayCommand(Execute_WatchModDirChangesCmd, p => Directory.Exists(BaseVm.ConfigVm.ModsPath)));
@@ -294,6 +293,9 @@ namespace FactorioSupervisor.ViewModels
 
         public RelayCommand InstallDependencyModCmd => _installDependencyModCmd ??
             (_installDependencyModCmd = new RelayCommand(p => Execute_InstallDependencyModCmd(p as Dependency), p => true));
+
+        public RelayCommand ItemEntryUpdateCmd => _itemEntryUpdateCmd ??
+            (_itemEntryUpdateCmd = new RelayCommand(Execute_ItemEntryUpdateCmd, p => true));
 
         /*
          * Methods
@@ -339,7 +341,7 @@ namespace FactorioSupervisor.ViewModels
             // Get vars from configVm
             var settings = BaseVm.ConfigVm;
             var username = settings.ModPortalUsername;
-            var password = settings.ModPortalPassword;
+            var password = settings.ModPortalAuthToken;
 
             if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
             {
@@ -388,7 +390,7 @@ namespace FactorioSupervisor.ViewModels
 
                                 await Task.Delay(500);
 
-                                ModEntryAdd(Path.Combine(BaseVm.ConfigVm.ModsPath, remoteFilename));
+                                ItemEntryAdd(Path.Combine(BaseVm.ConfigVm.ModsPath, remoteFilename));
 
                                 selectedMod.DependenciesCollection.First(x => x.Name == dependency.Name).IsInstalled = true;
                             }
@@ -411,7 +413,7 @@ namespace FactorioSupervisor.ViewModels
 
             // Loop all entries and add to collection
             foreach (var fileEntry in fileEntries)
-                ModEntryAdd(fileEntry);
+                ItemEntryAdd(fileEntry);
 
             // Check for installed dependencies
             foreach (var mod in Mods)
@@ -483,7 +485,7 @@ namespace FactorioSupervisor.ViewModels
             // Create api class
             var modPortalApi = new ModPortalApi();
 
-            Logger.WriteLine($"Attempting connection with mod portal (https://mods.factorio.com/api/mods)...");
+            Logger.WriteLine($"Attempting connection with mod portal...");
 
             // Check if api is reachable
             if (await modPortalApi.CanReachApi())
@@ -549,98 +551,74 @@ namespace FactorioSupervisor.ViewModels
 
         private async void Execute_DownloadModCmd(object obj)
         {
+            Logger.WriteLine($"Attempting connection with mod portal...");
+
+            // Verify/Get authentication
+            await VerifyAuthentication();
+
             IsUpdating = true;
             CurrentUpdatingMod = null;
-
             var totalUpdateCount = Mods.Count(x => x.UpdateAvailable);
             double updateCount = 0;
-
-            var authenticationApi = new AuthenticationApi();
 
             // Get vars from configVm
             var settings = BaseVm.ConfigVm;
             var username = settings.ModPortalUsername;
-            var password = settings.ModPortalPassword;
+            var token = settings.ModPortalAuthToken;
 
-            if (!string.IsNullOrWhiteSpace(username) && !string.IsNullOrWhiteSpace(password))
+            // Loop all mods with UpdateAvailable flag
+            foreach (var mod in Mods.Where(x => x.UpdateAvailable))
             {
-                Logger.WriteLine($"Aquiring authentication with mod portal...");
+                CurrentUpdatingMod = mod;
+                mod.IsUpdating = true;
 
-                // Get authentication token
-                var token = await authenticationApi.GetAuthenticationToken(username, password, true);
+                // Execute the download
+                await ExecuteDownload(mod, username, token);
 
-                if (authenticationApi.Success)
+                // If successfull
+                if (_fileDownloadSucceeded)
                 {
-                    Logger.WriteLine($"Authentication successful!");
+                    Exception exception = null;
+
+                    // Delete old mod file
+                    try
+                    {
+                        File.Delete(mod.FullName);
+                    }
+                    catch (Exception ex)
+                    {
+                        exception = ex;
+                        Logger.WriteLine($"Failed to delete file: {mod.FullName}", true, ex);
+                    }
+                    finally
+                    {
+                        if (exception == null)
+                            Logger.WriteLine($"Deleted old file: {mod.FullName}", true);
+                    }
 
                     // Wait 500ms
                     await Task.Delay(500);
 
-                    // Loop all mods with UpdateAvailable flag
-                    foreach (var mod in Mods.Where(x => x.UpdateAvailable))
-                    {
-                        CurrentUpdatingMod = mod;
-                        mod.IsUpdating = true;
-
-                        // Execute the download
-                        await ExecuteDownload(mod, username, token);
-
-                        // If successfull
-                        if (_fileDownloadSucceeded)
-                        {
-                            Exception exception = null;
-
-                            // Delete old mod file
-                            try
-                            {
-                                File.Delete(mod.FullName);
-                            }
-                            catch (Exception ex)
-                            {
-                                exception = ex;
-                                Logger.WriteLine($"Failed to delete file: {mod.FullName}", true, ex);
-                            }
-                            finally
-                            {
-                                if (exception == null)
-                                    Logger.WriteLine($"Deleted old file: {mod.FullName}", true);
-                            }
-
-                            // Wait 500ms
-                            await Task.Delay(500);
-
-                            // Set new/reset properties
-                            mod.UpdateAvailable = false;
-                            mod.InstalledVersion = mod.RemoteVersion;
-                            mod.FactorioVersion = mod.RemoteFactorioVersion;
-                            mod.FullName = Path.Combine(settings.ModsPath, mod.RemoteFilename);
-                            mod.Filename = mod.RemoteFilename;
-                            mod.FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(mod.RemoteFilename);
-                            mod.ProgressPercentage = 0;
-                        }
-
-                        mod.IsUpdating = false;
-
-                        // Calculate UpdateTotalProgress
-                        updateCount++;
-                        UpdateTotalProgress = (updateCount / totalUpdateCount) * 100;
-                    }
-
-                    // Reset IsUpdatesAvailable flag
-                    if (Mods.Count(x => x.UpdateAvailable) == 0)
-                        IsUpdatesAvailable = false;
+                    // Set new/reset properties
+                    mod.UpdateAvailable = false;
+                    mod.InstalledVersion = mod.RemoteVersion;
+                    mod.FactorioVersion = mod.RemoteFactorioVersion;
+                    mod.FullName = Path.Combine(settings.ModsPath, mod.RemoteFilename);
+                    mod.Filename = mod.RemoteFilename;
+                    mod.FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(mod.RemoteFilename);
+                    mod.ProgressPercentage = 0;
                 }
-                else
-                {
-                    Logger.WriteLine($"Authentication failed - Error message: {authenticationApi.ErrorMessage}");
-                    BaseVm.NotifyBannerRelay.SetNotifyBanner("Authentication failed!");
-                }
+
+                mod.IsUpdating = false;
+
+                // Calculate UpdateTotalProgress
+                updateCount++;
+                UpdateTotalProgress = (updateCount / totalUpdateCount) * 100;
             }
-            else
-            {
-                Logger.WriteLine($"Authentication failed - Username and/or password is null", true);
-                BaseVm.NotifyBannerRelay.SetNotifyBanner("Authentication failed!");
-            }
+
+            // Reset IsUpdatesAvailable flag
+            if (Mods.Count(x => x.UpdateAvailable) == 0)
+                IsUpdatesAvailable = false;
 
             IsUpdating = false;
         }
@@ -733,11 +711,19 @@ namespace FactorioSupervisor.ViewModels
             // Wait 500ms
             await Task.Delay(500);
 
+            string factorioExe = Path.Combine(BaseVm.ConfigVm.FactorioPath, @"bin\x64\factorio.exe");
+            if (!File.Exists(factorioExe))
+            {
+                BaseVm.NotifyBannerRelay.SetNotifyBanner($"Cannot launch Factorio. File not found!");
+                Logger.WriteLine($"Executable file does not exist: {factorioExe}", true);
+                return;
+            }
+
             // Create and start process
             using (var process = new Process())
             {
                 {
-                    process.StartInfo.FileName = BaseVm.ConfigVm.FactorioExePath;
+                    process.StartInfo.FileName = factorioExe;
                     process.Start();
                 }
             }
@@ -787,7 +773,7 @@ namespace FactorioSupervisor.ViewModels
             if (IsUpdating)
                 return;
 
-            ModEntryAdd(e.FullPath);
+            ItemEntryAdd(e.FullPath);
         }
 
         private void _fileSystemWatcher_Deleted(object sender, FileSystemEventArgs e)
@@ -803,6 +789,12 @@ namespace FactorioSupervisor.ViewModels
         {
             // on renamed
             Logger.WriteLine($"[INFO]: Mod directory change detected - event: {e.ChangeType.ToString()} file: '{e.FullPath}'", true);
+        }
+
+        private async Task<string> GetAuthenticationToken(string username, string password)
+        {
+            var authenticationApi = new AuthenticationApi();
+            return await authenticationApi.GetAuthenticationToken(username, password, true);
         }
 
         private void ModEntryDelete(Mod mod)
@@ -828,7 +820,82 @@ namespace FactorioSupervisor.ViewModels
             }
         }
 
-        private void ModEntryAdd(string filename)
+        private void Execute_ItemEntryUpdateCmd(object obj)
+        {
+            
+        }
+
+        private async Task VerifyAuthentication()
+        {
+            // Is auth token from configVm is null
+            if (string.IsNullOrWhiteSpace(BaseVm.ConfigVm.ModPortalAuthToken))
+            {
+                // Open message box to user
+                BaseVm.MessageBoxRelay.SetMessageBox(ResourceHelper.GetValue("MessageBoxAuthTitle"), ResourceHelper.GetValue("MessageBoxAuthValue"));
+            }
+            else
+            {
+                // Check if we can download anything
+                using (var webClient = new WebClient { Proxy = null })
+                {
+                    webClient.OpenReadCompleted += (sender, args) =>
+                    {
+                        if (args.Error == null)
+                            Logger.WriteLine($"[AUTH]: Successfully authenticated with mod portal with username: '{BaseVm.ConfigVm.ModPortalUsername}' and password: [SECRET]", true);
+                    };
+
+                    try
+                    {
+                        await webClient.OpenReadTaskAsync($"https://mods.factorio.com/api/downloads/data/mods/34/rso-mod_3.2.1.zip?username={BaseVm.ConfigVm.ModPortalUsername}&token={BaseVm.ConfigVm.ModPortalAuthToken}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Logger.WriteLine($"[AUTH]: Failed authentication with mod portal with username: '{BaseVm.ConfigVm.ModPortalUsername}' and password: [SECRET]", true, ex);
+
+                        // Attempt authentication
+                        var authenticationApi = new AuthenticationApi();
+
+                        // Get/set vars
+                        string username = BaseVm.ConfigVm.ModPortalUsername;
+                        string password = BaseVm.ConfigVm.ModPortalPassword;
+                        string authToken = null;
+
+                        // Get token
+                        try
+                        {
+                            authToken = await authenticationApi.GetAuthenticationToken(username, password, true);
+                        }
+                        catch (Exception)
+                        {
+                            // ignored
+                        }
+
+                        // Is success or fail
+                        if (authenticationApi.Success)
+                        {
+                            Logger.WriteLine($"[AUTH]: Successfully authenticated with mod portal with username: '{BaseVm.ConfigVm.ModPortalUsername}' and password: [SECRET]", true);
+
+                            // Set auth token to configVm
+                            BaseVm.ConfigVm.ModPortalAuthToken = authToken;
+                        }
+                        else
+                        {
+                            Logger.WriteLine($"[AUTH]: Failed authentication with mod portal with username: '{BaseVm.ConfigVm.ModPortalUsername}' and password: [SECRET]", true);
+
+                            // Open message box to user
+                            BaseVm.MessageBoxRelay.SetMessageBox(ResourceHelper.GetValue("MessageBoxAuthTitle"), ResourceHelper.GetValue("MessageBoxAuthValue"));
+
+                            // Re-try
+                            await VerifyAuthentication();
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+        private void ItemEntryAdd(string filename)
         {
             // If the file does not end with .zip, skip it
             if (!filename.EndsWith(".zip"))

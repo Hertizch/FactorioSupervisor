@@ -11,10 +11,12 @@
                 <ControlTemplate TargetType="{x:Type CheckBox}">
                     <Grid Background="{TemplateBinding Background}">
                         <StackPanel Orientation="Horizontal">
-                            <Viewbox Width="15" Margin="0,0,8,0">
-                                <Path x:Name="Icon" Data="{DynamicResource IconCheckmarkUnchecked}" Stretch="Uniform" Fill="{TemplateBinding Foreground}" />
+                            <Viewbox Width="16" Height="16">
+                                <Canvas Width="24" Height="24">
+                                    <Path x:Name="Icon" Data="{DynamicResource IconCheckmarkUnchecked}" Fill="{TemplateBinding Foreground}" />
+                                </Canvas>
                             </Viewbox>
-                            <ContentPresenter />
+                            <ContentPresenter Margin="8,0,0,0" />
                         </StackPanel>
                     </Grid>
                     <ControlTemplate.Triggers>
@@ -41,10 +43,12 @@
                 <ControlTemplate TargetType="{x:Type CheckBox}">
                     <Grid Background="{TemplateBinding Background}">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <Viewbox Width="15" Margin="0,0,8,0">
-                                <Path x:Name="Icon" Data="{DynamicResource IconCheckmarkUnchecked}" Stretch="Uniform" Fill="#33FFFFFF" />
+                            <Viewbox Width="16" Height="16">
+                                <Canvas Width="24" Height="24">
+                                    <Path x:Name="Icon" Data="{DynamicResource IconCheckmarkUnchecked}" Fill="{TemplateBinding Foreground}" />
+                                </Canvas>
                             </Viewbox>
-                            <ContentPresenter />
+                            <ContentPresenter Margin="8,0,0,0" />
                         </StackPanel>
                     </Grid>
                     <ControlTemplate.Triggers>

@@ -31,4 +31,35 @@
         </Setter>
     </Style>
 
+    <Style x:Key="MessageBoxWindow" TargetType="{x:Type Window}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="WindowStyle" Value="None" />
+        <Setter Property="Background" Value="{StaticResource BaseBackgroundColor}" />
+        <Setter Property="ResizeMode" Value="CanResize" />
+        <Setter Property="Title" Value="Factorio Supervisor" />
+        <Setter Property="MinWidth" Value="550" />
+        <Setter Property="SizeToContent" Value="Height" />
+        <Setter Property="Width" Value="550" />
+        <Setter Property="WindowChrome.WindowChrome">
+            <Setter.Value>
+                <WindowChrome
+                    CaptionHeight="35"
+                    CornerRadius="0"
+                    GlassFrameThickness="0,0,0,1"
+                    ResizeBorderThickness="5"
+                    UseAeroCaptionButtons="False" />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Window}">
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter />
+                    </Border>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

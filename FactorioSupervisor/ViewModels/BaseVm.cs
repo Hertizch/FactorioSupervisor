@@ -9,13 +9,14 @@ namespace FactorioSupervisor.ViewModels
         public BaseVm()
         {
             Logger.WriteLine($"Class created: {nameof(BaseVm)}");
-            Logger.WriteLine("\n\n", true);
-            Logger.WriteLine($"Factorio Supervisor startup version {Assembly.GetExecutingAssembly().GetName().Version.ToString()}", true);
-            Logger.WriteLine($"Windows OS version {EnvironmentHelpers.GetOsFriendlyName()}", true);
+            Logger.WriteLine($"\nFactorio Supervisor startup version: '{Assembly.GetExecutingAssembly().GetName().Version.ToString()}'", true);
+            Logger.WriteLine($"Windows OS version: '{EnvironmentHelpers.GetOsFriendlyName()}'", true);
 
+            // Create relays
             MessageBoxRelay = new MessageBoxRelay();
             NotifyBannerRelay = new NotifyBannerRelay();
 
+            // Create view models
             ConfigVm = new ConfigVm();
             ModsVm = new ModsVm();
             ProfilesVm = new ProfilesVm();

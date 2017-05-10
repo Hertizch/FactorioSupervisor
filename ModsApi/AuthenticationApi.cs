@@ -23,6 +23,12 @@ namespace ModsApi
 
         public async Task<string> GetAuthenticationToken(string userName, string password, bool requireGameOwnership)
         {
+            if (string.IsNullOrEmpty(userName))
+                return null;
+
+            if (string.IsNullOrEmpty(password))
+                return null;
+
             Debug.WriteLine($"Method called: {nameof(GetAuthenticationToken)}, param name: {nameof(userName)}, value: {userName}, param name: {nameof(password)}, value: [private], param name: {nameof(requireGameOwnership)}, value: {requireGameOwnership}");
 
             // Initialize the response as a byte array

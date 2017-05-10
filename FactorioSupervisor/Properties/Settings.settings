@@ -2,7 +2,7 @@
 <SettingsFile xmlns="http://schemas.microsoft.com/VisualStudio/2004/01/settings" CurrentProfile="(Default)" GeneratedClassNamespace="FactorioSupervisor.Properties" GeneratedClassName="Settings">
   <Profiles />
   <Settings>
-    <Setting Name="FactorioExePath" Type="System.String" Scope="User">
+    <Setting Name="FactorioPath" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="ModsPath" Type="System.String" Scope="User">
@@ -11,7 +11,7 @@
     <Setting Name="ModPortalUsername" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
-    <Setting Name="ModPortalPassword" Type="System.String" Scope="User">
+    <Setting Name="ModPortalAuthToken" Type="System.String" Scope="User">
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="SelectedProfile" Type="System.String" Scope="User">

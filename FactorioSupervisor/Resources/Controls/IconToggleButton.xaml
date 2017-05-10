@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
              mc:Ignorable="d" 
              d:DesignHeight="35" d:DesignWidth="35">
-    <Grid Background="{Binding ElementName=IconToggleButtonControl, Path=Background}">
-        <Path Data="{Binding ElementName=IconToggleButtonControl, Path=Icon}" Fill="{Binding ElementName=IconToggleButtonControl, Path=Foreground}" Stretch="Uniform" Margin="{Binding ElementName=IconToggleButtonControl, Path=MarginCustom}" />
-    </Grid>
+    <Viewbox Width="18" Height="18">
+        <Canvas Width="24" Height="24">
+            <Path Data="{Binding ElementName=IconToggleButtonControl, Path=Icon}" Fill="{Binding ElementName=IconToggleButtonControl, Path=Foreground}" />
+        </Canvas>
+    </Viewbox>
 </ToggleButton>

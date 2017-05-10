@@ -102,7 +102,6 @@
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Foreground" Value="#B2FFFFFF" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="MarginCustom" Value="9" />
         <Setter Property="Width" Value="30" />
         <Setter Property="Height" Value="30" />
         <Setter Property="Template">
@@ -176,7 +175,6 @@
         <Setter Property="Foreground" Value="#B2FFFFFF" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="Icon" Value="{StaticResource IconDots}" />
-        <Setter Property="MarginCustom" Value="9" />
         <Setter Property="Width" Value="30" />
         <Setter Property="Template">
             <Setter.Value>

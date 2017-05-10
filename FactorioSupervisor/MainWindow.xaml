@@ -117,6 +117,8 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <StackPanel Height="30" Orientation="Horizontal">
+                            
+                            <!-- profiles button -->
                             <ComboBox x:Name="ProfilesComboBox" Style="{StaticResource ProfilesComboBox}" ItemContainerStyle="{StaticResource ProfilesComboBoxItem}" ItemsSource="{Binding Path=ProfilesVm.Profiles}" DisplayMemberPath="Name" SelectedItem="{Binding Path=ProfilesVm.SelectedProfile, Mode=OneWay}">
                                 <i:Interaction.Triggers>
                                     <i:EventTrigger SourceObject="{Binding ElementName=ProfilesComboBox}" EventName="SelectionChanged">
@@ -125,6 +127,7 @@
                                 </i:Interaction.Triggers>
                             </ComboBox>
 
+                            <!-- check updates button -->
                             <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconCheckUpdate}" Command="{Binding Path=ModsVm.GetModRemoteDataCmd}" Width="30" ToolTip="Check for updates">
                                 <c:IconButton.IsEnabled>
                                     <MultiBinding Converter="{StaticResource InvertedBooleanMultiConverter}">
@@ -133,6 +136,8 @@
                                     </MultiBinding>
                                 </c:IconButton.IsEnabled>
                             </c:IconButton>
+                            
+                            <!-- download updates button -->
                             <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconDownload}" Command="{Binding Path=ModsVm.DownloadModCmd}" Width="30" ToolTip="Update all">
                                 <c:IconButton.IsEnabled>
                                     <MultiBinding Converter="{StaticResource InvertedBooleanMultiConverter}">
@@ -141,8 +146,14 @@
                                     </MultiBinding>
                                 </c:IconButton.IsEnabled>
                             </c:IconButton>
+
+                            <!-- test message box button -->
+                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconExclamation}" Command="{Binding Path=MessageBoxRelay.ShowMessageBoxCmd}" Width="30" />
+
                         </StackPanel>
                         <StackPanel Grid.Column="1" Height="30" Orientation="Horizontal" HorizontalAlignment="Right">
+                            
+                            <!-- options button -->
                             <ComboBox Style="{StaticResource OptionsComboBox}" ItemContainerStyle="{StaticResource OptionsComboBoxItem}">
                                 <ComboBox.Items>
                                     <Button Content="Toggle all" Padding="5,4" Command="{Binding Path=ModsVm.ToggleEnableModsCmd}" />
@@ -229,7 +240,7 @@
                     <!-- Mod details -->
                     <ScrollViewer Margin="0,0,-15,0" Visibility="{Binding Path=ModsVm.SelectedMod, Converter={StaticResource ValueToVisibilityConverter}}">
                         <StackPanel Margin="0,0,15,0">
-                            <TextBlock Text="{Binding Path=ModsVm.SelectedMod.Title, FallbackValue=Title}" Foreground="#B2FFFFFF" FontSize="24" FontFamily="Segoe UI Semilight" TextTrimming="CharacterEllipsis" />
+                            <TextBlock Style="{StaticResource HeaderTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.Title, FallbackValue=Title}" />
                             
                             <!-- description -->
                             <TextBlock TextWrapping="Wrap" Margin="0,12,0,40">
@@ -401,7 +412,7 @@
             </Grid>
 
             <!-- Root - Settings -->
-            <Grid Row="1" Background="#FF1E1E1E" Visibility="{Binding ElementName=SettingsButton, Path=IsChecked, Converter={StaticResource ValueToVisibilityConverter}}">
+            <Grid Row="1" Background="#FF1E1E1E" Visibility="{Binding ElementName=SettingsButton, Path=IsChecked, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,5,0,0">
                 <Grid Margin="20,30,20,0">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="1*" />
@@ -414,7 +425,7 @@
                     </Grid.RowDefinitions>
                     <TextBlock Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Factorio settings" />
                     <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,0,12">
-                        <c:DescriptionTextBox DescriptionText="Factorio .exe path" Text="{Binding Path=ConfigVm.FactorioExePath, Mode=TwoWay}" />
+                        <c:DescriptionTextBox DescriptionText="Factorio path" Text="{Binding Path=ConfigVm.FactorioPath, Mode=TwoWay}" />
                         <c:DescriptionTextBox DescriptionText="Mods folder path" Text="{Binding Path=ConfigVm.ModsPath, Mode=TwoWay}" />
                         <StackPanel Margin="0,0,0,12">
                             <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="Current Factorio Branch" />
@@ -438,7 +449,7 @@
                                 <ColumnDefinition />
                             </Grid.ColumnDefinitions>
                             <c:DescriptionTextBox DescriptionText="Username" Text="{Binding Path=ConfigVm.ModPortalUsername, Mode=TwoWay}" Margin="0,0,12,0" />
-                            <c:DescriptionTextBox Grid.Column="1" DescriptionText="Password" Text="{Binding Path=ConfigVm.ModPortalPassword, Mode=TwoWay}" IsPasswordBox="True" />
+                            <c:DescriptionTextBox Grid.Column="1" DescriptionText="Authentication Token" Text="{Binding Path=ConfigVm.ModPortalAuthToken, Mode=TwoWay}" IsPasswordBox="True" />
                         </Grid>
                     </StackPanel>
                 </Grid>
@@ -504,7 +515,7 @@
 
         <!--  Apply button  -->
         <AdornerDecorator x:Name="AdornerApplyButton" Width="80" Height="80" Margin="0,60,15,0" HorizontalAlignment="Right" VerticalAlignment="Top" Grid.RowSpan="2">
-            <c:IconButton Style="{StaticResource LaunchButton}" ToolTip="Launch Factorio!" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
+            <c:IconButton Style="{StaticResource LaunchButton}" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
                 <c:IconButton.Effect>
                     <DropShadowEffect BlurRadius="9" Direction="0" Opacity="0.53" RenderingBias="Quality" ShadowDepth="0" />
                 </c:IconButton.Effect>

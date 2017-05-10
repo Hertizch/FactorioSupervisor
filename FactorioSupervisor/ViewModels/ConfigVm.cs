@@ -27,10 +27,11 @@ namespace FactorioSupervisor.ViewModels
          * Private fields
          */
 
-        private string _factorioExePath;
+        private string _factorioPath;
         private string _modsPath;
         private string _modPortalUsername;
         private string _modPortalPassword;
+        private string _modPortalAuthToken;
         private bool _autoCheckModUpdate;
         private bool _autoDownloadModUpdate;
         private string _currentFactorioBranch;
@@ -52,10 +53,10 @@ namespace FactorioSupervisor.ViewModels
         /// <summary>
         /// Gets or sets the factorio exe full path
         /// </summary>
-        public string FactorioExePath
+        public string FactorioPath
         {
-            get { return _factorioExePath; }
-            set { if (value == _factorioExePath) return; _factorioExePath = value; OnPropertyChanged(nameof(FactorioExePath)); }
+            get { return _factorioPath; }
+            set { if (value == _factorioPath) return; _factorioPath = value; OnPropertyChanged(nameof(FactorioPath)); }
         }
 
         /// <summary>
@@ -83,6 +84,15 @@ namespace FactorioSupervisor.ViewModels
         {
             get { return _modPortalPassword; }
             set { if (value == _modPortalPassword) return; _modPortalPassword = value; OnPropertyChanged(nameof(ModPortalPassword)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the factorio mod portal authentication token
+        /// </summary>
+        public string ModPortalAuthToken
+        {
+            get { return _modPortalAuthToken; }
+            set { if (value == _modPortalAuthToken) return; _modPortalAuthToken = value; OnPropertyChanged(nameof(ModPortalAuthToken)); }
         }
 
         /// <summary>
@@ -206,15 +216,14 @@ namespace FactorioSupervisor.ViewModels
             UiDimModListWidth = settings.UiDimModListWidth;
             UiDimModDetailsWidth = settings.UiDimModDetailsWidth;
 
-            FactorioExePath = settings.FactorioExePath;
+            FactorioPath = settings.FactorioPath;
             ModsPath = settings.ModsPath;
             ModPortalUsername = settings.ModPortalUsername;
-            ModPortalPassword = settings.ModPortalPassword;
+            ModPortalAuthToken = settings.ModPortalAuthToken;
             AutoCheckModUpdate = settings.AutoCheckModUpdate;
             AutoDownloadModUpdate = settings.AutoDownloadModUpdate;
-            CurrentFactorioBranch = settings.CurrentFactorioBranch;
 
-            Logger.WriteLine("Loaded user settings");
+            Logger.WriteLine("Loaded user settings", true);
         }
 
         private void Execute_SaveUserSettingsCmd(object obj)
@@ -229,23 +238,22 @@ namespace FactorioSupervisor.ViewModels
             settings.UiDimModListWidth = UiDimModListWidth;
             settings.UiDimModDetailsWidth = UiDimModDetailsWidth;
 
-            settings.FactorioExePath = FactorioExePath;
+            settings.FactorioPath = FactorioPath;
             settings.ModsPath = ModsPath;
             settings.ModPortalUsername = ModPortalUsername;
-            settings.ModPortalPassword = ModPortalPassword;
+            settings.ModPortalAuthToken = ModPortalAuthToken;
             settings.SelectedProfile = BaseVm.ProfilesVm.SelectedProfile.Name;
             settings.AutoCheckModUpdate = AutoCheckModUpdate;
             settings.AutoDownloadModUpdate = AutoDownloadModUpdate;
-            settings.CurrentFactorioBranch = CurrentFactorioBranch;
 
             settings.Save();
 
-            Logger.WriteLine("Saved user settings");
+            Logger.WriteLine("Saved user settings", true);
         }
 
         private void Execute_GetCurrentFactorioBranchCmd(object obj)
         {
-            var factorioBaseFilename = Path.Combine(RegistryHelper.GetSteamPath(), @"steamapps\common\Factorio\data\base\info.json");
+            var factorioBaseFilename = Path.Combine(FactorioPath, @"data\base\info.json");
 
             if (File.Exists(factorioBaseFilename))
             {
@@ -264,10 +272,18 @@ namespace FactorioSupervisor.ViewModels
                 }
                 finally
                 {
-                    Logger.WriteLine(infoJsonStr);
-
                     if (exception == null)
-                        infoJson = JsonConvert.DeserializeObject<InfoJson>(infoJsonStr);
+                        Logger.WriteLine($"Read file: {factorioBaseFilename}", true);
+                }
+
+                // Deserialize json string
+                try
+                {
+                    infoJson = JsonConvert.DeserializeObject<InfoJson>(infoJsonStr);
+                }
+                catch (Exception ex)
+                {
+                    Logger.WriteLine($"Failed to deserialize json string from file: {factorioBaseFilename}", true, ex);
                 }
 
                 if (infoJson != null)
@@ -283,7 +299,10 @@ namespace FactorioSupervisor.ViewModels
                     else
                         Logger.WriteLine($"Unable to retreive current Factorio branch version", true);
                 }
-
+                else
+                {
+                    Logger.WriteLine($"Unable to retreive current Factorio branch version", true);
+                }
             }
             else
             {
@@ -301,6 +320,8 @@ namespace FactorioSupervisor.ViewModels
             UiDimHeight = settings.Properties.GetDefault<double>("UiDimHeight");
             UiDimModListWidth = new GridLength(1.2, GridUnitType.Star);
             UiDimModDetailsWidth = new GridLength(2.5, GridUnitType.Star);
+
+            Logger.WriteLine($"UI user settings reset", true);
         }
     }
 }

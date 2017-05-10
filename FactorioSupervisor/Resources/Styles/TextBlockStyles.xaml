@@ -19,11 +19,18 @@
         <Setter Property="Margin" Value="0,0,0,8" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
-    
-        <Style x:Key="PropertyDebugValueTextBlock" TargetType="{x:Type TextBlock}">
+
+    <Style x:Key="PropertyDebugValueTextBlock" TargetType="{x:Type TextBlock}">
         <Setter Property="Foreground" Value="#66FFFFFF" />
         <Setter Property="Margin" Value="0,2" />
         <Setter Property="TextWrapping" Value="Wrap" />
+    </Style>
+
+    <Style x:Key="HeaderTextBlock" TargetType="{x:Type TextBlock}">
+        <Setter Property="Foreground" Value="#B2FFFFFF" />
+        <Setter Property="FontSize" Value="24" />
+        <Setter Property="FontFamily" Value="Segoe UI Semilight" />
+        <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
 
 </ResourceDictionary>
