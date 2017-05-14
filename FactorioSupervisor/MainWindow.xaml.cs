@@ -1,4 +1,5 @@
 ﻿using FactorioSupervisor.Extensions;
+using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
 using FactorioSupervisor.ViewModels;
 using System;
@@ -23,6 +24,9 @@ namespace FactorioSupervisor
 
         private string _searchFilter;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string SearchFilter
         {
             get { return _searchFilter; }
@@ -40,6 +44,11 @@ namespace FactorioSupervisor
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void ModList_Filter(object sender, FilterEventArgs e)
         {
             var mod = e.Item as Mod;
@@ -50,13 +59,31 @@ namespace FactorioSupervisor
                 e.Accepted = false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         private void AddFilter()
         {
             ((CollectionViewSource)Resources["ModsVs"]).Filter -= ModList_Filter;
             ((CollectionViewSource)Resources["ModsVs"]).Filter += ModList_Filter;
         }
 
-        private void CloseCommandHandler(object sender, ExecutedRoutedEventArgs e)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void MinimizeButton_OnClick(object sender, RoutedEventArgs e)
+        {
+            WindowState = WindowState.Minimized;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void CloseButton_OnClick(object sender, RoutedEventArgs e)
         {
             // Save user settings
             if (BaseVm.ConfigVm.SaveUserSettingsCmd.CanExecute(null))
@@ -66,16 +93,22 @@ namespace FactorioSupervisor
             if (BaseVm.ProfilesVm.SaveSelectedProfileCmd.CanExecute(null))
                 BaseVm.ProfilesVm.SaveSelectedProfileCmd.Execute(null);
 
+            Logger.WriteLine("Goodbye!\n", true);
+
             Close();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
-
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ListBox_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             if (ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item)
@@ -92,6 +125,11 @@ namespace FactorioSupervisor
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ModsListBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             if (ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item && e.Key == Key.Return)
@@ -105,6 +143,22 @@ namespace FactorioSupervisor
                     mod.IsEnabled = false;
                 else
                     mod.IsEnabled = true;
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void WindowRoot_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (Keyboard.IsKeyDown(Key.LeftCtrl) | Keyboard.IsKeyDown(Key.RightCtrl) && e.Key == Key.F)
+            {
+                e.Handled = true;
+
+                SearchTextBox.SelectAll();
+                SearchTextBox.Focus();
             }
         }
     }

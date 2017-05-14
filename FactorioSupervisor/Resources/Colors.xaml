@@ -1,29 +1,39 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- #FF1E1E1E -->
-    <SolidColorBrush x:Key="BaseBackgroundColor" Color="#FF1E1E1E" />
 
-    <!-- #FF113344 -->
-    <SolidColorBrush x:Key="AccentColorDark" Color="#FF252525" />
+    <SolidColorBrush x:Key="Color_BaseBackground" Color="#FF1E1E1E" />
+    <SolidColorBrush x:Key="Color_TopTitlebarBackground" Color="#FF141414" />
+    <SolidColorBrush x:Key="Color_ModListColumnBackground" Color="#FF272727" />
+    <SolidColorBrush x:Key="Color_ComboBoxBackground" Color="#FF0E0E0E" />
 
-    <!-- #FF10242E -->
-    <SolidColorBrush x:Key="AccentColorDarkMuted" Color="#FF1E1E1E" />
+    <SolidColorBrush x:Key="Color_Accent" Color="#FFAA6075" />
+    <SolidColorBrush x:Key="Color_AccentMuted" Color="#FF865664" />
+    
+    <SolidColorBrush x:Key="Color_SearchBoxBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="Color_SearchBoxBackgroundHover" Color="#FF2E2E2E" />
+    
+    <SolidColorBrush x:Key="Color_Update" Color="#B2FFFF00" />
+    <SolidColorBrush x:Key="Color_Error" Color="#B2F06969" />
+    
+    <SolidColorBrush x:Key="Color_Text100" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="Color_Text70" Color="#B2FFFFFF" />
+    <SolidColorBrush x:Key="Color_Text40" Color="#66FFFFFF" />
+    <SolidColorBrush x:Key="Color_Text20" Color="#33FFFFFF" />
+    
+    <SolidColorBrush x:Key="Color_Button100" Color="#FFFFFFFF" />
+    <SolidColorBrush x:Key="Color_Button70" Color="#B2FFFFFF" />
+    <SolidColorBrush x:Key="Color_Button40" Color="#66FFFFFF" />
+    <SolidColorBrush x:Key="Color_Button20" Color="#33FFFFFF" />
 
-    <!-- #FF0A6E9E -->
-    <SolidColorBrush x:Key="AccentColorLight" Color="#FFAA6075" />
+    <SolidColorBrush x:Key="Color_IconButtonBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="Color_IconButtonBackgroundHover" Color="#FF1E1E1E" />
 
-    <SolidColorBrush x:Key="AccentColorLightMuted" Color="#FF865664" />
+    <SolidColorBrush x:Key="Color_TextButtonBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="Color_TextButtonBackgroundHover" Color="#FF1E1E1E" />
 
-    <!-- #FF2D2D30 -->
-    <SolidColorBrush x:Key="SearchBoxBackgroundColor" Color="#FF272727" />
-
-    <!-- #FFFFFF00 -->
-    <SolidColorBrush x:Key="UpdateAvailableColor" Color="#FFFFFF00" />
-
-    <!-- #FFF06969 -->
-    <SolidColorBrush x:Key="ModErrorColor" Color="#FFF06969" />
-
-    <SolidColorBrush x:Key="SubTitlebarButtonBackgroundHoverColor" Color="#FF272727" />
+    <SolidColorBrush x:Key="Color_ScrollBarTrackBackground" Color="Transparent" />
+    <SolidColorBrush x:Key="Color_ScrollBarThumbBackground" Color="#FF303030" />
+    <SolidColorBrush x:Key="Color_ScrollBarThumbBackgroundHover" Color="#FF5F5F5F" />
 
 </ResourceDictionary>

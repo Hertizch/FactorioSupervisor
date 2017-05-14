@@ -45,6 +45,7 @@ namespace FactorioSupervisor.ViewModels
         private RelayCommand _saveUserSettingsCmd;
         private RelayCommand _getCurrentFactorioBranchCmd;
         private RelayCommand _resetWindowPosDimCmd;
+        private RelayCommand _testMessageBoxWindowCmd;
 
         /*
          * Properties
@@ -192,6 +193,9 @@ namespace FactorioSupervisor.ViewModels
         public RelayCommand ResetWindowPosDimCmd => _resetWindowPosDimCmd ??
             (_resetWindowPosDimCmd = new RelayCommand(Execute_ResetWindowPosDimCmd, p => true));
 
+        public RelayCommand TestMessageBoxWindowCmd => _testMessageBoxWindowCmd ??
+            (_testMessageBoxWindowCmd = new RelayCommand(Execute_TestMessageBoxWindowCmd, p => true));
+
         /*
          * Methods
          */
@@ -322,6 +326,12 @@ namespace FactorioSupervisor.ViewModels
             UiDimModDetailsWidth = new GridLength(2.5, GridUnitType.Star);
 
             Logger.WriteLine($"UI user settings reset", true);
+        }
+
+        private void Execute_TestMessageBoxWindowCmd(object obj)
+        {
+            // Open message box to user
+            var messageBoxResult = MessageBoxWindow.Show("Test", "This is only a test, of the emergency broadcast system.", MessageBoxButton.OK);
         }
     }
 }

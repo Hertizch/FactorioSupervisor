@@ -5,9 +5,10 @@
     <Style x:Key="TitlebarButton" TargetType="{x:Type Button}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Foreground" Value="White" />
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Button70}" />
+        <Setter Property="Background" Value="{StaticResource Color_IconButtonBackground}" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Width" Value="35" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -16,7 +17,31 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource AccentColorDarkMuted}" />
+                            <Setter Property="Background" Value="{StaticResource Color_IconButtonBackgroundHover}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="TitlebarUiButton" TargetType="{x:Type Button}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Button20}" />
+        <Setter Property="Background" Value="{StaticResource Color_IconButtonBackground}" />
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
+        <Setter Property="Width" Value="35" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}">
+                        <ContentPresenter HorizontalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button70}" />
+                            <Setter Property="Background" Value="{StaticResource Color_IconButtonBackgroundHover}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -27,24 +52,51 @@
     <Style x:Key="SettingsButton" TargetType="{x:Type c:IconToggleButton}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Foreground" Value="White" />
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Button100}" />
+        <Setter Property="Background" Value="{StaticResource Color_IconButtonBackground}" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
         <Setter Property="Icon" Value="{StaticResource IconMenu}" />
         <Setter Property="Width" Value="35" />
+        <Setter Property="RenderTransformOrigin" Value="0.5,0.5" />
+        <Setter Property="RenderTransform">
+            <Setter.Value>
+                <RotateTransform />
+            </Setter.Value>
+        </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type c:IconToggleButton}">
+                    <ControlTemplate.Resources>
+                        <Storyboard x:Key="OnChecked">
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(RotateTransform.Angle)" From="0" To="90" Duration="0:0:0.3">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                        <Storyboard x:Key="OnUnChecked">
+                            <DoubleAnimation Storyboard.TargetProperty="(RenderTransform).(RotateTransform.Angle)" From="90" To="0" Duration="0:0:0.3">
+                                <DoubleAnimation.EasingFunction>
+                                    <CubicEase EasingMode="EaseOut" />
+                                </DoubleAnimation.EasingFunction>
+                            </DoubleAnimation>
+                        </Storyboard>
+                    </ControlTemplate.Resources>
                     <Border Background="{TemplateBinding Background}" CornerRadius="0,0,5,0">
                         <ContentPresenter HorizontalAlignment="Center" />
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource AccentColorDarkMuted}" />
+                            <Setter Property="Background" Value="{StaticResource Color_IconButtonBackgroundHover}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Icon" Value="{StaticResource IconMenuIsOpen}" />
-                            <Setter Property="Background" Value="{StaticResource AccentColorDarkMuted}" />
+                            <Setter Property="Background" Value="{StaticResource Color_IconButtonBackgroundHover}" />
+                            <Trigger.EnterActions>
+                                <BeginStoryboard x:Name="OnChecked_BeginStoryboard" Storyboard="{StaticResource OnChecked}" />
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard x:Name="OnUnChecked_BeginStoryboard" Storyboard="{StaticResource OnUnChecked}" />
+                            </Trigger.ExitActions>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -55,8 +107,9 @@
     <Style x:Key="SubTitlebarButton" TargetType="{x:Type Button}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Foreground" Value="#B2FFFFFF" />
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Button70}" />
+        <Setter Property="Background" Value="{StaticResource Color_IconButtonBackground}" />
+        <Setter Property="Width" Value="35" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -65,11 +118,11 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#FFFFFFFF" />
-                            <Setter Property="Background" Value="{StaticResource SubTitlebarButtonBackgroundHoverColor}" />
-                            </Trigger>
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button100}" />
+                            <Setter Property="Background" Value="{StaticResource Color_IconButtonBackgroundHover}" />
+                        </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="#33FFFFFF" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button20}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -80,8 +133,8 @@
     <Style x:Key="LaunchButton" TargetType="{x:Type Button}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Foreground" Value="#FFFEFEFE" />
-        <Setter Property="Background" Value="{StaticResource AccentColorLightMuted}" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Button100}" />
+        <Setter Property="Background" Value="{StaticResource Color_Accent}" />
         <Setter Property="Height" Value="50" />
         <Setter Property="Width" Value="50" />
         <Setter Property="WindowChrome.IsHitTestVisibleInChrome" Value="True" />
@@ -89,6 +142,11 @@
         <Setter Property="RenderTransform">
             <Setter.Value>
                 <ScaleTransform />
+            </Setter.Value>
+        </Setter>
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="9" Direction="0" Opacity="0.53" RenderingBias="Quality" ShadowDepth="0" />
             </Setter.Value>
         </Setter>
         <Setter Property="Template">
@@ -170,7 +228,7 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Foreground" Value="#B2FFFFFF" />
-        <Setter Property="Background" Value="{StaticResource AccentColorLightMuted}" />
+        <Setter Property="Background" Value="{StaticResource Color_AccentMuted}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
@@ -179,7 +237,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Background" Value="{StaticResource AccentColorLight}" />
+                            <Setter Property="Background" Value="{StaticResource Color_Accent}" />
                             <Setter Property="Foreground" Value="White" />
                         </Trigger>
                     </ControlTemplate.Triggers>

@@ -5,28 +5,32 @@
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
-        <Setter Property="Background" Value="{StaticResource SearchBoxBackgroundColor}" />
-        <Setter Property="Foreground" Value="#33FFFFFF" />
-        <Setter Property="CaretBrush" Value="White" />
-        <Setter Property="Padding" Value="8,8,0,8" />
+        <Setter Property="Background" Value="{StaticResource Color_SearchBoxBackground}" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text20}" />
+        <Setter Property="CaretBrush" Value="{StaticResource Color_Text100}" />
+        <Setter Property="Padding" Value="8,0" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type TextBox}">
-                    <Border Background="{TemplateBinding Background}" CornerRadius="5">
-                        <Grid Margin="{TemplateBinding Margin}">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="35" />
-                            </Grid.ColumnDefinitions>
-                            <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Padding="{TemplateBinding Padding}" />
-                            <Viewbox Grid.Column="1" Width="14">
-                                <Path Data="{StaticResource IconSearch}" Fill="{StaticResource AccentColorLightMuted}" />
-                            </Viewbox>
-                        </Grid>
-                    </Border>
+                    <Grid Background="{TemplateBinding Background}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+                        <ScrollViewer x:Name="PART_ContentHost" VerticalAlignment="Center" Padding="{TemplateBinding Padding}" />
+                        <Viewbox Grid.Column="1" Width="14">
+                            <Path x:Name="Icon" Data="{StaticResource IconSearch}" Fill="{StaticResource Color_AccentMuted}" />
+                        </Viewbox>
+                    </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter Property="Foreground" Value="#66FFFFFF" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Text40}" />
+                            <Setter TargetName="Icon" Property="Fill" Value="{StaticResource Color_Accent}" />
+                            <Setter Property="Background" Value="{StaticResource Color_SearchBoxBackgroundHover}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Icon" Property="Fill" Value="{StaticResource Color_Accent}" />
+                            <Setter Property="Background" Value="{StaticResource Color_SearchBoxBackgroundHover}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -55,7 +59,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsKeyboardFocused" Value="True">
-                            <Setter Property="BorderBrush" Value="{StaticResource AccentColorLight}" />
+                            <Setter Property="BorderBrush" Value="{StaticResource Color_Accent}" />
                         </Trigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>

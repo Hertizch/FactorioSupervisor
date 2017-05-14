@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              mc:Ignorable="d" d:DesignHeight="35" d:DesignWidth="35">
-    <Viewbox Width="18" Height="18">
+    <Viewbox Width="16" Height="16">
         <Canvas Width="24" Height="24">
             <Path Data="{Binding ElementName=IconButtonControl, Path=Icon}" Fill="{Binding ElementName=IconButtonControl, Path=Foreground}" />
         </Canvas>

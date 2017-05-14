@@ -5,7 +5,7 @@
     <Style x:Key="ProfilesComboBox" TargetType="{x:Type ComboBox}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Background" Value="#FF0E0E0E" />
+        <Setter Property="Background" Value="{StaticResource Color_ComboBoxBackground}" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
@@ -13,10 +13,10 @@
                 <ControlTemplate TargetType="{x:Type ComboBox}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="30" />
+                            <RowDefinition Height="35" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
-                        <c:IconToggleButton Style="{DynamicResource ProfilesComboBoxButton}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" MarginCustom="6" ToolTip="Profiles" />
+                        <c:IconToggleButton Style="{DynamicResource ProfilesComboBoxButton}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ToolTip="Profiles" />
                         <Popup x:Name="PART_Popup" Grid.Row="1" IsOpen="{Binding Path=IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}}" PopupAnimation="Slide" Placement="Bottom">
                             <Grid Name="DropDown" MinWidth="250" MaxHeight="800" Background="{TemplateBinding Background}">
                                 <Grid.RowDefinitions>
@@ -43,7 +43,7 @@
     <Style x:Key="ProfilesComboBoxItem" TargetType="{x:Type ComboBoxItem}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Foreground" Value="#66FFFFFF" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text40}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
@@ -54,11 +54,11 @@
                     </Grid>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{StaticResource AccentColorLight}" />
-                            <Setter Property="Foreground" Value="#B2FFFFFF" />
+                            <Setter Property="Background" Value="{StaticResource Color_Accent}" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Text70}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#B2FFFFFF" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Text70}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -69,10 +69,10 @@
     <Style x:Key="ProfilesComboBoxButton" TargetType="{x:Type c:IconToggleButton}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Foreground" Value="#B2FFFFFF" />
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Button70}" />
+        <Setter Property="Background" Value="{StaticResource Color_IconButtonBackground}" />
         <Setter Property="Icon" Value="{StaticResource IconProfiles}" />
-        <Setter Property="Width" Value="30" />
+        <Setter Property="Width" Value="35" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type c:IconToggleButton}">
@@ -81,15 +81,15 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#FFFFFFFF" />
-                            <Setter Property="Background" Value="{StaticResource SubTitlebarButtonBackgroundHoverColor}" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button100}" />
+                            <Setter Property="Background" Value="{StaticResource Color_IconButtonBackgroundHover}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" Value="#FF0E0E0E" />
-                            <Setter Property="Foreground" Value="#FFFFFFFF" />
+                            <Setter Property="Background" Value="{StaticResource Color_ComboBoxBackground}" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button100}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="#33FFFFFF" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button20}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -113,7 +113,7 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
                             <Setter Property="Foreground" Value="#FFFFFFFF" />
-                            <Setter Property="Background" Value="{StaticResource BaseBackgroundColor}" />
+                            <Setter Property="Background" Value="{StaticResource Color_BaseBackground}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter Property="Foreground" Value="#33FFFFFF" />
@@ -127,7 +127,7 @@
         <Style x:Key="OptionsComboBox" TargetType="{x:Type ComboBox}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Background" Value="#FF0E0E0E" />
+        <Setter Property="Background" Value="{StaticResource Color_ComboBoxBackground}" />
         <Setter Property="ScrollViewer.CanContentScroll" Value="True" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
@@ -135,7 +135,7 @@
                 <ControlTemplate TargetType="{x:Type ComboBox}">
                     <Grid>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="30" />
+                            <RowDefinition Height="35" />
                             <RowDefinition />
                         </Grid.RowDefinitions>
                         <c:IconToggleButton Style="{DynamicResource OptionsComboBoxButton}" IsChecked="{Binding IsDropDownOpen, Mode=TwoWay, RelativeSource={RelativeSource TemplatedParent}}" ToolTip="Options" />
@@ -155,7 +155,7 @@
     <Style x:Key="OptionsComboBoxItem" TargetType="{x:Type ComboBoxItem}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Foreground" Value="#66FFFFFF" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text40}" />
         <Setter Property="Background" Value="Transparent" />
         <Setter Property="FocusVisualStyle" Value="{x:Null}" />
         <Setter Property="Template">
@@ -172,10 +172,10 @@
     <Style x:Key="OptionsComboBoxButton" TargetType="{x:Type c:IconToggleButton}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Foreground" Value="#B2FFFFFF" />
-        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Button70}" />
+        <Setter Property="Background" Value="{StaticResource Color_IconButtonBackground}" />
         <Setter Property="Icon" Value="{StaticResource IconDots}" />
-        <Setter Property="Width" Value="30" />
+        <Setter Property="Width" Value="35" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type c:IconToggleButton}">
@@ -184,15 +184,15 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#FFFFFFFF" />
-                            <Setter Property="Background" Value="{StaticResource SubTitlebarButtonBackgroundHoverColor}" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button100}" />
+                            <Setter Property="Background" Value="{StaticResource Color_IconButtonBackgroundHover}" />
                         </Trigger>
                         <Trigger Property="IsChecked" Value="True">
-                            <Setter Property="Background" Value="#FF0E0E0E" />
-                            <Setter Property="Foreground" Value="#FFFFFFFF" />
+                            <Setter Property="Background" Value="{StaticResource Color_ComboBoxBackground}" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button100}" />
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
-                            <Setter Property="Foreground" Value="#33FFFFFF" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button20}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

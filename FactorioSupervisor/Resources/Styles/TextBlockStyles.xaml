@@ -2,32 +2,26 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Style x:Key="PropertyGroupDescriptorTextBlock" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="#66FFFFFF" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text40}" />
         <Setter Property="FontFamily" Value="Segoe UI Semibold" />
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="TextWrapping" Value="Wrap" />
     </Style>
 
     <Style x:Key="PropertyDescriptorTextBlock" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="#33FFFFFF" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text20}" />
         <Setter Property="Margin" Value="0,0,0,2" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
 
     <Style x:Key="PropertyValueTextBlock" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="#B2FFFFFF" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text70}" />
         <Setter Property="Margin" Value="0,0,0,8" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />
     </Style>
 
-    <Style x:Key="PropertyDebugValueTextBlock" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="#66FFFFFF" />
-        <Setter Property="Margin" Value="0,2" />
-        <Setter Property="TextWrapping" Value="Wrap" />
-    </Style>
-
     <Style x:Key="HeaderTextBlock" TargetType="{x:Type TextBlock}">
-        <Setter Property="Foreground" Value="#B2FFFFFF" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text70}" />
         <Setter Property="FontSize" Value="24" />
         <Setter Property="FontFamily" Value="Segoe UI Semilight" />
         <Setter Property="TextTrimming" Value="CharacterEllipsis" />

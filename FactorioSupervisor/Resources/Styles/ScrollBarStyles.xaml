@@ -4,14 +4,13 @@
     <Style x:Key="{x:Type ScrollBar}" TargetType="{x:Type ScrollBar}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
-        <Setter Property="Margin" Value="0,0,-5,0" />
         <Style.Triggers>
             <Trigger Property="Orientation" Value="Vertical">
                 <Setter Property="Width" Value="5" />
                 <Setter Property="Template">
                     <Setter.Value>
                         <ControlTemplate TargetType="{x:Type ScrollBar}">
-                            <Grid>
+                            <Grid Background="{StaticResource Color_ScrollBarTrackBackground}">
                                 <Track Name="PART_Track" IsDirectionReversed="True">
                                     <Track.Thumb>
                                         <Thumb Style="{DynamicResource ScrollBarThumb}" />
@@ -33,21 +32,21 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Thumb}">
-                    <Border Name="Scroller" Background="#FF303030" />
+                    <Border Name="Scroller" Background="{StaticResource Color_ScrollBarThumbBackground}" />
                     <ControlTemplate.Triggers>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
                                 <Condition Property="IsDragging" Value="False" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="Scroller" Property="Background" Value="#FF5f5f5f" />
+                            <Setter TargetName="Scroller" Property="Background" Value="{StaticResource Color_ScrollBarThumbBackgroundHover}" />
                         </MultiTrigger>
                         <MultiTrigger>
                             <MultiTrigger.Conditions>
                                 <Condition Property="IsMouseOver" Value="True" />
                                 <Condition Property="IsDragging" Value="True" />
                             </MultiTrigger.Conditions>
-                            <Setter TargetName="Scroller" Property="Background" Value="#FF5f5f5f" />
+                            <Setter TargetName="Scroller" Property="Background" Value="{StaticResource Color_ScrollBarThumbBackgroundHover}" />
                         </MultiTrigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

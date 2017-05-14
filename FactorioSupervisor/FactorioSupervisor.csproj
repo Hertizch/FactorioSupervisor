@@ -100,7 +100,6 @@
     <Compile Include="Models\Mod.cs" />
     <Compile Include="Models\ModListItem.cs" />
     <Compile Include="Models\Profile.cs" />
-    <Compile Include="Relays\MessageBoxRelay.cs" />
     <Compile Include="Relays\NotifyBannerRelay.cs" />
     <Compile Include="Resources\Controls\DescriptionTextBox.xaml.cs">
       <DependentUpon>DescriptionTextBox.xaml</DependentUpon>

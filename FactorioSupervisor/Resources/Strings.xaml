@@ -1,12 +1,20 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:system="clr-namespace:System;assembly=mscorlib">
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <system:String x:Key="MessageBoxAuthTitle">Authentication Required</system:String>
-    
-    <system:String x:Key="MessageBoxAuthValue">The mod portal requires an authentication token to download and update mods. 
+    <!-- MessageBoxAuth -->
+    <sys:String x:Key="MessageBoxAuthTitle">Authentication Required</sys:String>
+    <sys:String x:Key="MessageBoxAuthValue">The mod portal requires an authentication token to download and update mods. 
                     This token can be retreived by sending your username and password, securely, to the mod portal's authentication server. 
                     After this process is complete your password will not be saved. 
-                    This dialog will be prompted to you again if you change the password in the future.</system:String>
+                    This dialog will be prompted to you again if you change the password in the future.</sys:String>
+
+    <!-- MessageBoxHostUnreachable -->
+    <sys:String x:Key="MessageBoxHostUnreachableTitle">Oh snap!</sys:String>
+    <sys:String x:Key="MessageBoxHostUnreachableValue">The updater was unable to reach the mod portal. It may be temporarily down, undergoing maintenance or experiencing heavy load. Try agin later.</sys:String>
+
+    <!-- MessageBoxModPortalError -->
+    <sys:String x:Key="MessageBoxModPortalErrorTitle">Oh snap!</sys:String>
+    <sys:String x:Key="MessageBoxModPortalErrorValue">The mod portal seems to be experiencing some issues. An internal server error occurred. Try again later.</sys:String>
 
 </ResourceDictionary>
