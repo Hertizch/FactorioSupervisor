@@ -17,13 +17,12 @@ namespace FactorioSupervisor
         private static MessageBoxWindow _messageBoxWindow;
         private static MessageBoxResult _result = MessageBoxResult.No;
         private static bool _isAuthenticationDialog;
+        private static MessageBoxButton _messageBoxButton;
 
         public static MessageBoxResult Show(string title, string value, MessageBoxButton button, bool isAuthenticationDialog = false)
         {
-            if (isAuthenticationDialog)
-                _isAuthenticationDialog = true;
-            else
-                _isAuthenticationDialog = false;
+            _messageBoxButton = button;
+            _isAuthenticationDialog = isAuthenticationDialog;
 
             _messageBoxWindow = new MessageBoxWindow
             {
@@ -39,15 +38,28 @@ namespace FactorioSupervisor
 
         private void SetControlVisibility()
         {
+            // Set all to collapsed
+            OkButton.Visibility = Visibility.Collapsed;
+            CancelButton.Visibility = Visibility.Collapsed;
+            YesButton.Visibility = Visibility.Collapsed;
+            NoButton.Visibility = Visibility.Collapsed;
+            AuthInputBoxes.Visibility = Visibility.Collapsed;
+
             if (_isAuthenticationDialog)
-            {
                 AuthInputBoxes.Visibility = Visibility.Visible;
-            }
-            else if (!_isAuthenticationDialog)
+
+            if (_messageBoxButton == MessageBoxButton.OKCancel)
             {
-                AuthInputBoxes.Visibility = Visibility.Collapsed;
-                CancelButton.Visibility = Visibility.Collapsed;
+                OkButton.Visibility = Visibility.Visible;
+                CancelButton.Visibility = Visibility.Visible;
             }
+            else if (_messageBoxButton == MessageBoxButton.YesNo)
+            {
+                YesButton.Visibility = Visibility.Visible;
+                NoButton.Visibility = Visibility.Visible;
+            }
+            else if (_messageBoxButton == MessageBoxButton.OK)
+                OkButton.Visibility = Visibility.Visible;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -57,6 +69,10 @@ namespace FactorioSupervisor
             else if (sender == CancelButton)
                 _result = MessageBoxResult.Cancel;
             else if (sender == TitleBarCloseButton)
+                _result = MessageBoxResult.Cancel;
+            else if (sender == YesButton)
+                _result = MessageBoxResult.OK;
+            else if (sender == NoButton)
                 _result = MessageBoxResult.Cancel;
             else
                 _result = MessageBoxResult.None;

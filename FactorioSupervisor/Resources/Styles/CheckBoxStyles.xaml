@@ -22,10 +22,10 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Icon" Property="Data" Value="{DynamicResource IconCheckmarkChecked}" />
-                            <Setter Property="Foreground" Value="#B2FFFFFF" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Text70}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="#B2FFFFFF" />
+                            <Setter Property="Foreground" Value="{StaticResource Color_Text70}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -37,15 +37,15 @@
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Background" Value="Transparent" />
-        <Setter Property="Foreground" Value="#B2FFFFFF" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text70}" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type CheckBox}">
-                    <Grid Background="{TemplateBinding Background}">
+                    <Grid Background="{TemplateBinding Background}" HorizontalAlignment="Left">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
                             <Viewbox Width="16" Height="16">
                                 <Canvas Width="24" Height="24">
-                                    <Path x:Name="Icon" Data="{DynamicResource IconCheckmarkUnchecked}" Fill="{TemplateBinding Foreground}" />
+                                    <Path x:Name="Icon" Data="{DynamicResource IconCheckmarkUnchecked}" Fill="{StaticResource Color_Text20}" />
                                 </Canvas>
                             </Viewbox>
                             <ContentPresenter Margin="8,0,0,0" />
@@ -54,10 +54,10 @@
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsChecked" Value="True">
                             <Setter TargetName="Icon" Property="Data" Value="{DynamicResource IconCheckmarkChecked}" />
-                            <Setter TargetName="Icon" Property="Fill" Value="#B2FFFFFF" />
+                            <Setter TargetName="Icon" Property="Fill" Value="{StaticResource Color_Text70}" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Icon" Property="Fill" Value="#B2FFFFFF" />
+                            <Setter TargetName="Icon" Property="Fill" Value="{StaticResource Color_Text70}" />
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>

@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace FactorioSupervisor.ViewModels
 {
@@ -21,6 +22,8 @@ namespace FactorioSupervisor.ViewModels
 
             if (GetCurrentFactorioBranchCmd.CanExecute(null))
                 GetCurrentFactorioBranchCmd.Execute(null);
+
+            Logger.WriteLine($"Working: {GetScreensWorkingAreaWidth()} x {GetScreensWorkingAreaHeight()}");
         }
 
         /*
@@ -220,6 +223,12 @@ namespace FactorioSupervisor.ViewModels
             UiDimModListWidth = settings.UiDimModListWidth;
             UiDimModDetailsWidth = settings.UiDimModDetailsWidth;
 
+            if (settings.UiPosLeft > GetScreensWorkingAreaWidth())
+                UiPosLeft = settings.Properties.GetDefault<double>("UiPosLeft");
+
+            if (settings.UiPosTop > GetScreensWorkingAreaHeight())
+                UiPosTop = settings.Properties.GetDefault<double>("UiPosTop");
+
             FactorioPath = settings.FactorioPath;
             ModsPath = settings.ModsPath;
             ModPortalUsername = settings.ModPortalUsername;
@@ -227,7 +236,7 @@ namespace FactorioSupervisor.ViewModels
             AutoCheckModUpdate = settings.AutoCheckModUpdate;
             AutoDownloadModUpdate = settings.AutoDownloadModUpdate;
 
-            Logger.WriteLine("Loaded user settings", true);
+            Logger.WriteLine("Loaded user settings");
         }
 
         private void Execute_SaveUserSettingsCmd(object obj)
@@ -332,6 +341,26 @@ namespace FactorioSupervisor.ViewModels
         {
             // Open message box to user
             var messageBoxResult = MessageBoxWindow.Show("Test", "This is only a test, of the emergency broadcast system.", MessageBoxButton.OK);
+        }
+
+        private int GetScreensWorkingAreaWidth()
+        {
+            int width = 0;
+
+            foreach (var screen in Screen.AllScreens)
+                width += screen.WorkingArea.Width;
+
+            return width;
+        }
+
+        private int GetScreensWorkingAreaHeight()
+        {
+            int height = 0;
+
+            foreach (var screen in Screen.AllScreens)
+                height += screen.WorkingArea.Height;
+
+            return height;
         }
     }
 }

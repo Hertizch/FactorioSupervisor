@@ -5,6 +5,8 @@ using FactorioSupervisor.ViewModels;
 using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -159,6 +161,23 @@ namespace FactorioSupervisor
 
                 SearchTextBox.SelectAll();
                 SearchTextBox.Focus();
+            }
+        }
+
+        private async void ToggleButton_Click(object sender, RoutedEventArgs e)
+        {
+            UpdaterSnackbar.Title = "Test mod";
+
+            for (int i = 0; i < 101; i++)
+            {
+                await Task.Delay(50);
+                UpdaterSnackbar.ItemProgressPercentage = i;
+            }
+
+            for (int i = 0; i < 101; i++)
+            {
+                await Task.Delay(50);
+                UpdaterSnackbar.TotalProgressPercentage = i;
             }
         }
     }

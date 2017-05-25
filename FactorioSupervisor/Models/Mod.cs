@@ -36,6 +36,7 @@ namespace FactorioSupervisor.Models
         private bool _hideInModList;
         private ObservableImmutableList<Dependency> _dependenciesCollection;
         private bool _hasOptionalDependencies;
+        private Dependency _selectedDependency;
 
         /// <summary>
         /// Gets or sets the filename with extension
@@ -251,6 +252,15 @@ namespace FactorioSupervisor.Models
         {
             get { return _hasOptionalDependencies; }
             set { if (value == _hasOptionalDependencies) return; _hasOptionalDependencies = value; OnPropertyChanged(nameof(HasOptionalDependencies)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the currently selected dependency object
+        /// </summary>
+        public Dependency SelectedDependency
+        {
+            get { return _selectedDependency; }
+            set { if (value == _selectedDependency) return; _selectedDependency = value; OnPropertyChanged(nameof(SelectedDependency)); }
         }
     }
 }

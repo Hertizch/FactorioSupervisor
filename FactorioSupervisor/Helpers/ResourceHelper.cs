@@ -7,12 +7,12 @@ namespace FactorioSupervisor.Helpers
     {
         public static string GetValue(string value)
         {
-            var myResourceDictionary = new ResourceDictionary()
+            var resourceDictionary = new ResourceDictionary()
             {
                 Source = new Uri("/FactorioSupervisor;component/Resources/Strings.xaml", UriKind.RelativeOrAbsolute)
             };
 
-            return myResourceDictionary[value].ToString();
+            return resourceDictionary[value].ToString();
         }
     }
 }

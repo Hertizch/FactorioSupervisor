@@ -2,19 +2,48 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:sys="clr-namespace:System;assembly=mscorlib">
 
-    <!-- MessageBoxAuth -->
-    <sys:String x:Key="MessageBoxAuthTitle">Authentication Required</sys:String>
-    <sys:String x:Key="MessageBoxAuthValue">The mod portal requires an authentication token to download and update mods. 
+    <!--
+        Message Boxes
+    -->
+    
+    <sys:String x:Key="MessageBox_AuthRequired_Title">Authentication Required</sys:String>
+    <sys:String x:Key="MessageBox_AuthRequired">The mod portal requires an authentication token to download and update mods. 
                     This token can be retreived by sending your username and password, securely, to the mod portal's authentication server. 
-                    After this process is complete your password will not be saved. 
+                    After this process is complete, the supplied password will be destroyed and never saved. 
                     This dialog will be prompted to you again if you change the password in the future.</sys:String>
 
-    <!-- MessageBoxHostUnreachable -->
-    <sys:String x:Key="MessageBoxHostUnreachableTitle">Oh snap!</sys:String>
-    <sys:String x:Key="MessageBoxHostUnreachableValue">The updater was unable to reach the mod portal. It may be temporarily down, undergoing maintenance or experiencing heavy load. Try agin later.</sys:String>
+    <sys:String x:Key="MessageBox_HostUnreachable_Title">Oh snap!</sys:String>
+    <sys:String x:Key="MessageBox_HostUnreachable">The updater was unable to reach the mod portal. No internet connection available, it may be temporarily down, undergoing maintenance or experiencing heavy load. Try agin later.</sys:String>
 
-    <!-- MessageBoxModPortalError -->
-    <sys:String x:Key="MessageBoxModPortalErrorTitle">Oh snap!</sys:String>
-    <sys:String x:Key="MessageBoxModPortalErrorValue">The mod portal seems to be experiencing some issues. An internal server error occurred. Try again later.</sys:String>
+    <sys:String x:Key="MessageBox_ModPortalError_Title">Oh snap!</sys:String>
+    <sys:String x:Key="MessageBox_ModPortalError">The mod portal seems to be experiencing some issues. An internal server error occurred. Try again later.</sys:String>
+
+    <sys:String x:Key="MessageBox_DeleteMod_Title">Really delete?</sys:String>
+    <sys:String x:Key="MessageBox_DeleteMod">If you choose yes, the mod will be permanently deleted from your hard drive! Are you sure want to delete?</sys:String>
+
+    <sys:String x:Key="MessageBox_NoInternetConnection_Title">Oh snap!</sys:String>
+    <sys:String x:Key="MessageBox_NoInternetConnection">No internet connection.</sys:String>
+
+
+    <!--
+        Settings
+    -->
+
+    <sys:String x:Key="Settings_Descriptors_FactorioSettings">Factorio settings</sys:String>
+    <sys:String x:Key="Settings_Descriptors_ModPortalSettings">Mod portal settings</sys:String>
+    <sys:String x:Key="Settings_Descriptors_ApplicationSettings">Application settings</sys:String>
+
+    <sys:String x:Key="Settings_FactorioPath">Factorio path</sys:String>
+    <sys:String x:Key="Settings_ModsFolderPath">Mods folder path</sys:String>
+    <sys:String x:Key="Settings_CurrentFactorioBranch">Current Factorio branch</sys:String>
+
+    <sys:String x:Key="Settings_Username">Username</sys:String>
+    <sys:String x:Key="Settings_AuthenticationToken">Authentication token</sys:String>
+
+    <sys:String x:Key="Settings_AutoCheckModUpdate_Description">Immediately check all mods for any new versions each time the app is started</sys:String>
+    <sys:String x:Key="Settings_AutoCheckModUpdate">Check for mod updates at startup</sys:String>
+
+    <sys:String x:Key="Settings_AutoDownloadModUpdate_Description">If any mod has an update available, download it right away</sys:String>
+    <sys:String x:Key="Settings_AutoDownloadModUpdate">Update mods automatically</sys:String>
 
 </ResourceDictionary>

@@ -6,16 +6,23 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:c="clr-namespace:FactorioSupervisor.Resources.Controls"
         xmlns:conv="clr-namespace:FactorioSupervisor.Converters"
+        xmlns:snackbarConverters="clr-namespace:FactorioSupervisor.Converters.SnackbarValueConverters"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
         mc:Ignorable="d"
-        Height="{Binding Path=ConfigVm.UiDimHeight, Mode=TwoWay, Delay=1000}" Width="{Binding Path=ConfigVm.UiDimWidth, Mode=TwoWay, Delay=1000}"
-        Left="{Binding Path=ConfigVm.UiPosLeft, Mode=TwoWay, Delay=1000}" Top="{Binding Path=ConfigVm.UiPosTop, Mode=TwoWay, Delay=1000}"
+        Height="{Binding Path=ConfigVm.UiDimHeight, Mode=TwoWay}" Width="{Binding Path=ConfigVm.UiDimWidth, Mode=TwoWay}"
+        Left="{Binding Path=ConfigVm.UiPosLeft, Mode=TwoWay}" Top="{Binding Path=ConfigVm.UiPosTop, Mode=TwoWay}"
         WindowStartupLocation="Manual"
         DataContext="{StaticResource BaseVm}"
         Style="{StaticResource MainWindow}"
         PreviewKeyDown="WindowRoot_PreviewKeyDown">
+
+    <i:Interaction.Triggers>
+        <i:EventTrigger SourceObject="{Binding ElementName=WindowRoot}" EventName="Loaded">
+            <i:InvokeCommandAction Command="{Binding Path=ModsVm.VerifyAuthenticationCmd}" />
+        </i:EventTrigger>
+    </i:Interaction.Triggers>
 
     <Window.Resources>
         <conv:ValueToVisibilityConverter x:Key="ValueToVisibilityConverter" />
@@ -46,6 +53,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="35" />
                 <RowDefinition />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
             <!-- Titlebar -->
@@ -68,9 +76,9 @@
             <!-- Root - Content -->
             <Grid Row="1">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="{Binding Path=ConfigVm.UiDimModListWidth, Mode=TwoWay, Delay=1000}" />
+                    <ColumnDefinition Width="{Binding Path=ConfigVm.UiDimModListWidth, Mode=TwoWay}" />
                     <ColumnDefinition Width="4" />
-                    <ColumnDefinition Width="{Binding Path=ConfigVm.UiDimModDetailsWidth, Mode=TwoWay, Delay=1000}" />
+                    <ColumnDefinition Width="{Binding Path=ConfigVm.UiDimModDetailsWidth, Mode=TwoWay}" />
                 </Grid.ColumnDefinitions>
 
                 <!-- Left column -->
@@ -127,15 +135,15 @@
                             <!-- test message box window button -->
                             <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconImport}" Command="{Binding Path=ConfigVm.TestMessageBoxWindowCmd}" />
 
+                            <ToggleButton Content="SB" IsChecked="{Binding ElementName=UpdaterSnackbar, Path=IsOpen, Mode=TwoWay}" Click="ToggleButton_Click" />
+
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
 
                             <!-- options button -->
                             <ComboBox Style="{StaticResource OptionsComboBox}" ItemContainerStyle="{StaticResource OptionsComboBoxItem}">
                                 <ComboBox.Items>
-                                    <Button Content="Toggle all" Padding="5,4" Command="{Binding Path=ModsVm.ToggleEnableModsCmd}" />
-                                    <Button Content="Reload mods" Padding="5,4" ToolTip="Careful..." Command="{Binding Path=ModsVm.GetLocalModsCmd}" />
-                                    <CheckBox Style="{StaticResource SettingsCheckBox}" Content="Hide incompatible mods" IsChecked="{Binding Path=ModsVm.HideIncompatibleMods, Mode=TwoWay}" />
+                                    <CheckBox Style="{StaticResource SettingsCheckBox}" Content="Hide incompatible mods" IsChecked="{Binding Path=ModsVm.HideIncompatibleMods, Mode=TwoWay}" ToolTip="Hides mods that are not currently compatible with your branch of factorio" />
                                 </ComboBox.Items>
                             </ComboBox>
                         </StackPanel>
@@ -144,9 +152,10 @@
                     <Grid Grid.Row="3" Background="{StaticResource Color_BaseBackground}" />
 
                     <!-- Mod list -->
-                    <ScrollViewer Grid.Row="4" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Grid.Row="4" Style="{StaticResource DefaultScrollViewerStyle}">
                         <ListBox x:Name="ModsListBox" Style="{StaticResource GenericListBox}" ItemContainerStyle="{StaticResource GenericListBoxItem}" 
-                             ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}" PreviewMouseDoubleClick="ListBox_PreviewMouseDoubleClick" PreviewKeyDown="ModsListBox_PreviewKeyDown">
+                                 ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}" 
+                                 PreviewMouseDoubleClick="ListBox_PreviewMouseDoubleClick" PreviewKeyDown="ModsListBox_PreviewKeyDown">
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="10,5,10,5">
@@ -217,7 +226,7 @@
                 <Grid Column="2">
 
                     <!-- Mod details -->
-                    <ScrollViewer Margin="0" Visibility="{Binding Path=ModsVm.SelectedMod, Converter={StaticResource ValueToVisibilityConverter}}">
+                    <ScrollViewer Style="{StaticResource DefaultScrollViewerStyle}" Visibility="{Binding Path=ModsVm.SelectedMod, Converter={StaticResource ValueToVisibilityConverter}}">
                         <StackPanel Margin="40,35,30,0">
                             <TextBlock Style="{StaticResource HeaderTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.Title, FallbackValue=Title}" />
 
@@ -322,68 +331,64 @@
 
                                 <!-- Dependencies -->
                                 <TextBlock Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Dependencies" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" />
-                                <StackPanel Grid.Row="1" Grid.Column="1" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,-4,0,0">
+                                <ListBox Grid.Row="1" Grid.Column="1" Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod.SelectedDependency, Mode=TwoWay}" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}">
+                                    <ListBox.ItemContainerStyle>
+                                        <Style BasedOn="{StaticResource DependeciesListBoxItem}" TargetType="{x:Type ListBoxItem}">
+                                            <!-- null -->
+                                        </Style>
+                                    </ListBox.ItemContainerStyle>
+                                    <ListBox.ItemTemplate>
+                                        <DataTemplate>
+                                            <Grid Margin="8,3">
+                                                <Grid.ColumnDefinitions>
+                                                    <ColumnDefinition />
+                                                    <ColumnDefinition Width="Auto" />
+                                                </Grid.ColumnDefinitions>
+                                                <StackPanel Orientation="Horizontal">
 
-                                    <!-- required -->
-                                    <ListBox Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}" SelectedItem="{Binding Path=ModsVm.SelectedDependency}" Margin="0,0,0,8">
-                                        <ListBox.ItemContainerStyle>
-                                            <Style BasedOn="{StaticResource DependeciesListBoxItem}" TargetType="{x:Type ListBoxItem}">
-                                                <!-- null -->
-                                            </Style>
-                                        </ListBox.ItemContainerStyle>
-                                        <ListBox.ItemTemplate>
-                                            <DataTemplate>
-                                                <Grid Margin="8,3">
-                                                    <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition />
-                                                        <ColumnDefinition Width="Auto" />
-                                                    </Grid.ColumnDefinitions>
-                                                    <StackPanel Orientation="Horizontal">
-
-                                                        <!-- Optional -->
-                                                        <TextBlock>
-                                                            <TextBlock.Style>
-                                                                <Style BasedOn="{StaticResource PropertyDescriptorTextBlock}" TargetType="{x:Type TextBlock}">
-                                                                    <Style.Triggers>
-                                                                        <DataTrigger Binding="{Binding Path=IsOptional}" Value="True">
-                                                                            <Setter Property="Text" Value="OPTIONAL:" />
-                                                                            <Setter Property="Margin" Value="0,0,8,0" />
-                                                                        </DataTrigger>
-                                                                    </Style.Triggers>
-                                                                </Style>
-                                                            </TextBlock.Style>
-                                                        </TextBlock>
-
-                                                        <!-- Name -->
-                                                        <TextBlock Text="{Binding Path=Name}" />
-
-                                                    </StackPanel>
-
-                                                    <!-- Is installed -->
-                                                    <TextBlock Grid.Column="1">
+                                                    <!-- Optional -->
+                                                    <TextBlock>
                                                         <TextBlock.Style>
                                                             <Style BasedOn="{StaticResource PropertyDescriptorTextBlock}" TargetType="{x:Type TextBlock}">
-                                                                <Setter Property="Text" Value="Not installed" />
                                                                 <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding Path=IsInstalled}" Value="True">
-                                                                        <Setter Property="Text" Value="Installed" />
-                                                                        <Setter Property="Foreground" Value="#B2FFFFFF" />
+                                                                    <DataTrigger Binding="{Binding Path=IsOptional}" Value="True">
+                                                                        <Setter Property="Text" Value="OPTIONAL:" />
+                                                                        <Setter Property="Margin" Value="0,0,8,0" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
                                                             </Style>
                                                         </TextBlock.Style>
                                                     </TextBlock>
 
-                                                </Grid>
-                                            </DataTemplate>
-                                        </ListBox.ItemTemplate>
-                                        <ListBox.ContextMenu>
-                                            <ContextMenu>
-                                                <MenuItem Header="Install mod" Command="{Binding Path=ModsVm.InstallDependencyModCmd}" IsEnabled="{Binding Path=ModsVm.SelectedDependency.IsInstalled, Converter={StaticResource InvertedBooleanConverter}}" />
-                                            </ContextMenu>
-                                        </ListBox.ContextMenu>
-                                    </ListBox>
-                                </StackPanel>
+                                                    <!-- Name -->
+                                                    <TextBlock Text="{Binding Path=Name}" />
+
+                                                </StackPanel>
+
+                                                <!-- Is installed -->
+                                                <TextBlock Grid.Column="1">
+                                                    <TextBlock.Style>
+                                                        <Style BasedOn="{StaticResource PropertyDescriptorTextBlock}" TargetType="{x:Type TextBlock}">
+                                                            <Setter Property="Text" Value="Not installed" />
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding Path=IsInstalled}" Value="True">
+                                                                    <Setter Property="Text" Value="Installed" />
+                                                                    <Setter Property="Foreground" Value="#B2FFFFFF" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
+
+                                            </Grid>
+                                        </DataTemplate>
+                                    </ListBox.ItemTemplate>
+                                    <ListBox.ContextMenu>
+                                        <ContextMenu>
+                                            <MenuItem Header="Install mod" Command="{Binding Path=ModsVm.InstallDependencyModCmd}" IsEnabled="{Binding Path=ModsVm.SelectedDependency.IsInstalled, Converter={StaticResource InvertedBooleanConverter}}" />
+                                        </ContextMenu>
+                                    </ListBox.ContextMenu>
+                                </ListBox>
                             </Grid>
                         </StackPanel>
                     </ScrollViewer>
@@ -391,56 +396,80 @@
             </Grid>
 
             <!-- Root - Settings -->
-            <Grid Row="1" Background="{StaticResource Color_BaseBackground}" Visibility="{Binding ElementName=SettingsButton, Path=IsChecked, Converter={StaticResource ValueToVisibilityConverter}}">
-                <Grid Margin="20,30,20,0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="1*" />
-                        <ColumnDefinition Width="4*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <TextBlock Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Factorio settings" />
-                    <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,0,12">
-                        <c:DescriptionTextBox DescriptionText="Factorio path" Text="{Binding Path=ConfigVm.FactorioPath, Mode=TwoWay}" />
-                        <c:DescriptionTextBox DescriptionText="Mods folder path" Text="{Binding Path=ConfigVm.ModsPath, Mode=TwoWay}" />
-                        <StackPanel Margin="0,0,0,12">
-                            <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="Current Factorio Branch" />
-                            <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ConfigVm.CurrentFactorioBranch}" />
-                        </StackPanel>
-                    </StackPanel>
+            <ScrollViewer Grid.Row="1" Style="{StaticResource DefaultScrollViewerStyle}" Visibility="{Binding ElementName=SettingsButton, Path=IsChecked, Converter={StaticResource ValueToVisibilityConverter}}">
+                <Grid Background="{StaticResource Color_BaseBackground}">
+                    <Grid Margin="30,40,30,0" VerticalAlignment="Top">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="4*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
 
-                    <!-- app settings -->
-                    <TextBlock Grid.Column="0" Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Application settings" />
-                    <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,0,12">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <StackPanel>
-                                <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoCheckModUpdate, Mode=TwoWay}" Content="Check for mod updates at startup" />
-                                <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoDownloadModUpdate, Mode=TwoWay}" Content="Update mods automatically" />
+                        <!-- factorio settings -->
+                        <TextBlock Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="{StaticResource Settings_Descriptors_FactorioSettings}" />
+                        <StackPanel Grid.Column="1" Grid.Row="0" Margin="0,0,0,12">
+                            <c:DescriptionTextBox DescriptionText="{StaticResource Settings_FactorioPath}" Text="{Binding Path=ConfigVm.FactorioPath, Mode=TwoWay}" />
+                            <c:DescriptionTextBox DescriptionText="{StaticResource Settings_ModsFolderPath}" Text="{Binding Path=ConfigVm.ModsPath, Mode=TwoWay}" />
+                            <StackPanel Margin="0,0,0,12">
+                                <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="{StaticResource Settings_CurrentFactorioBranch}" />
+                                <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ConfigVm.CurrentFactorioBranch, TargetNullValue=N/A}" />
                             </StackPanel>
-                            <Button Grid.Column="1" Style="{StaticResource DialogButton}" Content="Reset application size and posistion" Command="{Binding Path=ConfigVm.ResetWindowPosDimCmd}" VerticalAlignment="Top" />
-                        </Grid>
-                    </StackPanel>
+                        </StackPanel>
 
-                    <TextBlock Grid.Column="0" Grid.Row="2" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Mod portal settings" />
-                    <StackPanel Grid.Column="1" Grid.Row="2">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition />
-                            </Grid.ColumnDefinitions>
-                            <c:DescriptionTextBox DescriptionText="Username" Text="{Binding Path=ConfigVm.ModPortalUsername, Mode=TwoWay}" Margin="0,0,12,0" />
-                            <c:DescriptionTextBox Grid.Column="1" DescriptionText="Authentication Token" Text="{Binding Path=ConfigVm.ModPortalAuthToken, Mode=TwoWay}" IsPasswordBox="True" />
-                        </Grid>
-                    </StackPanel>
+                        <!-- mod portal settings -->
+                        <TextBlock Grid.Column="0" Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="{StaticResource Settings_Descriptors_ModPortalSettings}" />
+                        <StackPanel Grid.Column="1" Grid.Row="1" Margin="0,0,0,12">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <c:DescriptionTextBox DescriptionText="{StaticResource Settings_Username}" Text="{Binding Path=ConfigVm.ModPortalUsername, Mode=TwoWay}" Margin="0,0,12,0" />
+                                <c:DescriptionTextBox Grid.Column="1" DescriptionText="{StaticResource Settings_AuthenticationToken}" Text="{Binding Path=ConfigVm.ModPortalAuthToken, Mode=TwoWay}" IsPasswordBox="True" />
+                            </Grid>
+                        </StackPanel>
+
+                        <!-- app settings -->
+                        <TextBlock Grid.Column="0" Grid.Row="2" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="{StaticResource Settings_Descriptors_ApplicationSettings}" />
+                        <StackPanel Grid.Column="1" Grid.Row="2" Margin="0,0,0,12">
+                            <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" TextWrapping="Wrap" Margin="0,0,0,4" Text="{StaticResource Settings_AutoCheckModUpdate_Description}" />
+                            <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoCheckModUpdate, Mode=TwoWay}" Content="{StaticResource Settings_AutoCheckModUpdate}" />
+                            <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" TextWrapping="Wrap" Margin="0,0,0,4" Text="{StaticResource Settings_AutoDownloadModUpdate_Description}" />
+                            <CheckBox Style="{StaticResource SettingsCheckBox}" IsChecked="{Binding Path=ConfigVm.AutoDownloadModUpdate, Mode=TwoWay}" Content="{StaticResource Settings_AutoDownloadModUpdate}" />
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{StaticResource DialogButton}" Content="Reset size and position of window" Command="{Binding Path=ConfigVm.ResetWindowPosDimCmd}" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
                 </Grid>
-            </Grid>
+            </ScrollViewer>
+
+            <!-- Snackbar -->
+            <c:Snackbar x:Name="UpdaterSnackbar" Grid.Row="2" TotalProgressPercentage="{Binding Path=ModsVm.UpdateTotalProgress}" IsOpen="{Binding Path=ModsVm.IsUpdating}">
+                <c:Snackbar.Resources>
+                    <snackbarConverters:ProgressPercentageConverter x:Key="ProgressPercentageConverter" />
+                    <snackbarConverters:TitleConverter x:Key="TitleConverter" />
+                </c:Snackbar.Resources>
+                <c:Snackbar.Title>
+                    <MultiBinding Converter="{StaticResource TitleConverter}">
+                        <Binding Path="ModsVm.IsUpdating" />
+                        <Binding Path="ModsVm.CurrentUpdatingMod" />
+                        <Binding Path="ModsVm.CurrentUpdatingDependency" />
+                    </MultiBinding>
+                </c:Snackbar.Title>
+                <c:Snackbar.ItemProgressPercentage>
+                    <MultiBinding Converter="{StaticResource ProgressPercentageConverter}">
+                        <Binding Path="ModsVm.IsUpdating" />
+                        <Binding Path="ModsVm.CurrentUpdatingMod" />
+                        <Binding Path="ModsVm.CurrentUpdatingDependency" />
+                    </MultiBinding>
+                </c:Snackbar.ItemProgressPercentage>
+            </c:Snackbar>
+
         </Grid>
 
         <!-- Progress bar -->
@@ -463,6 +492,7 @@
         </AdornerDecorator>
 
         <!-- Update notify banner -->
+        <!--
         <AdornerDecorator x:Name="AdornerUpdateNotify" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=ModsVm.IsUpdating, Converter={StaticResource ValueToVisibilityConverter}}">
             <Border Background="#CC111111">
                 <Grid>
@@ -473,8 +503,15 @@
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
                             <TextBlock Foreground="#B2FFFFFF" Margin="0,0,0,5" TextTrimming="CharacterEllipsis">
-                                <Run Text="{Binding Path=ModsVm.CurrentUpdatingMod.Title, StringFormat={}Updating: {0}, TargetNullValue='Warming up...', FallbackValue='Warming up...'}" />
-                                <Run Text="{Binding Path=ModsVm.CurrentUpdatingMod.ProgressPercentage, StringFormat={} - {0}%}" />
+                                <Run>
+                                    <Run.Text>
+                                        <MultiBinding Converter="{StaticResource IsUpdatingObjectToValueConverter}">
+                                            <Binding Path="ModsVm.IsUpdating" />
+                                            <Binding Path="ModsVm.CurrentUpdatingMod" />
+                                            <Binding Path="ModsVm.CurrentUpdatingDependency" />
+                                        </MultiBinding>
+                                    </Run.Text>
+                                </Run>
                             </TextBlock>
                             <TextBlock Grid.Column="1" Text="{Binding Path=ModsVm.UpdateTotalProgress, StringFormat={}Total: {0}%}" Foreground="#B2FFFFFF" HorizontalAlignment="Right" Margin="0,0,0,5" />
                         </Grid>
@@ -484,9 +521,10 @@
                 </Grid>
             </Border>
         </AdornerDecorator>
+    -->
 
         <!--  Launch button  -->
-        <AdornerDecorator x:Name="AdornerLaunchButton" Width="80" Height="80" Margin="0,0,57,0" HorizontalAlignment="Right" VerticalAlignment="Top">
+        <AdornerDecorator x:Name="AdornerLaunchButton" Width="80" Height="80" Margin="0,10,49,0" HorizontalAlignment="Right" VerticalAlignment="Top">
             <c:IconButton Style="{StaticResource LaunchButton}" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
                 <c:IconButton.IsEnabled>
                     <MultiBinding Converter="{StaticResource InvertedBooleanMultiConverter}">

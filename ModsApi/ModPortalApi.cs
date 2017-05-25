@@ -17,19 +17,25 @@ namespace ModsApi
         public ModPortalApi()
         {
             Debug.WriteLine($"Class created: {nameof(ModPortalApi)}");
+
+            _json = null;
+            _responseJson = null;
+            _buildApiDataException = null;
+            _getApiResponseJsonStringException = null;
         }
 
         private WebClient _webClient;
         private string _json;
+        private string _responseJson;
+        private Exception _buildApiDataException;
+        private Exception _getApiResponseJsonStringException;
         private const string ApiResponseUrl = "https://mods.factorio.com/api/mods";
 
-        public ApiData ApiData { get; set; } = new ApiData();
+        public ApiData ApiData { get; set; }
 
         public async Task BuildApiData(string request)
         {
             Debug.WriteLine($"Method called: {nameof(BuildApiData)}");
-
-            Exception exception = null;
 
             try
             {
@@ -37,71 +43,47 @@ namespace ModsApi
             }
             catch (Exception ex)
             {
-                exception = ex;
+                _buildApiDataException = ex;
                 Debug.WriteLine($"Method execution failed: {nameof(BuildApiData)}, exception message: {ex.Message}");
             }
             finally
             {
-                if (exception == null)
+                if (_buildApiDataException == null)
                     Debug.WriteLine($"Method execution succeeded: {nameof(BuildApiData)}");
             }
 
             if (!string.IsNullOrEmpty(_json))
                 ApiData = JsonConvert.DeserializeObject<ApiData>(_json, new JsonSerializerSettings { NullValueHandling = NullValueHandling.Ignore });
+            else
+                Debug.WriteLine($"Failed to get {nameof(GetApiResponseJsonString)} with request: {request} - JSON is null");
         }
 
         private async Task<string> GetApiResponseJsonString(string request)
         {
             Debug.WriteLine($"Method called: {nameof(GetApiResponseJsonString)}, param name: {nameof(request)}, value: {request}");
 
-            Exception exception = null;
-            string response = null;
-
-            using (_webClient = new PatientWebClient { Proxy = null })
+            using (_webClient = new WebClient { Proxy = null })
             {
+                _webClient.DownloadProgressChanged += (sender, args) => Debug.WriteLine($"_webClient.DownloadProgressChanged {args.BytesReceived}");
+                _webClient.DownloadStringCompleted += (sender, args) => Debug.WriteLine($"_webClient.DownloadStringCompleted");
+
                 try
                 {
-                    response = await _webClient.DownloadStringTaskAsync($"{ApiResponseUrl}{request}");
+                    _responseJson = await _webClient.DownloadStringTaskAsync($"{ApiResponseUrl}{request}");
                 }
                 catch (Exception ex)
                 {
-                    exception = ex;
+                    _getApiResponseJsonStringException = ex;
                     Debug.WriteLine($"Method execution failed: {nameof(GetApiResponseJsonString)}, exception message: {ex.Message}");
                 }
                 finally
                 {
-                    if (exception == null)
+                    if (_getApiResponseJsonStringException == null)
                         Debug.WriteLine($"Method execution succeeded: {nameof(GetApiResponseJsonString)}");
                 }
             }
 
-            return response;
-        }
-
-        public async Task<bool> CanReachApi()
-        {
-            HttpWebResponse response = null;
-            var result = false;
-
-            if (WebRequest.Create(ApiResponseUrl) is HttpWebRequest request)
-            {
-                request.Method = WebRequestMethods.Http.Head;
-                request.Timeout = 10000;
-
-                try
-                {
-                    response = await request.GetResponseAsync() as HttpWebResponse;
-                }
-                catch
-                {
-                    // ignored
-                }
-            }
-
-            if (response != null && response.StatusCode == HttpStatusCode.OK)
-                result = true;
-
-            return result;
+            return _responseJson;
         }
     }
 }

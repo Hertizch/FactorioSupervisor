@@ -22,7 +22,7 @@ namespace FactorioSupervisor.Helpers
             if (ProductName != "")
             {
                 return (ProductName.StartsWith("Microsoft") ? "" : "Microsoft ") + ProductName +
-                            (CSDVersion != "" ? " " + CSDVersion : "");
+                            (CSDVersion != "" ? " " + CSDVersion : "").Trim();
             }
             return "";
         }
