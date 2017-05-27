@@ -100,11 +100,11 @@ namespace FactorioSupervisor.ViewModels
 
         private ObservableImmutableList<Mod> _mods;
         private Mod _selectedMod;
-        private Dependency _selectedDependency;
         private bool _isCheckingForUpdates;
         private bool _isUpdating;
         private double _updateTotalProgress;
         private bool _isUpdatesAvailable;
+        private int _totalUpdatesAvailable;
         private Mod _currentUpdatingMod;
         private Dependency _currentUpdatingDependency;
         private bool _showProgressBar;
@@ -144,15 +144,6 @@ namespace FactorioSupervisor.ViewModels
         {
             get { return _selectedMod; }
             set { if (value == _selectedMod) return; _selectedMod = value; OnPropertyChanged(nameof(SelectedMod)); }
-        }
-
-        /// <summary>
-        /// Gets or sets the currently selected mod dependency
-        /// </summary>
-        public Dependency SelectedDependency
-        {
-            get { return _selectedDependency; }
-            set { if (value == _selectedDependency) return; _selectedDependency = value; OnPropertyChanged(nameof(SelectedDependency)); }
         }
 
         /// <summary>
@@ -203,6 +194,15 @@ namespace FactorioSupervisor.ViewModels
         {
             get { return _isUpdatesAvailable; }
             set { if (value == _isUpdatesAvailable) return; _isUpdatesAvailable = value; OnPropertyChanged(nameof(IsUpdatesAvailable)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the number of total mod updates available
+        /// </summary>
+        public int TotalUpdatesAvailable
+        {
+            get { return _totalUpdatesAvailable; }
+            set { if (value == _totalUpdatesAvailable) return; _totalUpdatesAvailable = value; OnPropertyChanged(nameof(TotalUpdatesAvailable)); }
         }
 
         /// <summary>
@@ -539,8 +539,8 @@ namespace FactorioSupervisor.ViewModels
                 if (Mods.Any(x => x.UpdateAvailable))
                 {
                     IsUpdatesAvailable = true;
-
                     var updateCount = Mods.Count(x => x.UpdateAvailable);
+                    TotalUpdatesAvailable = updateCount;
 
                     if (updateCount > 1)
                         BaseVm.NotifyBannerRelay.SetNotifyBanner($"{updateCount} updates are available!");
@@ -635,6 +635,9 @@ namespace FactorioSupervisor.ViewModels
                 updateCount++;
                 UpdateTotalProgress = (updateCount / totalUpdateCount) * 100;
             }
+
+            if (Mods.Count(x => x.UpdateAvailable) > 0)
+                TotalUpdatesAvailable = Mods.Count(x => x.UpdateAvailable);
 
             // Reset IsUpdatesAvailable flag
             if (Mods.Count(x => x.UpdateAvailable) == 0)
@@ -973,6 +976,10 @@ namespace FactorioSupervisor.ViewModels
                             result = false;
                     }
                 }
+            }
+            else
+            {
+                Logger.WriteLine($"[AUTH]: Failed authentication with mod portal with username: '{BaseVm.ConfigVm.ModPortalUsername}' and password: [SECRET] - No internet connection", true);
             }
 
             return result;

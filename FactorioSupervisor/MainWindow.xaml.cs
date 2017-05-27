@@ -43,6 +43,9 @@ namespace FactorioSupervisor
                     AddFilter();
 
                 ((CollectionViewSource)Resources["ModsVs"])?.View.Refresh();
+
+                if (ModsListBox.SelectedIndex == -1)
+                    ModsListBox.SelectedIndex = 0;
             }
         }
 

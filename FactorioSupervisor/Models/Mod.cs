@@ -1,7 +1,6 @@
 ﻿using FactorioSupervisor.Extensions;
 using FactorioSupervisor.ObservableImmutable;
 using Newtonsoft.Json.Linq;
-using System.Collections.ObjectModel;
 
 namespace FactorioSupervisor.Models
 {

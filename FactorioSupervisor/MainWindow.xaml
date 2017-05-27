@@ -10,6 +10,7 @@
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
+        xmlns:ext="clr-namespace:FactorioSupervisor.Extensions"
         mc:Ignorable="d"
         Height="{Binding Path=ConfigVm.UiDimHeight, Mode=TwoWay}" Width="{Binding Path=ConfigVm.UiDimWidth, Mode=TwoWay}"
         Left="{Binding Path=ConfigVm.UiPosLeft, Mode=TwoWay}" Top="{Binding Path=ConfigVm.UiPosTop, Mode=TwoWay}"
@@ -64,7 +65,7 @@
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal">
-                        <c:IconToggleButton x:Name="SettingsButton" Style="{StaticResource SettingsButton}" ToolTip="Settings" IsChecked="False" />
+                        <c:IconToggleButton x:Name="SettingsButton" Style="{StaticResource SettingsButton}" IsChecked="False" />
                     </StackPanel>
                     <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                         <c:IconButton Style="{StaticResource TitlebarUiButton}" Icon="{StaticResource IconMinimize}" Click="MinimizeButton_OnClick" />
@@ -92,7 +93,8 @@
                     </Grid.RowDefinitions>
 
                     <!-- Search box -->
-                    <TextBox x:Name="SearchTextBox" Style="{StaticResource SearchTextBox}" Text="{Binding ElementName=WindowRoot, Path=SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=50}" />
+                    <TextBox x:Name="SearchTextBox" Style="{StaticResource SearchTextBox}" Text="{Binding ElementName=WindowRoot, Path=SearchFilter, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Delay=50}" >
+                    </TextBox>
 
                     <Grid Grid.Row="1" Background="{StaticResource Color_BaseBackground}" />
 
@@ -113,29 +115,34 @@
                             </ComboBox>
 
                             <!-- check updates button -->
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconCheckUpdate}" Command="{Binding Path=ModsVm.GetModRemoteDataCmd}" ToolTip="Check for updates">
-                                <c:IconButton.IsEnabled>
+                            <Button>
+                                <Button.IsEnabled>
                                     <MultiBinding Converter="{StaticResource InvertedBooleanMultiConverter}">
                                         <Binding Path="ModsVm.IsUpdating" />
                                         <Binding Path="ModsVm.IsCheckingForUpdates" />
                                     </MultiBinding>
-                                </c:IconButton.IsEnabled>
-                            </c:IconButton>
+                                </Button.IsEnabled>
+                                <Button.Style>
+                                    <Style BasedOn="{StaticResource ModUpdateButton}" TargetType="{x:Type Button}">
+                                        <Setter Property="Content" Value="{StaticResource IconCheckUpdate}" />
+                                        <Setter Property="Command" Value="{Binding Path=ModsVm.GetModRemoteDataCmd}" />
+                                        <Setter Property="ToolTip" Value="Check for updates" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding Path=ModsVm.IsUpdatesAvailable}" Value="True">
+                                                <Setter Property="Content" Value="{StaticResource IconDownload}" />
+                                                <Setter Property="Command" Value="{Binding Path=ModsVm.DownloadModCmd}" />
+                                                <Setter Property="ToolTip" Value="Download updates" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
 
-                            <!-- download updates button -->
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconDownload}" Command="{Binding Path=ModsVm.DownloadModCmd}" ToolTip="Update all">
-                                <c:IconButton.IsEnabled>
-                                    <MultiBinding Converter="{StaticResource InvertedBooleanMultiConverter}">
-                                        <Binding Path="ModsVm.IsUpdating" />
-                                        <Binding Path="ModsVm.IsCheckingForUpdates" />
-                                    </MultiBinding>
-                                </c:IconButton.IsEnabled>
-                            </c:IconButton>
+                            <TextBlock Text="{Binding Path=ModsVm.TotalUpdatesAvailable, StringFormat='{}{0} updates available'}" Foreground="{StaticResource Color_Accent}" VerticalAlignment="Center" Margin="8,0,0,0" Visibility="{Binding Path=ModsVm.IsUpdatesAvailable, Converter={StaticResource ValueToVisibilityConverter}}" />
 
-                            <!-- test message box window button -->
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconImport}" Command="{Binding Path=ConfigVm.TestMessageBoxWindowCmd}" />
-
-                            <ToggleButton Content="SB" IsChecked="{Binding ElementName=UpdaterSnackbar, Path=IsOpen, Mode=TwoWay}" Click="ToggleButton_Click" />
+                            <!-- test buttons -->
+                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconImport}" Command="{Binding Path=ConfigVm.TestMessageBoxWindowCmd}" Visibility="Collapsed" />
+                            <ToggleButton Content="SB" IsChecked="{Binding ElementName=UpdaterSnackbar, Path=IsOpen, Mode=TwoWay}" Click="ToggleButton_Click" Visibility="Collapsed" />
 
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -330,7 +337,7 @@
                                 </StackPanel>
 
                                 <!-- Dependencies -->
-                                <TextBlock Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Dependencies" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" />
+                                <TextBlock Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Dependencies" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,3,0,0" />
                                 <ListBox Grid.Row="1" Grid.Column="1" Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod.SelectedDependency, Mode=TwoWay}" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}">
                                     <ListBox.ItemContainerStyle>
                                         <Style BasedOn="{StaticResource DependeciesListBoxItem}" TargetType="{x:Type ListBoxItem}">
@@ -352,7 +359,7 @@
                                                             <Style BasedOn="{StaticResource PropertyDescriptorTextBlock}" TargetType="{x:Type TextBlock}">
                                                                 <Style.Triggers>
                                                                     <DataTrigger Binding="{Binding Path=IsOptional}" Value="True">
-                                                                        <Setter Property="Text" Value="OPTIONAL:" />
+                                                                        <Setter Property="Text" Value="?" />
                                                                         <Setter Property="Margin" Value="0,0,8,0" />
                                                                     </DataTrigger>
                                                                 </Style.Triggers>
@@ -385,7 +392,7 @@
                                     </ListBox.ItemTemplate>
                                     <ListBox.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Install mod" Command="{Binding Path=ModsVm.InstallDependencyModCmd}" IsEnabled="{Binding Path=ModsVm.SelectedDependency.IsInstalled, Converter={StaticResource InvertedBooleanConverter}}" />
+                                            <MenuItem Header="Install mod" Command="{Binding Path=ModsVm.InstallDependencyModCmd}" IsEnabled="{Binding Path=ModsVm.SelectedMod.SelectedDependency.IsInstalled, Converter={StaticResource InvertedBooleanConverter}}" />
                                         </ContextMenu>
                                     </ListBox.ContextMenu>
                                 </ListBox>
@@ -469,8 +476,10 @@
                     </MultiBinding>
                 </c:Snackbar.ItemProgressPercentage>
             </c:Snackbar>
-
         </Grid>
+
+
+        <c:NotifyTicker VerticalAlignment="Bottom" Title="There is no internet connection!" Margin="120,0" Visibility="Collapsed"></c:NotifyTicker>
 
         <!-- Progress bar -->
         <AdornerDecorator x:Name="AdornerProgressBar" VerticalAlignment="Top" Margin="0,35,0,0">
@@ -478,8 +487,8 @@
         </AdornerDecorator>
 
         <!-- Notify banner -->
-        <AdornerDecorator x:Name="AdornerNotify" Height="35" MinWidth="400" Margin="0,0,0,15" HorizontalAlignment="Center" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=NotifyBannerRelay.ShowNotifyBanner, Converter={StaticResource ValueToVisibilityConverter}}">
-            <Border Background="#CC111111" CornerRadius="12">
+        <AdornerDecorator x:Name="AdornerNotify" Height="35" Margin="150,0,150,0" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=NotifyBannerRelay.ShowNotifyBanner, Converter={StaticResource ValueToVisibilityConverter}}">
+            <Border Background="#CC111111">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
@@ -491,48 +500,16 @@
             </Border>
         </AdornerDecorator>
 
-        <!-- Update notify banner -->
-        <!--
-        <AdornerDecorator x:Name="AdornerUpdateNotify" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=ModsVm.IsUpdating, Converter={StaticResource ValueToVisibilityConverter}}">
-            <Border Background="#CC111111">
-                <Grid>
-                    <StackPanel Margin="50,15">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Foreground="#B2FFFFFF" Margin="0,0,0,5" TextTrimming="CharacterEllipsis">
-                                <Run>
-                                    <Run.Text>
-                                        <MultiBinding Converter="{StaticResource IsUpdatingObjectToValueConverter}">
-                                            <Binding Path="ModsVm.IsUpdating" />
-                                            <Binding Path="ModsVm.CurrentUpdatingMod" />
-                                            <Binding Path="ModsVm.CurrentUpdatingDependency" />
-                                        </MultiBinding>
-                                    </Run.Text>
-                                </Run>
-                            </TextBlock>
-                            <TextBlock Grid.Column="1" Text="{Binding Path=ModsVm.UpdateTotalProgress, StringFormat={}Total: {0}%}" Foreground="#B2FFFFFF" HorizontalAlignment="Right" Margin="0,0,0,5" />
-                        </Grid>
-                        <ProgressBar Foreground="{StaticResource Color_AccentMuted}" Height="2" BorderBrush="Transparent" Background="Transparent" Value="{Binding Path=ModsVm.CurrentUpdatingMod.ProgressPercentage}" Margin="0,0,0,1" />
-                        <ProgressBar Foreground="{StaticResource Color_Accent}" Height="4" BorderBrush="Transparent" Background="Transparent" Value="{Binding Path=ModsVm.UpdateTotalProgress}" />
-                    </StackPanel>
-                </Grid>
-            </Border>
-        </AdornerDecorator>
-    -->
-
         <!--  Launch button  -->
-        <AdornerDecorator x:Name="AdornerLaunchButton" Width="80" Height="80" Margin="0,10,49,0" HorizontalAlignment="Right" VerticalAlignment="Top">
-            <c:IconButton Style="{StaticResource LaunchButton}" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
-                <c:IconButton.IsEnabled>
+        <AdornerDecorator x:Name="AdornerLaunchButton" Width="80" Height="80" Margin="0,0,64,0" HorizontalAlignment="Right" VerticalAlignment="Top">
+            <Button Style="{StaticResource LaunchButton}" Command="{Binding Path=ModsVm.LaunchFactorioCmd}">
+                <Button.IsEnabled>
                     <MultiBinding Converter="{StaticResource InvertedBooleanMultiConverter}">
                         <Binding Path="ModsVm.IsUpdating" />
                         <Binding Path="ModsVm.IsCheckingForUpdates" />
                     </MultiBinding>
-                </c:IconButton.IsEnabled>
-            </c:IconButton>
+                </Button.IsEnabled>
+            </Button>
         </AdornerDecorator>
     </Grid>
 </Window>

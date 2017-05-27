@@ -82,6 +82,7 @@
     <Compile Include="Converters\SnackbarValueConverters\ProgressPercentageConverter.cs" />
     <Compile Include="Converters\SnackbarValueConverters\TitleConverter.cs" />
     <Compile Include="Converters\ValueToVisibilityConverter.cs" />
+    <Compile Include="Extensions\ExtendedButton.cs" />
     <Compile Include="Helpers\NetcodeHelpers.cs" />
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="MessageBoxWindow.xaml.cs">
@@ -114,6 +115,9 @@
     <Compile Include="Resources\Controls\IconToggleButton.xaml.cs">
       <DependentUpon>IconToggleButton.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Resources\Controls\NotifyTicker.xaml.cs">
+      <DependentUpon>NotifyTicker.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Resources\Controls\Snackbar.xaml.cs">
       <DependentUpon>Snackbar.xaml</DependentUpon>
     </Compile>
@@ -137,6 +141,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Resources\Animations.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="Resources\Colors.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -150,6 +158,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\Controls\IconToggleButton.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\Controls\NotifyTicker.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
