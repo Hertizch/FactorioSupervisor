@@ -12,4 +12,4 @@ A Factorio mod manager and launcher.
 - Use Ctrl + F to focus the search box.
 
 ## Changelog
-Currently in development. No changelog until release.
+*Currently in development. No changelog until release.*
