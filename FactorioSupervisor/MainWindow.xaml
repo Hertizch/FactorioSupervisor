@@ -30,6 +30,7 @@
         <conv:InvertedBooleanConverter x:Key="InvertedBooleanConverter" />
         <conv:InvertedBooleanMultiConverter x:Key="InvertedBooleanMultiConverter" />
         <conv:IsUpdatingToNotifyValueConverter x:Key="IsUpdatingToNotifyValueConverter" />
+        <conv:NotifyBannerVisibilityMultiConverter x:Key="NotifyBannerVisibilityMultiConverter" />
 
         <CollectionViewSource x:Key="ModsVs" Source="{Binding Path=ModsVm.Mods}" IsLiveFilteringRequested="True" IsLiveSortingRequested="True">
             <CollectionViewSource.SortDescriptions>
@@ -54,6 +55,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="35" />
                 <RowDefinition />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
@@ -142,7 +144,7 @@
 
                             <!-- test buttons -->
                             <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconImport}" Command="{Binding Path=ConfigVm.TestMessageBoxWindowCmd}" Visibility="Collapsed" />
-                            <ToggleButton Content="SB" IsChecked="{Binding ElementName=UpdaterSnackbar, Path=IsOpen, Mode=TwoWay}" Click="ToggleButton_Click" Visibility="Collapsed" />
+                            <ToggleButton Content="SB" IsChecked="{Binding ElementName=UpdaterSnackbar, Path=IsOpen, Mode=TwoWay}" Click="ToggleButton_Click" />
 
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -455,8 +457,28 @@
                 </Grid>
             </ScrollViewer>
 
+            <!-- Notify banner -->
+            <AdornerDecorator x:Name="AdornerNotify" Grid.Row="2" Height="35" Margin="0,0,0,1">
+                <AdornerDecorator.Visibility>
+                    <MultiBinding Converter="{StaticResource NotifyBannerVisibilityMultiConverter}">
+                        <Binding Path="NotifyBannerRelay.ShowNotifyBanner" />
+                        <Binding ElementName="UpdaterSnackbar" Path="IsOpen" />
+                    </MultiBinding>
+                </AdornerDecorator.Visibility>
+                <Border Background="{StaticResource Color_SnackbarBackground}">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Text="{Binding Path=NotifyBannerRelay.NotifyBannerValue}" Foreground="#7FFFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="25,0,0,0" />
+                        <c:IconButton Grid.Column="1" Style="{StaticResource NotifyButton}" Icon="{StaticResource IconClose}" Command="{Binding Path=NotifyBannerRelay.CloseNotifyBannerCmd}" Margin="0,0,5,0" ToolTip="Close" />
+                    </Grid>
+                </Border>
+            </AdornerDecorator>
+
             <!-- Snackbar -->
-            <c:Snackbar x:Name="UpdaterSnackbar" Grid.Row="2" TotalProgressPercentage="{Binding Path=ModsVm.UpdateTotalProgress}" IsOpen="{Binding Path=ModsVm.IsUpdating}">
+            <c:Snackbar x:Name="UpdaterSnackbar" Grid.Row="3" TotalProgressPercentage="{Binding Path=ModsVm.UpdateTotalProgress}" IsOpen="{Binding Path=ModsVm.IsUpdating}">
                 <c:Snackbar.Resources>
                     <snackbarConverters:ProgressPercentageConverter x:Key="ProgressPercentageConverter" />
                     <snackbarConverters:TitleConverter x:Key="TitleConverter" />
@@ -484,20 +506,6 @@
         <!-- Progress bar -->
         <AdornerDecorator x:Name="AdornerProgressBar" VerticalAlignment="Top" Margin="0,35,0,0">
             <ProgressBar Height="1" Foreground="{StaticResource Color_Accent}" BorderBrush="Transparent" IsIndeterminate="{Binding Path=ModsVm.ShowProgressBar}" />
-        </AdornerDecorator>
-
-        <!-- Notify banner -->
-        <AdornerDecorator x:Name="AdornerNotify" Height="35" Margin="150,0,150,0" VerticalAlignment="Bottom" Grid.RowSpan="2" Visibility="{Binding Path=NotifyBannerRelay.ShowNotifyBanner, Converter={StaticResource ValueToVisibilityConverter}}">
-            <Border Background="#CC111111">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding Path=NotifyBannerRelay.NotifyBannerValue}" Foreground="#7FFFFFFF" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="25,0,0,0" />
-                    <c:IconButton Grid.Column="1" Style="{StaticResource NotifyButton}" Icon="{StaticResource IconClose}" Command="{Binding Path=NotifyBannerRelay.CloseNotifyBannerCmd}" Margin="0,0,5,0" ToolTip="Close" />
-                </Grid>
-            </Border>
         </AdornerDecorator>
 
         <!--  Launch button  -->

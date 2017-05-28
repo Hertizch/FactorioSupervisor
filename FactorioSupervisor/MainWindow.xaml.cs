@@ -167,21 +167,9 @@ namespace FactorioSupervisor
             }
         }
 
-        private async void ToggleButton_Click(object sender, RoutedEventArgs e)
+        private void ToggleButton_Click(object sender, RoutedEventArgs e)
         {
-            UpdaterSnackbar.Title = "Test mod";
-
-            for (int i = 0; i < 101; i++)
-            {
-                await Task.Delay(50);
-                UpdaterSnackbar.ItemProgressPercentage = i;
-            }
-
-            for (int i = 0; i < 101; i++)
-            {
-                await Task.Delay(50);
-                UpdaterSnackbar.TotalProgressPercentage = i;
-            }
+            UpdaterSnackbar.Title = "Test";
         }
     }
 }

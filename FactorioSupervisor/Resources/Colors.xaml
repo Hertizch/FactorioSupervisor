@@ -36,4 +36,6 @@
     <SolidColorBrush x:Key="Color_ScrollBarThumbBackground" Color="#FF303030" />
     <SolidColorBrush x:Key="Color_ScrollBarThumbBackgroundHover" Color="#FF5F5F5F" />
 
+    <SolidColorBrush x:Key="Color_SnackbarBackground" Color="#CC111111" />
+
 </ResourceDictionary>

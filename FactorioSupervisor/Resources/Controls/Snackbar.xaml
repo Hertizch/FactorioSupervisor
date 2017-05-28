@@ -3,28 +3,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:FactorioSupervisor.Resources.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="65" d:DesignWidth="800" Height="0">
 
     <UserControl.Resources>
         <Storyboard x:Key="OnIsOpenTrue">
-            <DoubleAnimation Storyboard.TargetProperty="Height" From="0" To="65" Duration="0:0:0.3">
+            <DoubleAnimation Storyboard.TargetProperty="Height" To="65" Duration="0:0:0.25">
                 <DoubleAnimation.EasingFunction>
-                    <CubicEase EasingMode="EaseIn" />
+                    <CubicEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
 
         <Storyboard x:Key="OnIsOpenFalse">
-            <DoubleAnimation Storyboard.TargetProperty="Height" From="65" To="0" Duration="0:0:0.3">
+            <DoubleAnimation Storyboard.TargetProperty="Height" To="0" Duration="0:0:0.25">
                 <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
             </DoubleAnimation>
         </Storyboard>
     </UserControl.Resources>
-    
+
     <UserControl.Style>
         <Style>
             <Style.Triggers>
@@ -40,18 +39,18 @@
         </Style>
     </UserControl.Style>
 
-        <Grid Background="#CC111111">
-            <StackPanel Margin="35,15">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
-                    <TextBlock Text="{Binding ElementName=SnackbarControl, Path=Title}" Foreground="{StaticResource Color_Text100}" />
-                    <TextBlock Grid.Column="1" Text="{Binding ElementName=SnackbarControl, Path=TotalProgressPercentage, StringFormat={}Total: {0}%}" Foreground="{StaticResource Color_Text70}" HorizontalAlignment="Right" Margin="0,0,0,5" />
-                </Grid>
-                <ProgressBar Foreground="{StaticResource Color_AccentMuted}" Height="2" BorderBrush="Transparent" Background="Transparent" Value="{Binding ElementName=SnackbarControl, Path=ItemProgressPercentage}" Margin="0,0,0,1" />
-                <ProgressBar Foreground="{StaticResource Color_Accent}" Height="4" BorderBrush="Transparent" Background="Transparent" Value="{Binding ElementName=SnackbarControl, Path=TotalProgressPercentage}" />
-            </StackPanel>
-        </Grid>
+    <Grid Background="{StaticResource Color_SnackbarBackground}">
+        <StackPanel Margin="35,15">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding ElementName=SnackbarControl, Path=Title}" Foreground="{StaticResource Color_Text100}" />
+                <TextBlock Grid.Column="1" Text="{Binding ElementName=SnackbarControl, Path=TotalProgressPercentage, StringFormat={}Total: {0}%}" Foreground="{StaticResource Color_Text70}" HorizontalAlignment="Right" Margin="0,0,0,5" />
+            </Grid>
+            <ProgressBar Foreground="{StaticResource Color_AccentMuted}" Height="2" BorderBrush="Transparent" Background="Transparent" Value="{Binding ElementName=SnackbarControl, Path=ItemProgressPercentage}" Margin="0,0,0,1" />
+            <ProgressBar Foreground="{StaticResource Color_Accent}" Height="4" BorderBrush="Transparent" Background="Transparent" Value="{Binding ElementName=SnackbarControl, Path=TotalProgressPercentage}" />
+        </StackPanel>
+    </Grid>
 </UserControl>

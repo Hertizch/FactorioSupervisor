@@ -6,6 +6,7 @@ using ModsApi;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -878,6 +879,39 @@ namespace FactorioSupervisor.ViewModels
             
         }
 
+        private async Task InstallMod(IEnumerable<string> modNames = null, IEnumerable<string> dependencyNames = null, bool installMod = false, bool updateMod = false, bool installDependency = false)
+        {
+            IsUpdating = true;
+
+            if (installMod)
+            {
+                return;
+            }
+
+            if (updateMod)
+            {
+                foreach (var modName in modNames)
+                {
+                    foreach (var mod in Mods)
+                    {
+                        if (modName == mod.Name)
+                        {
+                            
+                        }
+                    }
+                }
+
+                return;
+            }
+
+            if (installDependency)
+            {
+                return;
+            }
+
+            IsUpdating = false;
+        }
+
         private async Task<bool> VerifyInternetConnection()
         {
             try
@@ -985,6 +1019,66 @@ namespace FactorioSupervisor.ViewModels
             return result;
         }
 
+        private void AddModToCollection(InfoJson infoJson, string filename)
+        {
+            // Create mod object
+            var mod = new Mod()
+            {
+                Name = infoJson.Name,
+                Title = infoJson.Title,
+                Description = infoJson.Description.Replace("\n", ""), // remove newlines
+                FactorioVersion = infoJson.FactorioVersion,
+                InstalledVersion = infoJson.Version,
+                Author = infoJson.Author,
+                Homepage = infoJson.Homepage != null && infoJson.Homepage.StartsWith("http") ? infoJson.Homepage : null, // only valid urls
+                Dependencies = infoJson.Dependencies,
+                FullName = filename,
+                Filename = Path.GetFileName(filename),
+                FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(filename)
+            };
+
+            // Set dependencies
+            if (mod.Dependencies != null)
+            {
+                foreach (var dep in mod.Dependencies)
+                {
+                    // Convert to string
+                    var depString = dep.ToString();
+
+                    // Remove unwanted content
+                    if (depString.Contains(">="))
+                        depString = Regex.Replace(depString, ">=(?:.*)", "").Trim();
+
+                    if (depString.Contains("<"))
+                        depString = Regex.Replace(depString, "<(?:.*)", "").Trim();
+
+                    // Create dependency object
+                    var dependency = new Dependency();
+
+                    // set optional dependencies
+                    if (depString.StartsWith("?"))
+                    {
+                        dependency.IsOptional = true;
+                        mod.HasOptionalDependencies = true;
+                        depString = depString.Replace("?", "").Trim(); // remove "?" and trim start/end whitespaces
+                    }
+
+                    // set name
+                    dependency.Name = depString;
+
+                    // Skip "base" dependency
+                    if (dependency.Name.StartsWith("base", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
+                    // Add dependency to dependencies collection
+                    mod.DependenciesCollection.Add(dependency);
+                }
+            }
+
+            // Add to mods collection
+            Mods.Add(mod);
+        }
+
         private void ItemEntryAdd(string filename)
         {
             // If the file does not end with .zip, skip it
@@ -992,7 +1086,7 @@ namespace FactorioSupervisor.ViewModels
                 return;
 
             // Get info.json as string
-            string infoJsonString = JsonHelpers.GetModInfoJsonString(filename);
+            var infoJsonString = JsonHelpers.GetModInfoJsonString(filename);
 
             // If unable to read info from archive - flag an error in file entry
             if (string.IsNullOrEmpty(infoJsonString))
@@ -1008,73 +1102,14 @@ namespace FactorioSupervisor.ViewModels
 
             // Deserialize the json string to infojson object
             var infoJson = JsonConvert.DeserializeObject<InfoJson>(infoJsonString);
-
             if (infoJson != null)
             {
                 // Check for duplicates
                 if (Mods.Any(x => x.Name == infoJson.Name))
-                {
                     Logger.WriteLine($"Duplicated mod found: {infoJson.Name}");
-                }
 
                 // Create mod
-                var mod = new Mod()
-                {
-                    Name = infoJson.Name,
-                    Title = infoJson.Title,
-                    Description = infoJson.Description.Replace("\n", ""), // remove newlines
-                    FactorioVersion = infoJson.FactorioVersion,
-                    InstalledVersion = infoJson.Version,
-                    Author = infoJson.Author,
-                    Homepage = infoJson.Homepage != null && infoJson.Homepage.StartsWith("http") ? infoJson.Homepage : null, // add only valid urls
-                    Dependencies = infoJson.Dependencies,
-                    FullName = filename,
-                    Filename = Path.GetFileName(filename),
-                    FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(filename)
-                };
-
-                // Set dependencies
-                if (mod.Dependencies != null)
-                {
-                    foreach (var dep in mod.Dependencies)
-                    {
-                        var depStr = dep.ToString();
-
-                        if (depStr.Contains(">="))
-                        {
-                            depStr = Regex.Replace(depStr, ">=(?:.*)", "");
-                            depStr.Trim();
-                        }
-
-                        if (depStr.Contains("<"))
-                        {
-                            depStr = Regex.Replace(depStr, "<(?:.*)", "");
-                            depStr.Trim();
-                        }
-
-                        var dependency = new Dependency();
-
-                        // set optional deps
-                        if (depStr.StartsWith("?"))
-                        {
-                            dependency.IsOptional = true;
-                            mod.HasOptionalDependencies = true;
-                            depStr = depStr.Replace("?", "").Trim();
-                        }
-
-                        // set name
-                        dependency.Name = depStr;
-
-                        // Skip base mod
-                        if (dependency.Name.StartsWith("base", StringComparison.OrdinalIgnoreCase))
-                            continue;
-
-                        mod.DependenciesCollection.Add(dependency);
-                    }
-                }
-
-                // Add to collection
-                Mods.Add(mod);
+                AddModToCollection(infoJson, filename);
             }
         }
 
