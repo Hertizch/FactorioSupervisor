@@ -9,9 +9,9 @@ A Factorio mod manager and launcher.
 
 ## Tips
 - Enable a mod by double-clicking it or by hitting Enter if selected.
-- Use Ctrl + F to focus the search box.
+- Use Ctrl+F to focus the search box.
 
-## Known issues/bugs and improvements to be made
+## Known issues, bugs or improvements to be made
 - Checking for updates or downloading mods can sometimes take longer then usual, since at times the mod portal can be very slow to contact.
 
 ## Changelog
