@@ -11,6 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Input;
+using System.Windows.Media.Animation;
 
 namespace FactorioSupervisor
 {
@@ -22,6 +23,9 @@ namespace FactorioSupervisor
         public MainWindow()
         {
             InitializeComponent();
+
+            // Animation fps
+            Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = 120 });
         }
 
         private string _searchFilter;

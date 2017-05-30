@@ -53,7 +53,9 @@ namespace FactorioSupervisor.ViewModels
                     FullName = @"C:\mods\example",
                     FilenameWithoutExtenion = "example_mod",
                     ReleasedAt = TimeHelpers.GetTimeSpanDuration("2017-04-28T07:47:58.903536Z"),
-                    RemoteVersion = "0.3.2"
+                    RemoteVersion = "0.3.3",
+                    RemoteFactorioVersion = "0.15",
+                    UpdateAvailable = true
                 };
 
                 // Set dependencies
