@@ -7,6 +7,7 @@
         xmlns:c="clr-namespace:FactorioSupervisor.Resources.Controls"
         xmlns:conv="clr-namespace:FactorioSupervisor.Converters"
         xmlns:snackbarConverters="clr-namespace:FactorioSupervisor.Converters.SnackbarValueConverters"
+        xmlns:modListConverters="clr-namespace:FactorioSupervisor.Converters.ModListConverters"
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
@@ -65,11 +66,15 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
                         <ColumnDefinition />
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal">
                         <c:IconToggleButton x:Name="SettingsButton" Style="{StaticResource SettingsButton}" IsChecked="False" />
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,70,0">
+                        <c:IconToggleButton x:Name="LogButton" Style="{StaticResource LogButton}" IsChecked="False" />
+                    </StackPanel>
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                         <c:IconButton Style="{StaticResource TitlebarUiButton}" Icon="{StaticResource IconMinimize}" Click="MinimizeButton_OnClick" />
                         <c:IconButton Style="{StaticResource TitlebarUiButton}" Icon="{StaticResource IconClose}" Click="CloseButton_OnClick" />
                     </StackPanel>
@@ -145,6 +150,8 @@
                             <!-- test buttons -->
                             <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconImport}" Command="{Binding Path=ConfigVm.TestMessageBoxWindowCmd}" Visibility="Collapsed" />
                             <ToggleButton Content="SB" IsChecked="{Binding ElementName=UpdaterSnackbar, Path=IsOpen, Mode=TwoWay}" Click="ToggleButton_Click" Visibility="Collapsed" />
+                            <Button Content="all" Style="{StaticResource TitlebarButton}" Command="{Binding Path=ModsVm.InstallEntryCmd}" CommandParameter="updateExistingMod.all" />
+                            <Button Content="single" Style="{StaticResource TitlebarButton}" Command="{Binding Path=ModsVm.InstallEntryCmd}" CommandParameter="updateExistingMod.single.5dim_ores" />
 
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -165,6 +172,11 @@
                         <ListBox x:Name="ModsListBox" Style="{StaticResource GenericListBox}" ItemContainerStyle="{StaticResource GenericListBoxItem}" 
                                  ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}" 
                                  PreviewMouseDoubleClick="ListBox_PreviewMouseDoubleClick" PreviewKeyDown="ModsListBox_PreviewKeyDown">
+                            <ListBox.Resources>
+                                <modListConverters:EntryInstallCodeCommandParameterConverter x:Key="EntryInstallCodeCommandParameterConverter" />
+                                <system:String x:Key="EntryInstallCode_UpdateExistingMod">updateExistingMod</system:String>
+                                <system:String x:Key="EntryInstallCode_All">all</system:String>
+                            </ListBox.Resources>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="10,5,10,5">
@@ -202,7 +214,7 @@
                                             <TextBlock Text="{Binding Path=ProgressPercentage, StringFormat={} - Updating {0}%}" Visibility="{Binding Path=IsUpdating, Converter={StaticResource ValueToVisibilityConverter}}" Foreground="Yellow" />
                                         </StackPanel>
                                         <Viewbox Grid.Column="1" Width="12" Visibility="{Binding Path=UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" ToolTip="Update available!">
-                                            <Path Data="{StaticResource IconExclamation}" Fill="Yellow" />
+                                            <Path Data="{StaticResource IconExclamation}" Fill="{StaticResource Color_Button100}" />
                                         </Viewbox>
                                         <Grid.Style>
                                             <Style TargetType="{x:Type Grid}">
@@ -221,6 +233,24 @@
                             </ListBox.ItemTemplate>
                             <ListBox.ContextMenu>
                                 <ContextMenu>
+                                    <MenuItem Header="Update" Command="{Binding Path=ModsVm.InstallEntryCmd}">
+                                        <MenuItem.CommandParameter>
+                                            <MultiBinding Converter="{StaticResource EntryInstallCodeCommandParameterConverter}">
+                                                <Binding Source="{StaticResource EntryInstallCode_UpdateExistingMod}" />
+                                                <Binding Source="{StaticResource EntryInstallCode_All}" />
+                                                <Binding Path="ModsVm.SelectedMod.Name" />
+                                            </MultiBinding>
+                                        </MenuItem.CommandParameter>
+                                        <MenuItem.Style>
+                                            <Style TargetType="{x:Type MenuItem}">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Path=ModsVm.SelectedMod.UpdateAvailable}" Value="False">
+                                                        <Setter Property="IsEnabled" Value="False" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </MenuItem.Style>
+                                    </MenuItem>
                                     <MenuItem Header="Delete" Command="{Binding Path=ModsVm.DeleteModCmd}" />
                                 </ContextMenu>
                             </ListBox.ContextMenu>
@@ -288,19 +318,19 @@
                                 <TextBlock Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Latest version" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" />
                                 <StackPanel Grid.Column="1" Margin="0,0,0,12" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}">
                                     <StackPanel>
-                                        <TextBlock Text="{Binding Path=ModsVm.SelectedMod.RemoteVersion, FallbackValue=Version, TargetNullValue=N/A}" Margin="0,0,0,4" FontSize="14">
+                                        <TextBlock Text="{Binding Path=ModsVm.SelectedMod.RemoteVersion, FallbackValue=Version, TargetNullValue=N/A}" Margin="0,0,0,0" FontSize="14" FontFamily="Segoe UI Semilight">
                                             <TextBlock.Style>
                                                 <Style BasedOn="{StaticResource PropertyValueTextBlock}" TargetType="{x:Type TextBlock}">
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Path=ModsVm.SelectedMod.UpdateAvailable}" Value="True">
-                                                            <Setter Property="Foreground" Value="{StaticResource Color_Update}" />
+                                                            <Setter Property="Foreground" Value="{StaticResource Color_Text100}" />
                                                         </DataTrigger>
                                                     </Style.Triggers>
                                                 </Style>
                                             </TextBlock.Style>
                                         </TextBlock>
-                                        <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.ReleasedAt, StringFormat='{}Released: {0}'}" Visibility="{Binding Path=ModsVm.SelectedMod.RemoteVersion, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0" />
-                                        <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.RemoteFactorioVersion, StringFormat='{}For Factorio: {0}'}" Visibility="{Binding Path=ModsVm.SelectedMod.RemoteFactorioVersion, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0" />
+                                        <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.ReleasedAt, StringFormat='{}Released {0}.'}" Visibility="{Binding Path=ModsVm.SelectedMod.RemoteVersion, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0" />
+                                        <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.RemoteFactorioVersion, StringFormat='{}Compatible with Factorio {0}.'}" Visibility="{Binding Path=ModsVm.SelectedMod.RemoteFactorioVersion, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0" />
                                     </StackPanel>
                                 </StackPanel>
 
@@ -397,7 +427,7 @@
                 </Grid>
             </Grid>
 
-            <!-- Root - Settings -->
+            <!-- Settings -->
             <ScrollViewer Grid.Row="1" Style="{StaticResource DefaultScrollViewerStyle}" Visibility="{Binding ElementName=SettingsButton, Path=IsChecked, Converter={StaticResource ValueToVisibilityConverter}}">
                 <Grid Background="{StaticResource Color_BaseBackground}">
                     <Grid Margin="30,40,30,0" VerticalAlignment="Top">
@@ -446,6 +476,15 @@
                                 <Button Style="{StaticResource DialogButton}" Content="Reset size and position of window" Command="{Binding Path=ConfigVm.ResetWindowPosDimCmd}" />
                             </StackPanel>
                         </StackPanel>
+                    </Grid>
+                </Grid>
+            </ScrollViewer>
+
+            <!-- Log -->
+            <ScrollViewer Grid.Row="1" Style="{StaticResource DefaultScrollViewerStyle}" Visibility="{Binding ElementName=LogButton, Path=IsChecked, Converter={StaticResource ValueToVisibilityConverter}}">
+                <Grid Background="{StaticResource Color_BaseBackground}">
+                    <Grid Margin="30,40,30,0" VerticalAlignment="Top">
+                        
                     </Grid>
                 </Grid>
             </ScrollViewer>

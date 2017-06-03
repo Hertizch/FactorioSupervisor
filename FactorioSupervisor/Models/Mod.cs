@@ -1,4 +1,5 @@
-﻿using FactorioSupervisor.Extensions;
+﻿using System;
+using FactorioSupervisor.Extensions;
 using FactorioSupervisor.ObservableImmutable;
 using Newtonsoft.Json.Linq;
 
@@ -30,7 +31,8 @@ namespace FactorioSupervisor.Models
         private JToken _dependencies;
         private bool _updateAvailable;
         private bool _isUpdating;
-        private int _progressPercentage;
+        private bool _executeUpdate;
+        private double _progressPercentage;
         private bool _hasError;
         private bool _hideInModList;
         private ObservableImmutableList<Dependency> _dependenciesCollection;
@@ -42,8 +44,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string Filename
         {
-            get { return _filename; }
-            set { if (value == _filename) return; _filename = value; OnPropertyChanged(nameof(Filename)); }
+            get => _filename; set { if (value == _filename) return; _filename = value; OnPropertyChanged(nameof(Filename)); }
         }
 
         /// <summary>
@@ -51,8 +52,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string FilenameWithoutExtenion
         {
-            get { return _filenameWithoutExtenion; }
-            set { if (value == _filenameWithoutExtenion) return; _filenameWithoutExtenion = value; OnPropertyChanged(nameof(FilenameWithoutExtenion)); }
+            get => _filenameWithoutExtenion; set { if (value == _filenameWithoutExtenion) return; _filenameWithoutExtenion = value; OnPropertyChanged(nameof(FilenameWithoutExtenion)); }
         }
 
         /// <summary>
@@ -60,8 +60,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string FullName
         {
-            get { return _fullName; }
-            set { if (value == _fullName) return; _fullName = value; OnPropertyChanged(nameof(FullName)); }
+            get => _fullName; set { if (value == _fullName) return; _fullName = value; OnPropertyChanged(nameof(FullName)); }
         }
 
         /// <summary>
@@ -69,8 +68,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string Name
         {
-            get { return _name; }
-            set { if (value == _name) return; _name = value; OnPropertyChanged(nameof(Name)); }
+            get => _name; set { if (value == _name) return; _name = value; OnPropertyChanged(nameof(Name)); }
         }
 
         /// <summary>
@@ -78,8 +76,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string Title
         {
-            get { return _title; }
-            set { if (value == _title) return; _title = value; OnPropertyChanged(nameof(Title)); }
+            get => _title; set { if (value == _title) return; _title = value; OnPropertyChanged(nameof(Title)); }
         }
 
         /// <summary>
@@ -87,8 +84,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string Description
         {
-            get { return _description; }
-            set { if (value == _description) return; _description = value; OnPropertyChanged(nameof(Description)); }
+            get => _description; set { if (value == _description) return; _description = value; OnPropertyChanged(nameof(Description)); }
         }
 
         /// <summary>
@@ -96,8 +92,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public JToken Author
         {
-            get { return _author; }
-            set { if (value == _author) return; _author = value; OnPropertyChanged(nameof(Author)); }
+            get => _author; set { if (value == _author) return; _author = value; OnPropertyChanged(nameof(Author)); }
         }
 
         /// <summary>
@@ -105,8 +100,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string Homepage
         {
-            get { return _homepage; }
-            set { if (value == _homepage) return; _homepage = value; OnPropertyChanged(nameof(Homepage)); }
+            get => _homepage; set { if (value == _homepage) return; _homepage = value; OnPropertyChanged(nameof(Homepage)); }
         }
 
         /// <summary>
@@ -114,8 +108,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string InstalledVersion
         {
-            get { return _installedVersion; }
-            set { if (value == _installedVersion) return; _installedVersion = value; OnPropertyChanged(nameof(InstalledVersion)); }
+            get => _installedVersion; set { if (value == _installedVersion) return; _installedVersion = value; OnPropertyChanged(nameof(InstalledVersion)); }
         }
 
         /// <summary>
@@ -123,8 +116,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string RemoteVersion
         {
-            get { return _remoteVersion; }
-            set { if (value == _remoteVersion) return; _remoteVersion = value; OnPropertyChanged(nameof(RemoteVersion)); }
+            get => _remoteVersion; set { if (value == _remoteVersion) return; _remoteVersion = value; OnPropertyChanged(nameof(RemoteVersion)); }
         }
 
         /// <summary>
@@ -132,8 +124,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string ReleasedAt
         {
-            get { return _releasedAt; }
-            set { if (value == _releasedAt) return; _releasedAt = value; OnPropertyChanged(nameof(ReleasedAt)); }
+            get => _releasedAt; set { if (value == _releasedAt) return; _releasedAt = value; OnPropertyChanged(nameof(ReleasedAt)); }
         }
 
         /// <summary>
@@ -141,8 +132,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string RemoteFilename
         {
-            get { return _remoteFilename; }
-            set { if (value == _remoteFilename) return; _remoteFilename = value; OnPropertyChanged(nameof(RemoteFilename)); }
+            get => _remoteFilename; set { if (value == _remoteFilename) return; _remoteFilename = value; OnPropertyChanged(nameof(RemoteFilename)); }
         }
 
         /// <summary>
@@ -150,8 +140,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string DownloadUrl
         {
-            get { return _downloadUrl; }
-            set { if (value == _downloadUrl) return; _downloadUrl = value; OnPropertyChanged(nameof(DownloadUrl)); }
+            get => _downloadUrl; set { if (value == _downloadUrl) return; _downloadUrl = value; OnPropertyChanged(nameof(DownloadUrl)); }
         }
 
         /// <summary>
@@ -159,8 +148,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool IsEnabled
         {
-            get { return _isEnabled; }
-            set { if (value == _isEnabled) return; _isEnabled = value; OnPropertyChanged(nameof(IsEnabled)); }
+            get => _isEnabled; set { if (value == _isEnabled) return; _isEnabled = value; OnPropertyChanged(nameof(IsEnabled)); }
         }
 
         /// <summary>
@@ -168,8 +156,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string FactorioVersion
         {
-            get { return _factorioVersion; }
-            set { if (value == _factorioVersion) return; _factorioVersion = value; OnPropertyChanged(nameof(FactorioVersion)); }
+            get => _factorioVersion; set { if (value == _factorioVersion) return; _factorioVersion = value; OnPropertyChanged(nameof(FactorioVersion)); }
         }
 
         /// <summary>
@@ -177,8 +164,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string RemoteFactorioVersion
         {
-            get { return _remoteFactorioVersion; }
-            set { if (value == _remoteFactorioVersion) return; _remoteFactorioVersion = value; OnPropertyChanged(nameof(RemoteFactorioVersion)); }
+            get => _remoteFactorioVersion; set { if (value == _remoteFactorioVersion) return; _remoteFactorioVersion = value; OnPropertyChanged(nameof(RemoteFactorioVersion)); }
         }
 
         /// <summary>
@@ -186,8 +172,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public JToken Dependencies
         {
-            get { return _dependencies; }
-            set { if (value == _dependencies) return; _dependencies = value; OnPropertyChanged(nameof(Dependencies)); }
+            get => _dependencies; set { if (value == _dependencies) return; _dependencies = value; OnPropertyChanged(nameof(Dependencies)); }
         }
 
         /// <summary>
@@ -195,8 +180,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool UpdateAvailable
         {
-            get { return _updateAvailable; }
-            set { if (value == _updateAvailable) return; _updateAvailable = value; OnPropertyChanged(nameof(UpdateAvailable)); }
+            get => _updateAvailable; set { if (value == _updateAvailable) return; _updateAvailable = value; OnPropertyChanged(nameof(UpdateAvailable)); }
         }
 
         /// <summary>
@@ -204,17 +188,23 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool IsUpdating
         {
-            get { return _isUpdating; }
-            set { if (value == _isUpdating) return; _isUpdating = value; OnPropertyChanged(nameof(IsUpdating)); }
+            get => _isUpdating; set { if (value == _isUpdating) return; _isUpdating = value; OnPropertyChanged(nameof(IsUpdating)); }
+        }
+
+        /// <summary>
+        /// Gets or sets a boolean value if the update shoule execute
+        /// </summary>
+        public bool ExecuteUpdate
+        {
+            get => _executeUpdate; set { if (value == _executeUpdate) return; _executeUpdate = value; OnPropertyChanged(nameof(ExecuteUpdate)); }
         }
 
         /// <summary>
         /// Gets or sets the current mod update progress as a percentage value
         /// </summary>
-        public int ProgressPercentage
+        public double ProgressPercentage
         {
-            get { return _progressPercentage; }
-            set { if (value == _progressPercentage) return; _progressPercentage = value; OnPropertyChanged(nameof(ProgressPercentage)); }
+            get => _progressPercentage; set { if (Math.Abs(value - _progressPercentage) < 0.01) return; _progressPercentage = value; OnPropertyChanged(nameof(ProgressPercentage)); }
         }
 
         /// <summary>
@@ -222,8 +212,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool HasError
         {
-            get { return _hasError; }
-            set { if (value == _hasError) return; _hasError = value; OnPropertyChanged(nameof(HasError)); }
+            get => _hasError; set { if (value == _hasError) return; _hasError = value; OnPropertyChanged(nameof(HasError)); }
         }
 
         /// <summary>
@@ -231,8 +220,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool HideInModList
         {
-            get { return _hideInModList; }
-            set { if (value == _hideInModList) return; _hideInModList = value; OnPropertyChanged(nameof(HideInModList)); }
+            get => _hideInModList; set { if (value == _hideInModList) return; _hideInModList = value; OnPropertyChanged(nameof(HideInModList)); }
         }
 
         /// <summary>
@@ -240,8 +228,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public ObservableImmutableList<Dependency> DependenciesCollection
         {
-            get { return _dependenciesCollection; }
-            set { if (value == _dependenciesCollection) return; _dependenciesCollection = value; OnPropertyChanged(nameof(DependenciesCollection)); }
+            get => _dependenciesCollection; set { if (value == _dependenciesCollection) return; _dependenciesCollection = value; OnPropertyChanged(nameof(DependenciesCollection)); }
         }
 
         /// <summary>
@@ -249,8 +236,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool HasOptionalDependencies
         {
-            get { return _hasOptionalDependencies; }
-            set { if (value == _hasOptionalDependencies) return; _hasOptionalDependencies = value; OnPropertyChanged(nameof(HasOptionalDependencies)); }
+            get => _hasOptionalDependencies; set { if (value == _hasOptionalDependencies) return; _hasOptionalDependencies = value; OnPropertyChanged(nameof(HasOptionalDependencies)); }
         }
 
         /// <summary>
@@ -258,8 +244,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public Dependency SelectedDependency
         {
-            get { return _selectedDependency; }
-            set { if (value == _selectedDependency) return; _selectedDependency = value; OnPropertyChanged(nameof(SelectedDependency)); }
+            get => _selectedDependency; set { if (value == _selectedDependency) return; _selectedDependency = value; OnPropertyChanged(nameof(SelectedDependency)); }
         }
     }
 }

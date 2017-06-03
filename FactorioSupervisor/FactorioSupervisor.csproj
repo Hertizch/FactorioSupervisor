@@ -79,16 +79,19 @@
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
     <Compile Include="Converters\InvertedBooleanMultiConverter.cs" />
     <Compile Include="Converters\IsUpdatingToNotifyValueConverter.cs" />
+    <Compile Include="Converters\ModListConverters\EntryInstallCodeCommandParameterConverter.cs" />
     <Compile Include="Converters\SnackbarValueConverters\ProgressPercentageConverter.cs" />
     <Compile Include="Converters\SnackbarValueConverters\TitleConverter.cs" />
     <Compile Include="Converters\ValueToVisibilityConverter.cs" />
     <Compile Include="Converters\NotifyBannerVisibilityMultiConverter.cs" />
+    <Compile Include="Enums\EntryInstallMethod.cs" />
     <Compile Include="Extensions\ExtendedButton.cs" />
     <Compile Include="Helpers\NetcodeHelpers.cs" />
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="MessageBoxWindow.xaml.cs">
       <DependentUpon>MessageBoxWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ModDownloader.cs" />
     <Compile Include="ObservableImmutable\ObservableCollectionObject.cs" />
     <Compile Include="ObservableImmutable\ObservableImmutableDictionary.cs" />
     <Compile Include="ObservableImmutable\ObservableImmutableList.cs" />

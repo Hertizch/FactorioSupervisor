@@ -11,17 +11,17 @@ namespace FactorioSupervisor.Helpers
 
             var timeSpan = dateTimeNow - dateTimeLastUpdate;
 
+            if (timeSpan.Hours < 1)
+                return $"{timeSpan.Minutes} minutes ago";
+
+            if (timeSpan.Days < 1)
+                return $"{timeSpan.Hours} hours ago";
+
             if (timeSpan.Days == 1)
                 return $"1 day ago";
 
             if (timeSpan.Days > 1)
                 return $"{timeSpan.Days} days ago";
-
-            if (timeSpan.Days == 0 && timeSpan.Hours <= 24)
-                return $"{timeSpan.Hours} hours ago";
-
-            if (timeSpan.Minutes < 60 && timeSpan.Hours == 0 && timeSpan.Days == 0)
-                return $"{timeSpan} minutes ago";
 
             if (timeSpan.Days >= 365)
                 return $"1 year ago";

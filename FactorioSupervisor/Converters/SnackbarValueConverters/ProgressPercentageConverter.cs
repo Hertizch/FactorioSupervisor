@@ -1,4 +1,5 @@
 ﻿using FactorioSupervisor.Models;
+using FactorioSupervisor.ViewModels;
 using System;
 using System.Globalization;
 using System.Windows.Data;
@@ -13,20 +14,16 @@ namespace FactorioSupervisor.Converters.SnackbarValueConverters
             var mod = (Mod)values[1];
             var dependency = (Dependency)values[2];
 
-            double output = 0;
-
             if (isUpdating)
             {
                 if (mod != null)
-                    output = mod.ProgressPercentage;
+                    return mod.ProgressPercentage;
 
                 if (dependency != null)
-                    output = dependency.ProgressPercentage;
+                    return dependency.ProgressPercentage;
             }
-            else
-                output = 0;
 
-            return output;
+            return (double)0;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
