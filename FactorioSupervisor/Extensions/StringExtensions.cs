@@ -20,18 +20,18 @@ namespace FactorioSupervisor.Extensions
                 yield return str.Substring(i, Math.Min(maxChunkSize, str.Length - i));
         }
 
-        public static string CreateMD5String(string input)
+        public static string CreateMd5String(string input)
         {
             // Use input string to calculate MD5 hash
-            using (MD5 md5 = MD5.Create())
+            using (var md5 = MD5.Create())
             {
-                byte[] inputBytes = Encoding.ASCII.GetBytes(input);
-                byte[] hashBytes = md5.ComputeHash(inputBytes);
+                var inputBytes = Encoding.ASCII.GetBytes(input);
+                var hashBytes = md5.ComputeHash(inputBytes);
 
                 // Convert the byte array to hexadecimal string
                 var sb = new StringBuilder();
-                for (int i = 0; i < hashBytes.Length; i++)
-                    sb.Append(hashBytes[i].ToString("X2"));
+                foreach (var t in hashBytes)
+                    sb.Append(t.ToString("X2"));
 
                 return sb.ToString();
             }
@@ -47,21 +47,29 @@ namespace FactorioSupervisor.Extensions
         /// <returns>A string that can be used as a filename. If the output string would otherwise be empty, returns "_".</returns>
         public static string MakeValidFileName(string text, char? replacement = '_', bool fancy = true)
         {
-            StringBuilder sb = new StringBuilder(text.Length);
+            var sb = new StringBuilder(text.Length);
             var invalids = _invalids ?? (_invalids = Path.GetInvalidFileNameChars());
-            bool changed = false;
-            for (int i = 0; i < text.Length; i++)
+            var changed = false;
+            foreach (var c in text)
             {
-                char c = text[i];
                 if (invalids.Contains(c))
                 {
                     changed = true;
                     var repl = replacement ?? '\0';
                     if (fancy)
                     {
-                        if (c == '"') repl = '”'; // U+201D right double quotation mark
-                        else if (c == '\'') repl = '’'; // U+2019 right single quotation mark
-                        else if (c == '/') repl = '⁄'; // U+2044 fraction slash
+                        switch (c)
+                        {
+                            case '"':
+                                repl = '”'; // U+201D right double quotation mark
+                                break;
+                            case '\'':
+                                repl = '’'; // U+2019 right single quotation mark
+                                break;
+                            case '/':
+                                repl = '⁄'; // U+2044 fraction slash
+                                break;
+                        }
                     }
                     if (repl != '\0')
                         sb.Append(repl);

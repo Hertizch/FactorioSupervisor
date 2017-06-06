@@ -2,23 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Collections.Immutable;
 
 namespace FactorioSupervisor.ObservableImmutable
 {
-    public class ObservableImmutableList<T> : ObservableCollectionObject, IList, ICollection, IEnumerable, IList<T>, IImmutableList<T>, ICollection<T>, IEnumerable<T>, IReadOnlyList<T>, IReadOnlyCollection<T>, INotifyCollectionChanged, INotifyPropertyChanged
+    public class ObservableImmutableList<T> : ObservableCollectionObject, IList, IList<T>, IImmutableList<T>
     {
-        #region Private
-
         private readonly object _syncRoot;
         private ImmutableList<T> _items;
-
-        #endregion Private
-
-        #region Constructors
 
         public ObservableImmutableList() : this(new T[0], LockTypeEnum.SpinWait)
         {
@@ -38,12 +31,6 @@ namespace FactorioSupervisor.ObservableImmutable
             _items = ImmutableList<T>.Empty.AddRange(items);
         }
 
-        #endregion Constructors
-
-        #region Thread-Safe Methods
-
-        #region General
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool TryOperation(Func<ImmutableList<T>, ImmutableList<T>> operation)
         {
@@ -55,8 +42,6 @@ namespace FactorioSupervisor.ObservableImmutable
         {
             return DoOperation(operation, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
-
-        #region Helpers
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool TryOperation(Func<ImmutableList<T>, ImmutableList<T>> operation, NotifyCollectionChangedEventArgs args)
@@ -183,12 +168,6 @@ namespace FactorioSupervisor.ObservableImmutable
 
             return result;
         }
-
-        #endregion Helpers
-
-        #endregion General
-
-        #region Specific
 
         public bool DoInsert(Func<ImmutableList<T>, KeyValuePair<int, T>> valueProvider)
         {
@@ -338,14 +317,10 @@ namespace FactorioSupervisor.ObservableImmutable
                 );
         }
 
-        #endregion Specific
-
         public ImmutableList<T> ToImmutableList()
         {
             return _items;
         }
-
-        #region IEnumerable<T>
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -356,14 +331,6 @@ namespace FactorioSupervisor.ObservableImmutable
         {
             return GetEnumerator();
         }
-
-        #endregion IEnumerable<T>
-
-        #endregion Thread-Safe Methods
-
-        #region Non Thead-Safe Methods
-
-        #region IList
 
         public int Add(object value)
         {
@@ -387,13 +354,7 @@ namespace FactorioSupervisor.ObservableImmutable
             Insert(index, (T)value);
         }
 
-        public bool IsFixedSize
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsFixedSize => false;
 
         public void Remove(object value)
         {
@@ -407,14 +368,8 @@ namespace FactorioSupervisor.ObservableImmutable
 
         object IList.this[int index]
         {
-            get
-            {
-                return this[index];
-            }
-            set
-            {
-                SetItem(index, (T)value);
-            }
+            get => this[index];
+            set => SetItem(index, (T)value);
         }
 
         public void CopyTo(Array array, int index)
@@ -422,25 +377,9 @@ namespace FactorioSupervisor.ObservableImmutable
             _items.ToArray().CopyTo(array, index);
         }
 
-        public bool IsSynchronized
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsSynchronized => false;
 
-        public object SyncRoot
-        {
-            get
-            {
-                return _syncRoot;
-            }
-        }
-
-        #endregion IList
-
-        #region IList<T>
+        public object SyncRoot => _syncRoot;
 
         public int IndexOf(T item)
         {
@@ -459,14 +398,8 @@ namespace FactorioSupervisor.ObservableImmutable
 
         public T this[int index]
         {
-            get
-            {
-                return _items[index];
-            }
-            set
-            {
-                SetItem(index, value);
-            }
+            get => _items[index];
+            set => SetItem(index, value);
         }
 
         void ICollection<T>.Add(T item)
@@ -494,21 +427,9 @@ namespace FactorioSupervisor.ObservableImmutable
             _items.CopyTo(array, arrayIndex);
         }
 
-        public int Count
-        {
-            get
-            {
-                return _items.Count;
-            }
-        }
+        public int Count => _items.Count;
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsReadOnly => false;
 
         public bool Remove(T item)
         {
@@ -519,10 +440,6 @@ namespace FactorioSupervisor.ObservableImmutable
             RaiseNotifyCollectionChanged();
             return true;
         }
-
-        #endregion IList<T>
-
-        #region IImmutableList<T>
 
         public IImmutableList<T> Add(T value)
         {
@@ -620,9 +537,5 @@ namespace FactorioSupervisor.ObservableImmutable
             RaiseNotifyCollectionChanged(new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, oldItem, value, index));
             return this;
         }
-
-        #endregion IImmutableList<T>
-
-        #endregion Non Thead-Safe Methods
     }
 }

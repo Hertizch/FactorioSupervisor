@@ -30,9 +30,9 @@ namespace FactorioSupervisor.ViewModels
             if (GetLocalModsCmd.CanExecute(null))
                 GetLocalModsCmd.Execute(null);
 
+            /* Create example mod */
             if (Mods.Count == 0)
             {
-                /* Create example mod */
                 var mod = new Mod()
                 {
                     Name = "aai-programmable-vehicles",
@@ -90,9 +90,8 @@ namespace FactorioSupervisor.ViewModels
                 SelectedMod = Mods[0];
 
                 //IsUpdating = true;
-
-                /* Create example mod END */
             }
+            /* Create example mod END */
 
             // Auto check for mod updates - if user specified
             if (BaseVm.ConfigVm.AutoCheckModUpdate)
@@ -129,7 +128,6 @@ namespace FactorioSupervisor.ViewModels
         private RelayCommand _watchModDirChangesCmd;
         private RelayCommand _deleteModCmd;
         private RelayCommand _installDependencyModCmd;
-        private RelayCommand _itemEntryUpdateCmd;
         private RelayCommand _verifyAuthenticationCmd;
         private RelayCommand _installEntryCmd;
 
@@ -137,14 +135,14 @@ namespace FactorioSupervisor.ViewModels
          * Properties
          */
 
-        #region
+        #region Properties
 
         /// <summary>
         /// Gets or sets the collection of mods
         /// </summary>
         public ObservableImmutableList<Mod> Mods
         {
-            get => _mods; set { if (value == _mods) return; _mods = value; OnPropertyChanged(nameof(Mods)); }
+            get => _mods; set { if (value == _mods) return; _mods = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -152,7 +150,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public Mod SelectedMod
         {
-            get => _selectedMod; set { if (value == _selectedMod) return; _selectedMod = value; OnPropertyChanged(nameof(SelectedMod)); }
+            get => _selectedMod; set { if (value == _selectedMod) return; _selectedMod = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -162,7 +160,7 @@ namespace FactorioSupervisor.ViewModels
         {
             get => _isCheckingForUpdates; set
             {
-                if (value == _isCheckingForUpdates) return; _isCheckingForUpdates = value; OnPropertyChanged(nameof(IsCheckingForUpdates));
+                if (value == _isCheckingForUpdates) return; _isCheckingForUpdates = value; OnPropertyChanged();
                 ShowProgressBar = IsCheckingForUpdates;
             }
         }
@@ -174,7 +172,7 @@ namespace FactorioSupervisor.ViewModels
         {
             get => _isUpdating; set
             {
-                if (value == _isUpdating) return; _isUpdating = value; OnPropertyChanged(nameof(IsUpdating));
+                if (value == _isUpdating) return; _isUpdating = value; OnPropertyChanged();
                 ShowProgressBar = IsUpdating;
             }
         }
@@ -184,7 +182,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public double UpdateTotalProgress
         {
-            get => _updateTotalProgress; set { if (Math.Abs(value - _updateTotalProgress) < 0.01) return; _updateTotalProgress = value; OnPropertyChanged(nameof(UpdateTotalProgress)); }
+            get => _updateTotalProgress; set { if (Math.Abs(value - _updateTotalProgress) < 0.01) return; _updateTotalProgress = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -192,7 +190,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public bool IsUpdatesAvailable
         {
-            get => _isUpdatesAvailable; set { if (value == _isUpdatesAvailable) return; _isUpdatesAvailable = value; OnPropertyChanged(nameof(IsUpdatesAvailable)); }
+            get => _isUpdatesAvailable; set { if (value == _isUpdatesAvailable) return; _isUpdatesAvailable = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -200,7 +198,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public int TotalUpdatesAvailable
         {
-            get => _totalUpdatesAvailable; set { if (value == _totalUpdatesAvailable) return; _totalUpdatesAvailable = value; OnPropertyChanged(nameof(TotalUpdatesAvailable)); }
+            get => _totalUpdatesAvailable; set { if (value == _totalUpdatesAvailable) return; _totalUpdatesAvailable = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -208,7 +206,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public Mod CurrentUpdatingMod
         {
-            get => _currentUpdatingMod; set { if (value == _currentUpdatingMod) return; _currentUpdatingMod = value; OnPropertyChanged(nameof(CurrentUpdatingMod)); }
+            get => _currentUpdatingMod; set { if (value == _currentUpdatingMod) return; _currentUpdatingMod = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -216,7 +214,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public Dependency CurrentUpdatingDependency
         {
-            get => _currentUpdatingDependency; set { if (value == _currentUpdatingDependency) return; _currentUpdatingDependency = value; OnPropertyChanged(nameof(CurrentUpdatingDependency)); }
+            get => _currentUpdatingDependency; set { if (value == _currentUpdatingDependency) return; _currentUpdatingDependency = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -224,7 +222,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public bool ShowProgressBar
         {
-            get => _showProgressBar; set { if (value == _showProgressBar) return; _showProgressBar = value; OnPropertyChanged(nameof(ShowProgressBar)); }
+            get => _showProgressBar; set { if (value == _showProgressBar) return; _showProgressBar = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -234,7 +232,7 @@ namespace FactorioSupervisor.ViewModels
         {
             get => _hideIncompatibleMods; set
             {
-                if (value == _hideIncompatibleMods) return; _hideIncompatibleMods = value; OnPropertyChanged(nameof(HideIncompatibleMods));
+                if (value == _hideIncompatibleMods) return; _hideIncompatibleMods = value; OnPropertyChanged();
 
                 // determine visibility
                 if (HideIncompatibleMods && BaseVm.ConfigVm.CurrentFactorioBranch != null)
@@ -268,7 +266,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public bool IsAuthenticated
         {
-            get => _isAuthenticated; set { if (value == _isAuthenticated) return; _isAuthenticated = value; OnPropertyChanged(nameof(IsAuthenticated)); }
+            get => _isAuthenticated; set { if (value == _isAuthenticated) return; _isAuthenticated = value; OnPropertyChanged(); }
         }
 
         #endregion
@@ -305,9 +303,6 @@ namespace FactorioSupervisor.ViewModels
 
         public RelayCommand InstallDependencyModCmd => _installDependencyModCmd ??
             (_installDependencyModCmd = new RelayCommand(Execute_InstallDependencyModCmd, p => true));
-
-        public RelayCommand ItemEntryUpdateCmd => _itemEntryUpdateCmd ??
-            (_itemEntryUpdateCmd = new RelayCommand(Execute_ItemEntryUpdateCmd, p => true));
 
         public RelayCommand VerifyAuthenticationCmd => _verifyAuthenticationCmd ??
             (_verifyAuthenticationCmd = new RelayCommand(Execute_VerifyAuthenticationCmd, p => true));
@@ -509,7 +504,7 @@ namespace FactorioSupervisor.ViewModels
                 foreach (var mod in Mods.Where(x => !x.HasError))
                     sb.Append($"&namelist={mod.Name}");
 
-                Logger.WriteLine($"Created Mod Portal Api request: {sb}", true);
+                Logger.WriteLine($"[INFO] Created Mod Portal Api request: {sb}", true);
 
                 // Build the Api Data
                 await modPortalApi.BuildApiData(sb.ToString());
@@ -540,21 +535,21 @@ namespace FactorioSupervisor.ViewModels
                     var updateCount = Mods.Count(x => x.UpdateAvailable);
                     TotalUpdatesAvailable = updateCount;
 
-                    BaseVm.NotifyBannerRelay.SetNotifyBanner(updateCount > 1
+                    /*BaseVm.NotifyBannerRelay.SetNotifyBanner(updateCount > 1
                         ? $"{updateCount} updates are available!"
-                        : $"{updateCount} update are available!");
+                        : $"{updateCount} update are available!");*/
 
-                    Logger.WriteLine($"{Mods.Count(x => x.UpdateAvailable)} updates are available", true);
+                    Logger.WriteLine($"[INFO] {Mods.Count(x => x.UpdateAvailable)} updates are available", true);
                 }
                 else
                 {
-                    BaseVm.NotifyBannerRelay.SetNotifyBanner("There are currently no updates available");
-                    Logger.WriteLine("No updates available", true);
+                    //BaseVm.NotifyBannerRelay.SetNotifyBanner("There are currently no updates available");
+                    Logger.WriteLine("[INFO] No updates available", true);
                 }
             }
             else
             {
-                Logger.WriteLine("ERROR: modPortalApi.ApiData.Results == null", true);
+                Logger.WriteLine($"[ERROR] Method {nameof(Execute_GetModRemoteDataCmd)} failed - modPortalApi.ApiData.Results is null", true);
 
                 // Open message box to user
                 MessageBoxWindow.Show(ResourceHelper.GetValue("MessageBox_ModPortalError_Title"), ResourceHelper.GetValue("MessageBox_ModPortalError"), MessageBoxButton.OK);
@@ -869,11 +864,6 @@ namespace FactorioSupervisor.ViewModels
             }
         }
 
-        private void Execute_ItemEntryUpdateCmd(object obj)
-        {
-            
-        }
-
         private static async Task<bool> VerifyAuthentication()
         {
             var result = false;
@@ -970,7 +960,7 @@ namespace FactorioSupervisor.ViewModels
             {
                 Name = infoJson.Name,
                 Title = infoJson.Title,
-                Description = infoJson.Description.Replace("\n", ""), // remove newlines
+                Description = infoJson.Description.Replace("\n", string.Empty), // remove newlines
                 FactorioVersion = infoJson.FactorioVersion,
                 InstalledVersion = infoJson.Version,
                 Author = infoJson.Author,
@@ -1070,10 +1060,20 @@ namespace FactorioSupervisor.ViewModels
 
         private async void Execute_InstallEntryCmd(string entryInstallCode)
         {
-            // Parse code to array
+            if (!await NetcodeHelpers.VerifyInternetConnection())
+            {
+                // Open message box to user
+                MessageBoxWindow.Show(ResourceHelper.GetValue("MessageBox_NoInternetConnection_Title"), ResourceHelper.GetValue("MessageBox_NoInternetConnection"), MessageBoxButton.OK);
+                return;
+            }
+
+            if (IsUpdating || !IsAuthenticated)
+                return;
+
+            // Parse code to an array
             var code = entryInstallCode.Split('.');
 
-            // If code array is empty, return
+            // If the array is empty, return
             if (code.Length <= 0)
                 return;
 
@@ -1109,27 +1109,27 @@ namespace FactorioSupervisor.ViewModels
             }
         }
 
-        private async Task InstallEntry([Optional] bool multiple,
-            [Optional] bool installNewMod,
-            [Optional] bool updateExistingMod,
-            [Optional] bool installNewDependency,
-            [Optional] IEnumerable<string> modNames,
-            [Optional] string modName,
-            [Optional] IEnumerable<string> dependencyNames,
-            [Optional] string dependencyName)
+        private async Task InstallEntry([Optional] bool multiple, [Optional] bool installNewMod, [Optional] bool updateExistingMod, [Optional] bool installNewDependency, [Optional] IEnumerable<string> modNames, [Optional] string modName, [Optional] IEnumerable<string> dependencyNames, [Optional] string dependencyName)
         {
             IsUpdating = true;
 
-            // installNewMod
+            /*
+             * Install New Mod
+             */
+
             if (installNewMod)
             {
                 
             }
 
-            // updateExistingMod
+
+            /*
+             * Update Existing Mod
+             */
+
             if (updateExistingMod)
             {
-                // SetExecuteUpdate
+                // Set ExecuteUpdate boolean
                 if (multiple && modNames != null)
                 {
                     foreach (var name in modNames)
@@ -1148,60 +1148,116 @@ namespace FactorioSupervisor.ViewModels
                 {
                     Logger.WriteLine($"[INFO] Begin update of: {mod.Title}");
 
+                    CurrentUpdatingMod = mod;
                     mod.IsUpdating = true;
 
                     // Execute the download
-                    var modDownloader = new ModDownloader();
-                    await modDownloader.ExecuteDownload(mod);
+                    var modDownloader = new ModDownloader(mod, CurrentUpdatingMod);
+                    await modDownloader.ExecuteDownload();
 
-                    // Reset properties
-                    mod.ExecuteUpdate = false;
+                    // If success
+                    if (modDownloader.DownloadSuccessful)
+                    {
+                        // Delete old file
+                        modDownloader.DeleteOldFile();
+
+                        // Reset update properties
+                        mod.UpdateAvailable = false;
+
+                        // Set new filename
+                        mod.Filename = mod.RemoteFilename;
+                        mod.FilenameWithoutExtenion = Path.GetFileNameWithoutExtension(mod.Filename);
+                        mod.FullName = Path.Combine(BaseVm.ConfigVm.ModsPath, mod.Filename);
+
+                        // Set new version info
+                        GetUpdatedVersionInfo(mod.FullName, out string version, out string factorioVersion);
+                        mod.InstalledVersion = version;
+                        mod.FactorioVersion = factorioVersion;
+                    }
+
+                    // Reset update properties
                     mod.IsUpdating = false;
-                    mod.UpdateAvailable = false;
+                    mod.ExecuteUpdate = false;
 
                     // Log
                     Logger.WriteLine(modDownloader.DownloadSuccessful ? $"[INFO] Update of mod succeeded: {mod.Title}" : $"[ERROR] Update of mod failed: {mod.Title}");
                 }
             }
 
-            // installNewDependency
+
+            /*
+             * Install New Dependency
+             */
+
             if (installNewDependency)
             {
-                
+                // Create ModPortalAPI request
+                var modPortalApi = new ModPortalApi();
+                var sb = new StringBuilder();
+                sb.Append("?page_size=max");
+                sb.Append($"&namelist={dependencyName}");
+
+                Logger.WriteLine($"[INFO] Called ModPortalAPI with request parameter: {sb}", true);
+
+                // Build the Api Data
+                await modPortalApi.BuildApiData(sb.ToString());
+
+                if (modPortalApi.ApiData.Results != null)
+                {
+                    // Create temporary dependency object
+                    var dependency = new Dependency
+                    {
+                        Name = dependencyName,
+                        DownloadUrl = modPortalApi.ApiData.Results.First().Releases.First().DownloadUrl,
+                        RemoteFilename = modPortalApi.ApiData.Results.First().Releases.First().FileName
+                    };
+
+                    // Execute the download
+                    var modDownloader = new ModDownloader(dependency:dependency);
+                    await modDownloader.ExecuteDownload();
+
+                    if (modDownloader.DownloadSuccessful)
+                    {
+                        // Add to collection
+                        ItemEntryAdd(Path.Combine(BaseVm.ConfigVm.ModsPath, dependency.RemoteFilename));
+
+                        // Set new dependency as installed in collections
+                        foreach (var mod in Mods)
+                        {
+                            foreach (var dep in mod.DependenciesCollection)
+                            {
+                                if (dep.Name == dependency.Name)
+                                    dep.IsInstalled = true;
+                            }
+                        }
+                    }
+                }
             }
+
 
             // Set new TotalUpdatesAvailable and IsUpdatesAvailable
             TotalUpdatesAvailable = Mods.Count(x => x.UpdateAvailable);
             if (TotalUpdatesAvailable == 0)
                 IsUpdatesAvailable = false;
 
-            IsUpdating = false;
+            //IsUpdating = false;
         }
 
-        private void SetExecuteUpdateFlag([Optional] IEnumerable<string> modNames,
-            [Optional] string singleModName,
-            [Optional] IEnumerable<string> dependencyNames,
-            [Optional] string singleDependencyName)
+        private static void GetUpdatedVersionInfo(string infoJsonFilename, out string version, out string factorioVersion)
         {
-            if (modNames != null)
-            {
-                foreach (var modName in modNames)
-                {
-                    foreach (var mod in Mods)
-                    {
-                        if (modName == mod.Name)
-                            mod.ExecuteUpdate = true;
-                    }
-                }
-            }
-            else if (singleModName != null)
-            {
-                foreach (var mod in Mods)
-                {
-                    if (singleModName == mod.Name)
-                        mod.ExecuteUpdate = true;
-                }
-            }
+            version = null;
+            factorioVersion = null;
+
+            // Get info.json as string
+            var infoJsonString = JsonHelpers.GetModInfoJsonString(infoJsonFilename);
+            if (infoJsonString == null) return;
+
+            // Deserialize the json string to infojson object
+            var infoJson = JsonConvert.DeserializeObject<InfoJson>(infoJsonString);
+            if (infoJson == null) return;
+
+            version = infoJson.Version;
+            factorioVersion = infoJson.FactorioVersion;
         }
     }
 }

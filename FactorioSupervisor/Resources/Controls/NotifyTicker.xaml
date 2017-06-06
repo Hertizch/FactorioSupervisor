@@ -12,7 +12,7 @@
                 <ColumnDefinition />
                 <ColumnDefinition Width="35" />
             </Grid.ColumnDefinitions>
-            <TextBlock Text="{Binding ElementName=NotifyTickerControl, Path=Title, FallbackValue=Title}" Foreground="{StaticResource Color_Text70}" Margin="29.5,0,12,0" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <ItemsControl ItemsSource="{Binding ElementName=NotifyTickerControl, Path=Titles}" Foreground="{StaticResource Color_Text70}" Margin="29.5,0,12,0" HorizontalAlignment="Center" VerticalAlignment="Center" />
             <Button Grid.Column="1" Style="{StaticResource ModUpdateButton}" Content="{StaticResource IconClose}" Foreground="{StaticResource Color_Text40}" />
         </Grid>
     </Grid>

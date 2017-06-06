@@ -30,10 +30,10 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="UiPosLeft" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">535</Value>
+      <Value Profile="(Default)">99999</Value>
     </Setting>
     <Setting Name="UiPosTop" Type="System.Double" Scope="User">
-      <Value Profile="(Default)">265</Value>
+      <Value Profile="(Default)">99999</Value>
     </Setting>
     <Setting Name="UiDimWidth" Type="System.Double" Scope="User">
       <Value Profile="(Default)">850</Value>

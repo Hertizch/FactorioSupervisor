@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System.Collections.Generic;
+using System.Windows;
 using System.Windows.Controls;
 
 namespace FactorioSupervisor.Resources.Controls
@@ -15,11 +16,20 @@ namespace FactorioSupervisor.Resources.Controls
 
         public string Title
         {
-            get { return (string)GetValue(TitleProperty); }
-            set { SetValue(TitleProperty, value); }
+            get => (string)GetValue(TitleProperty);
+            set => SetValue(TitleProperty, value);
+        }
+
+        public List<string> Titles
+        {
+            get => (List<string>)GetValue(TitlesProperty);
+            set => SetValue(TitlesProperty, value);
         }
 
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string),
             typeof(NotifyTicker), new PropertyMetadata("Title"));
+
+        public static readonly DependencyProperty TitlesProperty = DependencyProperty.Register(nameof(Title), typeof(List<string>),
+            typeof(NotifyTicker), new PropertyMetadata(default(List<string>)));
     }
 }

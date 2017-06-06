@@ -12,15 +12,11 @@ namespace FactorioSupervisor.Converters.SnackbarValueConverters
         {
             var isUpdating = (bool)values[0];
             var mod = (Mod)values[1];
-            var dependency = (Dependency)values[2];
 
             if (isUpdating)
             {
                 if (mod != null)
                     return mod.ProgressPercentage;
-
-                if (dependency != null)
-                    return dependency.ProgressPercentage;
             }
 
             return (double)0;

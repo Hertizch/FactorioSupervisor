@@ -9,38 +9,17 @@ namespace FactorioSupervisor.ObservableImmutable
 {
     public abstract class ObservableCollectionObject : INotifyCollectionChanged, INotifyPropertyChanged
     {
-        #region Private
-
         private bool _lockObjWasTaken;
         private readonly object _lockObj;
         private int _lock; // 0=unlocked		1=locked
 
-        #endregion Private
-
-        #region Public Properties
-
-        private readonly LockTypeEnum _lockType;
-        public LockTypeEnum LockType
-        {
-            get
-            {
-                return _lockType;
-            }
-        }
-
-        #endregion Public Properties
-
-        #region Constructor
+        public LockTypeEnum LockType { get; }
 
         protected ObservableCollectionObject(LockTypeEnum lockType)
         {
-            _lockType = lockType;
+            LockType = lockType;
             _lockObj = new object();
         }
-
-        #endregion Constructor
-
-        #region SpinWait/PumpWait Methods
 
         // note : find time to put all these methods into a helper class instead of in a base class
 
@@ -165,10 +144,6 @@ namespace FactorioSupervisor.ObservableImmutable
             }
         }
 
-        #endregion SpinWait/PumpWait Methods
-
-        #region INotifyCollectionChanged
-
         public virtual event NotifyCollectionChangedEventHandler CollectionChanged;
 
         protected virtual void OnCollectionChanged(NotifyCollectionChangedEventArgs args)
@@ -178,8 +153,9 @@ namespace FactorioSupervisor.ObservableImmutable
             if (notifyCollectionChangedEventHandler == null)
                 return;
 
-            foreach (NotifyCollectionChangedEventHandler handler in notifyCollectionChangedEventHandler.GetInvocationList())
+            foreach (var @delegate in notifyCollectionChangedEventHandler.GetInvocationList())
             {
+                var handler = (NotifyCollectionChangedEventHandler) @delegate;
                 var dispatcherObject = handler.Target as DispatcherObject;
 
                 if (dispatcherObject != null && !dispatcherObject.CheckAccess())
@@ -203,32 +179,19 @@ namespace FactorioSupervisor.ObservableImmutable
             OnCollectionChanged(args);
         }
 
-        #endregion INotifyCollectionChanged
-
-        #region INotifyPropertyChanged
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         public void RaisePropertyChanged(string propertyName)
         {
             var propertyChangedEventHandler = PropertyChanged;
 
-            if (propertyChangedEventHandler != null)
-            {
-                propertyChangedEventHandler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            propertyChangedEventHandler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
-
-        #endregion INotifyPropertyChanged
-
-        #region Nested Types
 
         public enum LockTypeEnum
         {
             SpinWait,
             Lock
         }
-
-        #endregion Nested Types
     }
 }

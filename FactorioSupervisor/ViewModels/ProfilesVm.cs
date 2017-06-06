@@ -52,7 +52,7 @@ namespace FactorioSupervisor.ViewModels
             // Select profile from settings
             if (!string.IsNullOrEmpty(Settings.Default.SelectedProfile))
             {
-                bool profileExists = Profiles.Any(x => x.Name == Settings.Default.SelectedProfile);
+                var profileExists = Profiles.Any(x => x.Name == Settings.Default.SelectedProfile);
 
                 if (profileExists)
                 {
@@ -79,7 +79,7 @@ namespace FactorioSupervisor.ViewModels
          * Fields
          */
 
-        private string _profilesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "profiles");
+        private readonly string _profilesPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "profiles");
         private ObservableCollection<Profile> _profiles;
         private Profile _selectedProfile;
         private Profile _previousProfile;
@@ -98,8 +98,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public ObservableCollection<Profile> Profiles
         {
-            get { return _profiles; }
-            set { if (value == _profiles) return; _profiles = value; OnPropertyChanged(nameof(Profiles)); }
+            get => _profiles; set { if (value == _profiles) return; _profiles = value; OnPropertyChanged(nameof(Profiles)); }
         }
 
         /// <summary>
@@ -107,8 +106,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public Profile SelectedProfile
         {
-            get { return _selectedProfile; }
-            set { if (value == _selectedProfile) return; _selectedProfile = value; OnPropertyChanged(nameof(SelectedProfile)); }
+            get => _selectedProfile; set { if (value == _selectedProfile) return; _selectedProfile = value; OnPropertyChanged(nameof(SelectedProfile)); }
         }
 
         /// <summary>
@@ -116,8 +114,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public Profile PreviousProfile
         {
-            get { return _previousProfile; }
-            set { if (value == _previousProfile) return; _previousProfile = value; OnPropertyChanged(nameof(PreviousProfile)); }
+            get => _previousProfile; set { if (value == _previousProfile) return; _previousProfile = value; OnPropertyChanged(nameof(PreviousProfile)); }
         }
 
         /*

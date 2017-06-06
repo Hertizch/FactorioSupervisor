@@ -4,11 +4,6 @@ namespace FactorioSupervisor.Relays
 {
     public class NotifyBannerRelay : ObservableObject
     {
-        public NotifyBannerRelay()
-        {
-            //
-        }
-
         private bool _showNotifyBanner;
         private string _notifyBannerValue;
         private RelayCommand _closeNotifyBannerCmd;
@@ -18,8 +13,7 @@ namespace FactorioSupervisor.Relays
         /// </summary>
         public bool ShowNotifyBanner
         {
-            get { return _showNotifyBanner; }
-            set { if (value == _showNotifyBanner) return; _showNotifyBanner = value; OnPropertyChanged(nameof(ShowNotifyBanner)); }
+            get => _showNotifyBanner; set { if (value == _showNotifyBanner) return; _showNotifyBanner = value; OnPropertyChanged(nameof(ShowNotifyBanner)); }
         }
 
         /// <summary>
@@ -27,8 +21,7 @@ namespace FactorioSupervisor.Relays
         /// </summary>
         public string NotifyBannerValue
         {
-            get { return _notifyBannerValue; }
-            set { if (value == _notifyBannerValue) return; _notifyBannerValue = value; OnPropertyChanged(nameof(NotifyBannerValue)); }
+            get => _notifyBannerValue; set { if (value == _notifyBannerValue) return; _notifyBannerValue = value; OnPropertyChanged(nameof(NotifyBannerValue)); }
         }
 
         public RelayCommand CloseNotifyBannerCmd => _closeNotifyBannerCmd ??

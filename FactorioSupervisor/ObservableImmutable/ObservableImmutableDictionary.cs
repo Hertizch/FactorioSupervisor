@@ -2,63 +2,47 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Collections.Immutable;
 
 namespace FactorioSupervisor.ObservableImmutable
 {
-    public class ObservableImmutableDictionary<T, V> : ObservableCollectionObject, IImmutableDictionary<T, V>, IReadOnlyDictionary<T, V>, IReadOnlyCollection<KeyValuePair<T, V>>, IDictionary<T, V>, ICollection<KeyValuePair<T, V>>, IEnumerable<KeyValuePair<T, V>>, IDictionary, INotifyCollectionChanged, INotifyPropertyChanged
+    public class ObservableImmutableDictionary<T, TV> : ObservableCollectionObject, IImmutableDictionary<T, TV>, IDictionary<T, TV>, IDictionary
     {
-        #region Private
+        private ImmutableDictionary<T, TV> _items;
 
-        private readonly object _syncRoot;
-        private ImmutableDictionary<T, V> _items;
-
-        #endregion Private
-
-        #region Constructors
-
-        public ObservableImmutableDictionary() : this(new KeyValuePair<T, V>[0], LockTypeEnum.SpinWait)
+        public ObservableImmutableDictionary() : this(new KeyValuePair<T, TV>[0], LockTypeEnum.SpinWait)
         {
         }
 
-        public ObservableImmutableDictionary(IEnumerable<KeyValuePair<T, V>> items) : this(items, LockTypeEnum.SpinWait)
+        public ObservableImmutableDictionary(IEnumerable<KeyValuePair<T, TV>> items) : this(items, LockTypeEnum.SpinWait)
         {
         }
 
-        public ObservableImmutableDictionary(LockTypeEnum lockType) : this(new KeyValuePair<T, V>[0], lockType)
+        public ObservableImmutableDictionary(LockTypeEnum lockType) : this(new KeyValuePair<T, TV>[0], lockType)
         {
         }
 
-        public ObservableImmutableDictionary(IEnumerable<KeyValuePair<T, V>> items, LockTypeEnum lockType) : base(lockType)
+        public ObservableImmutableDictionary(IEnumerable<KeyValuePair<T, TV>> items, LockTypeEnum lockType) : base(lockType)
         {
-            _syncRoot = new object();
-            _items = ImmutableDictionary<T, V>.Empty.AddRange(items);
+            SyncRoot = new object();
+            _items = ImmutableDictionary<T, TV>.Empty.AddRange(items);
         }
-
-        #endregion Constructors
-
-        #region Thread-Safe Methods
-
-        #region General
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool TryOperation(Func<ImmutableDictionary<T, V>, ImmutableDictionary<T, V>> operation)
+        public bool TryOperation(Func<ImmutableDictionary<T, TV>, ImmutableDictionary<T, TV>> operation)
         {
             return TryOperation(operation, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool DoOperation(Func<ImmutableDictionary<T, V>, ImmutableDictionary<T, V>> operation)
+        public bool DoOperation(Func<ImmutableDictionary<T, TV>, ImmutableDictionary<T, TV>> operation)
         {
             return DoOperation(operation, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
-        #region Helpers
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryOperation(Func<ImmutableDictionary<T, V>, ImmutableDictionary<T, V>> operation, NotifyCollectionChangedEventArgs args)
+        private bool TryOperation(Func<ImmutableDictionary<T, TV>, ImmutableDictionary<T, TV>> operation, NotifyCollectionChangedEventArgs args)
         {
             try
             {
@@ -89,7 +73,7 @@ namespace FactorioSupervisor.ObservableImmutable
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool TryOperation(Func<ImmutableDictionary<T, V>, KeyValuePair<ImmutableDictionary<T, V>, NotifyCollectionChangedEventArgs>> operation)
+        private bool TryOperation(Func<ImmutableDictionary<T, TV>, KeyValuePair<ImmutableDictionary<T, TV>, NotifyCollectionChangedEventArgs>> operation)
         {
             try
             {
@@ -122,7 +106,7 @@ namespace FactorioSupervisor.ObservableImmutable
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool DoOperation(Func<ImmutableDictionary<T, V>, ImmutableDictionary<T, V>> operation, NotifyCollectionChangedEventArgs args)
+        private bool DoOperation(Func<ImmutableDictionary<T, TV>, ImmutableDictionary<T, TV>> operation, NotifyCollectionChangedEventArgs args)
         {
             bool result;
 
@@ -152,7 +136,7 @@ namespace FactorioSupervisor.ObservableImmutable
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool DoOperation(Func<ImmutableDictionary<T, V>, KeyValuePair<ImmutableDictionary<T, V>, NotifyCollectionChangedEventArgs>> operation)
+        private bool DoOperation(Func<ImmutableDictionary<T, TV>, KeyValuePair<ImmutableDictionary<T, TV>, NotifyCollectionChangedEventArgs>> operation)
         {
             bool result;
 
@@ -183,13 +167,7 @@ namespace FactorioSupervisor.ObservableImmutable
             return result;
         }
 
-        #endregion Helpers
-
-        #endregion General
-
-        #region Specific
-
-        public bool DoAdd(Func<ImmutableDictionary<T, V>, KeyValuePair<T, V>> valueProvider)
+        public bool DoAdd(Func<ImmutableDictionary<T, TV>, KeyValuePair<T, TV>> valueProvider)
         {
             return DoOperation
                 (
@@ -197,12 +175,12 @@ namespace FactorioSupervisor.ObservableImmutable
                 {
                     var kvp = valueProvider(currentItems);
                     var newItems = _items.Add(kvp.Key, kvp.Value);
-                    return new KeyValuePair<ImmutableDictionary<T, V>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, kvp));
+                    return new KeyValuePair<ImmutableDictionary<T, TV>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, kvp));
                 }
                 );
         }
 
-        public bool DoAddRange(Func<ImmutableDictionary<T, V>, IEnumerable<KeyValuePair<T, V>>> valueProvider)
+        public bool DoAddRange(Func<ImmutableDictionary<T, TV>, IEnumerable<KeyValuePair<T, TV>>> valueProvider)
         {
             return DoOperation
                 (
@@ -220,21 +198,21 @@ namespace FactorioSupervisor.ObservableImmutable
                 );
         }
 
-        public bool DoRemove(Func<ImmutableDictionary<T, V>, KeyValuePair<T, V>> valueProvider)
+        public bool DoRemove(Func<ImmutableDictionary<T, TV>, KeyValuePair<T, TV>> valueProvider)
         {
             return DoOperation
                 (
                 currentItems =>
                 {
-                    var newKVP = valueProvider(currentItems);
-                    var oldKVP = new KeyValuePair<T, V>(newKVP.Key, currentItems[newKVP.Key]);
-                    var newItems = currentItems.Remove(newKVP.Key);
-                    return new KeyValuePair<ImmutableDictionary<T, V>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldKVP));
+                    var newKvp = valueProvider(currentItems);
+                    var oldKvp = new KeyValuePair<T, TV>(newKvp.Key, currentItems[newKvp.Key]);
+                    var newItems = currentItems.Remove(newKvp.Key);
+                    return new KeyValuePair<ImmutableDictionary<T, TV>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldKvp));
                 }
                 );
         }
 
-        public bool DoRemoveRange(Func<ImmutableDictionary<T, V>, IEnumerable<T>> valueProvider)
+        public bool DoRemoveRange(Func<ImmutableDictionary<T, TV>, IEnumerable<T>> valueProvider)
         {
             return DoOperation
                 (
@@ -243,21 +221,21 @@ namespace FactorioSupervisor.ObservableImmutable
                 );
         }
 
-        public bool DoSetItem(Func<ImmutableDictionary<T, V>, KeyValuePair<T, V>> valueProvider)
+        public bool DoSetItem(Func<ImmutableDictionary<T, TV>, KeyValuePair<T, TV>> valueProvider)
         {
             return DoOperation
                 (
                 currentItems =>
                 {
-                    var newKVP = valueProvider(currentItems);
-                    var oldKVP = new KeyValuePair<T, V>(newKVP.Key, currentItems[newKVP.Key]);
-                    var newItems = currentItems.SetItem(newKVP.Key, newKVP.Value);
-                    return new KeyValuePair<ImmutableDictionary<T, V>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, oldKVP, newKVP));
+                    var newKvp = valueProvider(currentItems);
+                    var oldKvp = new KeyValuePair<T, TV>(newKvp.Key, currentItems[newKvp.Key]);
+                    var newItems = currentItems.SetItem(newKvp.Key, newKvp.Value);
+                    return new KeyValuePair<ImmutableDictionary<T, TV>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, oldKvp, newKvp));
                 }
                 );
         }
 
-        public bool DoSetItems(Func<ImmutableDictionary<T, V>, IEnumerable<KeyValuePair<T, V>>> valueProvider)
+        public bool DoSetItems(Func<ImmutableDictionary<T, TV>, IEnumerable<KeyValuePair<T, TV>>> valueProvider)
         {
             return DoOperation
                 (
@@ -266,7 +244,7 @@ namespace FactorioSupervisor.ObservableImmutable
                 );
         }
 
-        public bool TryAdd(Func<ImmutableDictionary<T, V>, KeyValuePair<T, V>> valueProvider)
+        public bool TryAdd(Func<ImmutableDictionary<T, TV>, KeyValuePair<T, TV>> valueProvider)
         {
             return TryOperation
                 (
@@ -274,12 +252,12 @@ namespace FactorioSupervisor.ObservableImmutable
                 {
                     var kvp = valueProvider(currentItems);
                     var newItems = _items.Add(kvp.Key, kvp.Value);
-                    return new KeyValuePair<ImmutableDictionary<T, V>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, kvp));
+                    return new KeyValuePair<ImmutableDictionary<T, TV>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Add, kvp));
                 }
                 );
         }
 
-        public bool TryAddRange(Func<ImmutableDictionary<T, V>, IEnumerable<KeyValuePair<T, V>>> valueProvider)
+        public bool TryAddRange(Func<ImmutableDictionary<T, TV>, IEnumerable<KeyValuePair<T, TV>>> valueProvider)
         {
             return TryOperation
                 (
@@ -297,21 +275,21 @@ namespace FactorioSupervisor.ObservableImmutable
                 );
         }
 
-        public bool TryRemove(Func<ImmutableDictionary<T, V>, KeyValuePair<T, V>> valueProvider)
+        public bool TryRemove(Func<ImmutableDictionary<T, TV>, KeyValuePair<T, TV>> valueProvider)
         {
             return TryOperation
                 (
                 currentItems =>
                 {
-                    var newKVP = valueProvider(currentItems);
-                    var oldKVP = new KeyValuePair<T, V>(newKVP.Key, currentItems[newKVP.Key]);
-                    var newItems = currentItems.Remove(newKVP.Key);
-                    return new KeyValuePair<ImmutableDictionary<T, V>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldKVP));
+                    var newKvp = valueProvider(currentItems);
+                    var oldKvp = new KeyValuePair<T, TV>(newKvp.Key, currentItems[newKvp.Key]);
+                    var newItems = currentItems.Remove(newKvp.Key);
+                    return new KeyValuePair<ImmutableDictionary<T, TV>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Remove, oldKvp));
                 }
                 );
         }
 
-        public bool TryRemoveRange(Func<ImmutableDictionary<T, V>, IEnumerable<T>> valueProvider)
+        public bool TryRemoveRange(Func<ImmutableDictionary<T, TV>, IEnumerable<T>> valueProvider)
         {
             return TryOperation
                 (
@@ -320,21 +298,21 @@ namespace FactorioSupervisor.ObservableImmutable
                 );
         }
 
-        public bool TrySetItem(Func<ImmutableDictionary<T, V>, KeyValuePair<T, V>> valueProvider)
+        public bool TrySetItem(Func<ImmutableDictionary<T, TV>, KeyValuePair<T, TV>> valueProvider)
         {
             return TryOperation
                 (
                 currentItems =>
                 {
-                    var newKVP = valueProvider(currentItems);
-                    var oldKVP = new KeyValuePair<T, V>(newKVP.Key, currentItems[newKVP.Key]);
-                    var newItems = currentItems.SetItem(newKVP.Key, newKVP.Value);
-                    return new KeyValuePair<ImmutableDictionary<T, V>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, oldKVP, newKVP));
+                    var newKvp = valueProvider(currentItems);
+                    var oldKvp = new KeyValuePair<T, TV>(newKvp.Key, currentItems[newKvp.Key]);
+                    var newItems = currentItems.SetItem(newKvp.Key, newKvp.Value);
+                    return new KeyValuePair<ImmutableDictionary<T, TV>, NotifyCollectionChangedEventArgs>(newItems, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Replace, oldKvp, newKvp));
                 }
                 );
         }
 
-        public bool TrySetItems(Func<ImmutableDictionary<T, V>, IEnumerable<KeyValuePair<T, V>>> valueProvider)
+        public bool TrySetItems(Func<ImmutableDictionary<T, TV>, IEnumerable<KeyValuePair<T, TV>>> valueProvider)
         {
             return TryOperation
                 (
@@ -343,16 +321,12 @@ namespace FactorioSupervisor.ObservableImmutable
                 );
         }
 
-        #endregion Specific
-
-        public ImmutableDictionary<T, V> ToImmutableDictionary()
+        public ImmutableDictionary<T, TV> ToImmutableDictionary()
         {
             return _items;
         }
 
-        #region IEnumerable<KeyValuePair<T, V>>
-
-        public IEnumerator<KeyValuePair<T, V>> GetEnumerator()
+        public IEnumerator<KeyValuePair<T, TV>> GetEnumerator()
         {
             return _items.GetEnumerator();
         }
@@ -362,62 +336,54 @@ namespace FactorioSupervisor.ObservableImmutable
             return GetEnumerator();
         }
 
-        #endregion IEnumerable<T>
-
-        #endregion Thread-Safe Methods
-
-        #region Non Thead-Safe Methods
-
-        #region IImmutableDictionary<T, V>
-
-        public IImmutableDictionary<T, V> Add(T key, V value)
+        public IImmutableDictionary<T, TV> Add(T key, TV value)
         {
             _items = _items.Add(key, value);
             RaiseNotifyCollectionChanged();
             return this;
         }
 
-        public IImmutableDictionary<T, V> AddRange(IEnumerable<KeyValuePair<T, V>> pairs)
+        public IImmutableDictionary<T, TV> AddRange(IEnumerable<KeyValuePair<T, TV>> pairs)
         {
             _items = _items.AddRange(pairs);
             RaiseNotifyCollectionChanged();
             return this;
         }
 
-        public IImmutableDictionary<T, V> Clear()
+        public IImmutableDictionary<T, TV> Clear()
         {
             _items = _items.Clear();
             RaiseNotifyCollectionChanged();
             return this;
         }
 
-        public bool Contains(KeyValuePair<T, V> pair)
+        public bool Contains(KeyValuePair<T, TV> pair)
         {
             return _items.Contains(pair);
         }
 
-        public IImmutableDictionary<T, V> Remove(T key)
+        public IImmutableDictionary<T, TV> Remove(T key)
         {
             _items = _items.Remove(key);
             RaiseNotifyCollectionChanged();
             return this;
         }
 
-        public IImmutableDictionary<T, V> RemoveRange(IEnumerable<T> keys)
+        public IImmutableDictionary<T, TV> RemoveRange(IEnumerable<T> keys)
         {
             _items = _items.RemoveRange(keys);
             RaiseNotifyCollectionChanged();
             return this;
         }
 
-        public IImmutableDictionary<T, V> SetItem(T key, V value)
+        public IImmutableDictionary<T, TV> SetItem(T key, TV value)
         {
             _items = _items.SetItem(key, value);
             RaiseNotifyCollectionChanged();
             return this;
         }
 
-        public IImmutableDictionary<T, V> SetItems(IEnumerable<KeyValuePair<T, V>> items)
+        public IImmutableDictionary<T, TV> SetItems(IEnumerable<KeyValuePair<T, TV>> items)
         {
             _items = _items.SetItems(items);
             RaiseNotifyCollectionChanged();
@@ -434,53 +400,25 @@ namespace FactorioSupervisor.ObservableImmutable
             return _items.ContainsKey(key);
         }
 
-        public IEnumerable<T> Keys
-        {
-            get
-            {
-                return _items.Keys;
-            }
-        }
+        public IEnumerable<T> Keys => _items.Keys;
 
-        public bool TryGetValue(T key, out V value)
+        public bool TryGetValue(T key, out TV value)
         {
             return _items.TryGetValue(key, out value);
         }
 
-        public IEnumerable<V> Values
-        {
-            get
-            {
-                return _items.Values;
-            }
-        }
+        public IEnumerable<TV> Values => _items.Values;
 
-        public int Count
-        {
-            get
-            {
-                return _items.Count;
-            }
-        }
+        public int Count => _items.Count;
 
-        #endregion IImmutableDictionary<T, V>
-
-        #region IDictionary<T, V>
-
-        void IDictionary<T, V>.Add(T key, V value)
+        void IDictionary<T, TV>.Add(T key, TV value)
         {
             Add(key, value);
         }
 
-        ICollection<T> IDictionary<T, V>.Keys
-        {
-            get
-            {
-                return (_items as IDictionary<T, V>).Keys;
-            }
-        }
+        ICollection<T> IDictionary<T, TV>.Keys => (_items as IDictionary<T, TV>).Keys;
 
-        bool IDictionary<T, V>.Remove(T key)
+        bool IDictionary<T, TV>.Remove(T key)
         {
             var oldItems = _items;
             var newItems = _items = oldItems.Remove(key);
@@ -492,20 +430,11 @@ namespace FactorioSupervisor.ObservableImmutable
             return true;
         }
 
-        ICollection<V> IDictionary<T, V>.Values
-        {
-            get
-            {
-                return (_items as IDictionary<T, V>).Values;
-            }
-        }
+        ICollection<TV> IDictionary<T, TV>.Values => (_items as IDictionary<T, TV>).Values;
 
-        public V this[T key]
+        public TV this[T key]
         {
-            get
-            {
-                return _items[key];
-            }
+            get => _items[key];
             set
             {
                 _items.SetItem(key, value);
@@ -513,44 +442,34 @@ namespace FactorioSupervisor.ObservableImmutable
             }
         }
 
-        public void Add(KeyValuePair<T, V> item)
+        public void Add(KeyValuePair<T, TV> item)
         {
-            (_items as IDictionary<T, V>).Add(item);
+            (_items as IDictionary<T, TV>).Add(item);
             RaiseNotifyCollectionChanged();
         }
 
-        void ICollection<KeyValuePair<T, V>>.Clear()
+        void ICollection<KeyValuePair<T, TV>>.Clear()
         {
             Clear();
         }
 
-        public void CopyTo(KeyValuePair<T, V>[] array, int arrayIndex)
+        public void CopyTo(KeyValuePair<T, TV>[] array, int arrayIndex)
         {
-            (_items as IDictionary<T, V>).CopyTo(array, arrayIndex);
+            (_items as IDictionary<T, TV>).CopyTo(array, arrayIndex);
         }
 
-        public bool IsReadOnly
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsReadOnly => false;
 
-        public bool Remove(KeyValuePair<T, V> item)
+        public bool Remove(KeyValuePair<T, TV> item)
         {
-            var result = (_items as IDictionary<T, V>).Remove(item);
+            var result = (_items as IDictionary<T, TV>).Remove(item);
             RaiseNotifyCollectionChanged();
             return result;
         }
 
-        #endregion IDictionary<T, V>
-
-        #region IDictionary
-
         public void Add(object key, object value)
         {
-            Add((T)key, (V)value);
+            Add((T)key, (TV)value);
         }
 
         void IDictionary.Clear()
@@ -568,21 +487,9 @@ namespace FactorioSupervisor.ObservableImmutable
             return (_items as IDictionary).GetEnumerator();
         }
 
-        public bool IsFixedSize
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsFixedSize => false;
 
-        ICollection IDictionary.Keys
-        {
-            get
-            {
-                return (_items as IDictionary).Keys;
-            }
-        }
+        ICollection IDictionary.Keys => (_items as IDictionary).Keys;
 
         public void Remove(object key)
         {
@@ -590,24 +497,12 @@ namespace FactorioSupervisor.ObservableImmutable
             RaiseNotifyCollectionChanged();
         }
 
-        ICollection IDictionary.Values
-        {
-            get
-            {
-                return (_items as IDictionary).Values;
-            }
-        }
+        ICollection IDictionary.Values => (_items as IDictionary).Values;
 
         public object this[object key]
         {
-            get
-            {
-                return this[(T)key];
-            }
-            set
-            {
-                this[(T)key] = (V)value;
-            }
+            get => this[(T)key];
+            set => this[(T)key] = (TV)value;
         }
 
         public void CopyTo(Array array, int index)
@@ -615,24 +510,8 @@ namespace FactorioSupervisor.ObservableImmutable
             (_items as IDictionary).CopyTo(array, index);
         }
 
-        public bool IsSynchronized
-        {
-            get
-            {
-                return false;
-            }
-        }
+        public bool IsSynchronized => false;
 
-        public object SyncRoot
-        {
-            get
-            {
-                return _syncRoot;
-            }
-        }
-
-        #endregion IDictionary
-
-        #endregion Non Thead-Safe Methods
+        public object SyncRoot { get; }
     }
 }

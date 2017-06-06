@@ -15,33 +15,33 @@ namespace FactorioSupervisor.Resources.Controls
 
         public bool IsOpen
         {
-            get { return (bool)GetValue(IsOpenProperty); }
-            set { SetValue(IsOpenProperty, value); }
+            get => (bool)GetValue(IsOpenProperty);
+            set => SetValue(IsOpenProperty, value);
         }
 
         public string Title
         {
-            get { return (string)GetValue(TitleProperty); }
-            set { SetValue(TitleProperty, value); }
+            get => (string)GetValue(TitleProperty);
+            set => SetValue(TitleProperty, value);
         }
 
         public double ItemProgressPercentage
         {
-            get { return (double)GetValue(ItemProgressPercentageProperty); }
-            set { SetValue(ItemProgressPercentageProperty, value); }
+            get => (double)GetValue(ItemProgressPercentageProperty);
+            set => SetValue(ItemProgressPercentageProperty, value);
         }
 
         public double TotalProgressPercentage
         {
-            get { return (double)GetValue(TotalProgressPercentageProperty); }
-            set { SetValue(TotalProgressPercentageProperty, value); }
+            get => (double)GetValue(TotalProgressPercentageProperty);
+            set => SetValue(TotalProgressPercentageProperty, value);
         }
 
         public static readonly DependencyProperty IsOpenProperty = DependencyProperty.Register(nameof(IsOpen), typeof(bool),
             typeof(Snackbar), new PropertyMetadata(default(bool)));
 
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string),
-            typeof(Snackbar), new PropertyMetadata("Title"));
+            typeof(Snackbar), new PropertyMetadata(default(string)));
 
         public static readonly DependencyProperty ItemProgressPercentageProperty = DependencyProperty.Register(nameof(ItemProgressPercentage), typeof(double),
             typeof(Snackbar), new PropertyMetadata((double)0));

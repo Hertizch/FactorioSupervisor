@@ -1,7 +1,6 @@
 ﻿using FactorioSupervisor.Extensions;
 using Newtonsoft.Json;
 using System.Collections.Generic;
-using System.Configuration;
 
 namespace FactorioSupervisor.Models
 {
@@ -17,8 +16,7 @@ namespace FactorioSupervisor.Models
         [JsonProperty(PropertyName = "name")]
         public string Name
         {
-            get { return _name; }
-            set { if (value == _name) return; _name = value; OnPropertyChanged(nameof(Name)); }
+            get => _name; set { if (value == _name) return; _name = value; OnPropertyChanged(nameof(Name)); }
         }
 
         /// <summary>
@@ -27,8 +25,7 @@ namespace FactorioSupervisor.Models
         [JsonProperty(PropertyName = "filename")]
         public string Filename
         {
-            get { return _filename; }
-            set { if (value == _filename) return; _filename = value; OnPropertyChanged(nameof(Filename)); }
+            get => _filename; set { if (value == _filename) return; _filename = value; OnPropertyChanged(nameof(Filename)); }
         }
 
         /// <summary>
@@ -37,8 +34,7 @@ namespace FactorioSupervisor.Models
         [JsonProperty(PropertyName = "enabled_mod_names")]
         public IEnumerable<string> EnabledModNames
         {
-            get { return _enabledModNames; }
-            set { if (value == _enabledModNames) return; _enabledModNames = value; OnPropertyChanged(nameof(EnabledModNames)); }
+            get => _enabledModNames; set { if (value == _enabledModNames) return; _enabledModNames = value; OnPropertyChanged(nameof(EnabledModNames)); }
         }
     }
 }

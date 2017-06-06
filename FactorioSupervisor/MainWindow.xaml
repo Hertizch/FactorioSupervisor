@@ -11,7 +11,6 @@
         xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=WindowsBase"
         xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
         xmlns:system="clr-namespace:System;assembly=mscorlib"
-        xmlns:ext="clr-namespace:FactorioSupervisor.Extensions"
         mc:Ignorable="d"
         Height="{Binding Path=ConfigVm.UiDimHeight, Mode=TwoWay}" Width="{Binding Path=ConfigVm.UiDimWidth, Mode=TwoWay}"
         Left="{Binding Path=ConfigVm.UiPosLeft, Mode=TwoWay}" Top="{Binding Path=ConfigVm.UiPosTop, Mode=TwoWay}"
@@ -30,8 +29,11 @@
         <conv:ValueToVisibilityConverter x:Key="ValueToVisibilityConverter" />
         <conv:InvertedBooleanConverter x:Key="InvertedBooleanConverter" />
         <conv:InvertedBooleanMultiConverter x:Key="InvertedBooleanMultiConverter" />
-        <conv:IsUpdatingToNotifyValueConverter x:Key="IsUpdatingToNotifyValueConverter" />
-        <conv:NotifyBannerVisibilityMultiConverter x:Key="NotifyBannerVisibilityMultiConverter" />
+        <modListConverters:EntryInstallCodeCommandParameterConverter x:Key="EntryInstallCodeCommandParameterConverter" />
+
+        <system:String x:Key="EntryInstallCodeUpdateExistingMod">updateExistingMod</system:String>
+        <system:String x:Key="EntryInstallCodeInstallNewDependency">installNewDependency</system:String>
+        <system:String x:Key="EntryInstallCodeSingle">single</system:String>
 
         <CollectionViewSource x:Key="ModsVs" Source="{Binding Path=ModsVm.Mods}" IsLiveFilteringRequested="True" IsLiveSortingRequested="True">
             <CollectionViewSource.SortDescriptions>
@@ -65,16 +67,12 @@
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition />
-                        <ColumnDefinition />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
                     <StackPanel Orientation="Horizontal">
                         <c:IconToggleButton x:Name="SettingsButton" Style="{StaticResource SettingsButton}" IsChecked="False" />
                     </StackPanel>
-                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,0,70,0">
-                        <c:IconToggleButton x:Name="LogButton" Style="{StaticResource LogButton}" IsChecked="False" />
-                    </StackPanel>
-                    <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
                         <c:IconButton Style="{StaticResource TitlebarUiButton}" Icon="{StaticResource IconMinimize}" Click="MinimizeButton_OnClick" />
                         <c:IconButton Style="{StaticResource TitlebarUiButton}" Icon="{StaticResource IconClose}" Click="CloseButton_OnClick" />
                     </StackPanel>
@@ -121,7 +119,7 @@
                                 </i:Interaction.Triggers>
                             </ComboBox>
 
-                            <!-- check updates button -->
+                            <!-- check/download updates button -->
                             <Button>
                                 <Button.IsEnabled>
                                     <MultiBinding Converter="{StaticResource InvertedBooleanMultiConverter}">
@@ -137,7 +135,8 @@
                                         <Style.Triggers>
                                             <DataTrigger Binding="{Binding Path=ModsVm.IsUpdatesAvailable}" Value="True">
                                                 <Setter Property="Content" Value="{StaticResource IconDownload}" />
-                                                <Setter Property="Command" Value="{Binding Path=ModsVm.DownloadModCmd}" />
+                                                <Setter Property="Command" Value="{Binding Path=ModsVm.InstallEntryCmd}" />
+                                                <Setter Property="CommandParameter" Value="updateExistingMod.all" />
                                                 <Setter Property="ToolTip" Value="Download updates" />
                                             </DataTrigger>
                                         </Style.Triggers>
@@ -145,14 +144,8 @@
                                 </Button.Style>
                             </Button>
 
+                            <!-- TotalUpdatesAvailable text -->
                             <TextBlock Text="{Binding Path=ModsVm.TotalUpdatesAvailable, StringFormat='{}{0} updates available'}" Foreground="{StaticResource Color_Accent}" VerticalAlignment="Center" Margin="8,0,0,0" Visibility="{Binding Path=ModsVm.IsUpdatesAvailable, Converter={StaticResource ValueToVisibilityConverter}}" />
-
-                            <!-- test buttons -->
-                            <c:IconButton Style="{StaticResource SubTitlebarButton}" Icon="{StaticResource IconImport}" Command="{Binding Path=ConfigVm.TestMessageBoxWindowCmd}" Visibility="Collapsed" />
-                            <ToggleButton Content="SB" IsChecked="{Binding ElementName=UpdaterSnackbar, Path=IsOpen, Mode=TwoWay}" Click="ToggleButton_Click" Visibility="Collapsed" />
-                            <Button Content="all" Style="{StaticResource TitlebarButton}" Command="{Binding Path=ModsVm.InstallEntryCmd}" CommandParameter="updateExistingMod.all" />
-                            <Button Content="single" Style="{StaticResource TitlebarButton}" Command="{Binding Path=ModsVm.InstallEntryCmd}" CommandParameter="updateExistingMod.single.5dim_ores" />
-
                         </StackPanel>
                         <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Right">
 
@@ -172,11 +165,6 @@
                         <ListBox x:Name="ModsListBox" Style="{StaticResource GenericListBox}" ItemContainerStyle="{StaticResource GenericListBoxItem}" 
                                  ItemsSource="{Binding Source={StaticResource ModsVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod, Mode=TwoWay}" 
                                  PreviewMouseDoubleClick="ListBox_PreviewMouseDoubleClick" PreviewKeyDown="ModsListBox_PreviewKeyDown">
-                            <ListBox.Resources>
-                                <modListConverters:EntryInstallCodeCommandParameterConverter x:Key="EntryInstallCodeCommandParameterConverter" />
-                                <system:String x:Key="EntryInstallCode_UpdateExistingMod">updateExistingMod</system:String>
-                                <system:String x:Key="EntryInstallCode_All">all</system:String>
-                            </ListBox.Resources>
                             <ListBox.ItemTemplate>
                                 <DataTemplate>
                                     <Grid Margin="10,5,10,5">
@@ -236,8 +224,8 @@
                                     <MenuItem Header="Update" Command="{Binding Path=ModsVm.InstallEntryCmd}">
                                         <MenuItem.CommandParameter>
                                             <MultiBinding Converter="{StaticResource EntryInstallCodeCommandParameterConverter}">
-                                                <Binding Source="{StaticResource EntryInstallCode_UpdateExistingMod}" />
-                                                <Binding Source="{StaticResource EntryInstallCode_All}" />
+                                                <Binding Source="{StaticResource EntryInstallCodeUpdateExistingMod}" />
+                                                <Binding Source="{StaticResource EntryInstallCodeSingle}" />
                                                 <Binding Path="ModsVm.SelectedMod.Name" />
                                             </MultiBinding>
                                         </MenuItem.CommandParameter>
@@ -316,7 +304,7 @@
 
                                 <!-- Latest version -->
                                 <TextBlock Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Latest version" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" />
-                                <StackPanel Grid.Column="1" Margin="0,0,0,12" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}">
+                                <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,0,0,12" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}">
                                     <StackPanel>
                                         <TextBlock Text="{Binding Path=ModsVm.SelectedMod.RemoteVersion, FallbackValue=Version, TargetNullValue=N/A}" Margin="0,0,0,0" FontSize="14" FontFamily="Segoe UI Semilight">
                                             <TextBlock.Style>
@@ -335,7 +323,7 @@
                                 </StackPanel>
 
                                 <!-- mod info -->
-                                <TextBlock Grid.Row="1" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Mod info" />
+                                <TextBlock Grid.Row="1" Grid.Column="0" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Mod info" />
                                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,0,0,12">
 
                                     <!-- installed version -->
@@ -354,7 +342,7 @@
 
                                     <!-- homepage -->
                                     <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Text="Homepage" Visibility="{Binding Path=ModsVm.SelectedMod.Homepage, Converter={StaticResource ValueToVisibilityConverter}}" />
-                                    <TextBlock Style="{StaticResource PropertyValueTextBlock}" Visibility="{Binding Path=ModsVm.SelectedMod.Homepage, Converter={StaticResource ValueToVisibilityConverter}}" Foreground="{StaticResource Color_Accent}" TextDecorations="Underline" TextTrimming="CharacterEllipsis">
+                                    <TextBlock Style="{StaticResource PropertyValueTextBlock}" Visibility="{Binding Path=ModsVm.SelectedMod.Homepage, Converter={StaticResource ValueToVisibilityConverter}}" Foreground="{StaticResource Color_Accent}" TextDecorations="Underline">
                                         <Hyperlink Command="{Binding Path=ModsVm.OpenHyperlinkCmd}" CommandParameter="homepage" Foreground="{StaticResource Color_Accent}">
                                             <Run Text="{Binding Path=ModsVm.SelectedMod.Homepage, FallbackValue=Homepage}" />
                                         </Hyperlink>
@@ -362,7 +350,7 @@
                                 </StackPanel>
 
                                 <!-- Dependencies -->
-                                <TextBlock Grid.Row="2" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Dependencies" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,3,0,0" />
+                                <TextBlock Grid.Row="2" Grid.Column="0" Style="{StaticResource PropertyGroupDescriptorTextBlock}" Text="Dependencies" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}" Margin="0,3,0,0" />
                                 <ListBox Grid.Row="2" Grid.Column="1" Style="{StaticResource GenericListBox}" ItemsSource="{Binding Source={StaticResource DependenciesVs}}" SelectedItem="{Binding Path=ModsVm.SelectedMod.SelectedDependency, Mode=TwoWay}" Visibility="{Binding Path=ModsVm.SelectedMod.DependenciesCollection.Count, Converter={StaticResource ValueToVisibilityConverter}}">
                                     <ListBox.ItemContainerStyle>
                                         <Style BasedOn="{StaticResource DependeciesListBoxItem}" TargetType="{x:Type ListBoxItem}">
@@ -417,7 +405,15 @@
                                     </ListBox.ItemTemplate>
                                     <ListBox.ContextMenu>
                                         <ContextMenu>
-                                            <MenuItem Header="Install mod" Command="{Binding Path=ModsVm.InstallDependencyModCmd}" IsEnabled="{Binding Path=ModsVm.SelectedMod.SelectedDependency.IsInstalled, Converter={StaticResource InvertedBooleanConverter}}" />
+                                            <MenuItem Header="Install" Command="{Binding Path=ModsVm.InstallEntryCmd}" IsEnabled="{Binding Path=ModsVm.SelectedMod.SelectedDependency.IsInstalled, Converter={StaticResource InvertedBooleanConverter}}">
+                                                <MenuItem.CommandParameter>
+                                                    <MultiBinding Converter="{StaticResource EntryInstallCodeCommandParameterConverter}">
+                                                        <Binding Source="{StaticResource EntryInstallCodeInstallNewDependency}" />
+                                                        <Binding Source="{StaticResource EntryInstallCodeSingle}" />
+                                                        <Binding Path="ModsVm.SelectedMod.SelectedDependency.Name" />
+                                                    </MultiBinding>
+                                                </MenuItem.CommandParameter>
+                                            </MenuItem>
                                         </ContextMenu>
                                     </ListBox.ContextMenu>
                                 </ListBox>
@@ -480,15 +476,6 @@
                 </Grid>
             </ScrollViewer>
 
-            <!-- Log -->
-            <ScrollViewer Grid.Row="1" Style="{StaticResource DefaultScrollViewerStyle}" Visibility="{Binding ElementName=LogButton, Path=IsChecked, Converter={StaticResource ValueToVisibilityConverter}}">
-                <Grid Background="{StaticResource Color_BaseBackground}">
-                    <Grid Margin="30,40,30,0" VerticalAlignment="Top">
-                        
-                    </Grid>
-                </Grid>
-            </ScrollViewer>
-
             <!-- Notify banner -->
             <AdornerDecorator x:Name="AdornerNotify" Grid.Row="2" Height="35" Margin="0,0,0,1" Visibility="{Binding Path=NotifyBannerRelay.ShowNotifyBanner, Converter={StaticResource ValueToVisibilityConverter}}">
                 <Border Background="{StaticResource Color_SnackbarBackground}">
@@ -513,21 +500,16 @@
                     <MultiBinding Converter="{StaticResource TitleConverter}">
                         <Binding Path="ModsVm.IsUpdating" />
                         <Binding Path="ModsVm.CurrentUpdatingMod" />
-                        <Binding Path="ModsVm.CurrentUpdatingDependency" />
                     </MultiBinding>
                 </c:Snackbar.Title>
                 <c:Snackbar.ItemProgressPercentage>
                     <MultiBinding Converter="{StaticResource ProgressPercentageConverter}">
                         <Binding Path="ModsVm.IsUpdating" />
                         <Binding Path="ModsVm.CurrentUpdatingMod" />
-                        <Binding Path="ModsVm.CurrentUpdatingDependency" />
                     </MultiBinding>
                 </c:Snackbar.ItemProgressPercentage>
             </c:Snackbar>
         </Grid>
-
-
-        <c:NotifyTicker VerticalAlignment="Bottom" Title="There is no internet connection!" Margin="120,0" Visibility="Collapsed"></c:NotifyTicker>
 
         <!-- Progress bar -->
         <AdornerDecorator x:Name="AdornerProgressBar" VerticalAlignment="Top" Margin="0,35,0,0">

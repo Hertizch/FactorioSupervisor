@@ -133,7 +133,7 @@ namespace FactorioSupervisor.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("535")]
+        [global::System.Configuration.DefaultSettingValueAttribute("99999")]
         public double UiPosLeft {
             get {
                 return ((double)(this["UiPosLeft"]));
@@ -145,7 +145,7 @@ namespace FactorioSupervisor.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("265")]
+        [global::System.Configuration.DefaultSettingValueAttribute("99999")]
         public double UiPosTop {
             get {
                 return ((double)(this["UiPosTop"]));

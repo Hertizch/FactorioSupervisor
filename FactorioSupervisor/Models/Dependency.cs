@@ -1,4 +1,5 @@
-﻿using FactorioSupervisor.Extensions;
+﻿using System;
+using FactorioSupervisor.Extensions;
 
 namespace FactorioSupervisor.Models
 {
@@ -8,8 +9,10 @@ namespace FactorioSupervisor.Models
         private bool _isOptional;
         private bool _isInstalled;
         private string _remoteFilename;
+        private string _fullName;
         private string _downloadUrl;
         private bool _updateAvailable;
+        private bool _executeUpdate;
         private bool _isUpdating;
         private double _progressPercentage;
 
@@ -18,8 +21,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string Name
         {
-            get { return _name; }
-            set { if (value == _name) return; _name = value; OnPropertyChanged(nameof(Name)); }
+            get => _name; set { if (value == _name) return; _name = value; OnPropertyChanged(nameof(Name)); }
         }
 
         /// <summary>
@@ -27,8 +29,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool IsOptional
         {
-            get { return _isOptional; }
-            set { if (value == _isOptional) return; _isOptional = value; OnPropertyChanged(nameof(IsOptional)); }
+            get => _isOptional; set { if (value == _isOptional) return; _isOptional = value; OnPropertyChanged(nameof(IsOptional)); }
         }
 
         /// <summary>
@@ -36,8 +37,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool IsInstalled
         {
-            get { return _isInstalled; }
-            set { if (value == _isInstalled) return; _isInstalled = value; OnPropertyChanged(nameof(IsInstalled)); }
+            get => _isInstalled; set { if (value == _isInstalled) return; _isInstalled = value; OnPropertyChanged(nameof(IsInstalled)); }
         }
 
         /// <summary>
@@ -45,8 +45,15 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string RemoteFilename
         {
-            get { return _remoteFilename; }
-            set { if (value == _remoteFilename) return; _remoteFilename = value; OnPropertyChanged(nameof(RemoteFilename)); }
+            get => _remoteFilename; set { if (value == _remoteFilename) return; _remoteFilename = value; OnPropertyChanged(nameof(RemoteFilename)); }
+        }
+
+        /// <summary>
+        /// Gets or sets the filename and path
+        /// </summary>
+        public string FullName
+        {
+            get => _fullName; set { if (value == _fullName) return; _fullName = value; OnPropertyChanged(nameof(FullName)); }
         }
 
         /// <summary>
@@ -54,8 +61,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public string DownloadUrl
         {
-            get { return _downloadUrl; }
-            set { if (value == _downloadUrl) return; _downloadUrl = value; OnPropertyChanged(nameof(DownloadUrl)); }
+            get => _downloadUrl; set { if (value == _downloadUrl) return; _downloadUrl = value; OnPropertyChanged(nameof(DownloadUrl)); }
         }
 
         /// <summary>
@@ -63,8 +69,15 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool UpdateAvailable
         {
-            get { return _updateAvailable; }
-            set { if (value == _updateAvailable) return; _updateAvailable = value; OnPropertyChanged(nameof(UpdateAvailable)); }
+            get => _updateAvailable; set { if (value == _updateAvailable) return; _updateAvailable = value; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Gets or sets a boolean value if the dependency should update
+        /// </summary>
+        public bool ExecuteUpdate
+        {
+            get => _executeUpdate; set { if (value == _executeUpdate) return; _executeUpdate = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -72,8 +85,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public bool IsUpdating
         {
-            get { return _isUpdating; }
-            set { if (value == _isUpdating) return; _isUpdating = value; OnPropertyChanged(nameof(IsUpdating)); }
+            get => _isUpdating; set { if (value == _isUpdating) return; _isUpdating = value; OnPropertyChanged(nameof(IsUpdating)); }
         }
 
         /// <summary>
@@ -81,8 +93,7 @@ namespace FactorioSupervisor.Models
         /// </summary>
         public double ProgressPercentage
         {
-            get { return _progressPercentage; }
-            set { if (value == _progressPercentage) return; _progressPercentage = value; OnPropertyChanged(nameof(ProgressPercentage)); }
+            get => _progressPercentage; set { if (Math.Abs(value - _progressPercentage) < 0.01) return; _progressPercentage = value; OnPropertyChanged(nameof(ProgressPercentage)); }
         }
     }
 }

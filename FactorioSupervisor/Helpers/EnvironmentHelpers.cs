@@ -8,7 +8,7 @@ namespace FactorioSupervisor.Helpers
         {
             try
             {
-                RegistryKey rk = Registry.LocalMachine.OpenSubKey(path);
+                var rk = Registry.LocalMachine.OpenSubKey(path);
                 if (rk == null) return "";
                 return (string)rk.GetValue(key);
             }
@@ -17,12 +17,12 @@ namespace FactorioSupervisor.Helpers
 
         public static string GetOsFriendlyName()
         {
-            string ProductName = HKLM_GetString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName");
-            string CSDVersion = HKLM_GetString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CSDVersion");
-            if (ProductName != "")
+            var productName = HKLM_GetString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "ProductName");
+            var csdVersion = HKLM_GetString(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion", "CSDVersion");
+            if (productName != "")
             {
-                return (ProductName.StartsWith("Microsoft") ? "" : "Microsoft ") + ProductName +
-                            (CSDVersion != "" ? " " + CSDVersion : "").Trim();
+                return (productName.StartsWith("Microsoft") ? "" : "Microsoft ") + productName +
+                            (csdVersion != "" ? " " + csdVersion : "").Trim();
             }
             return "";
         }

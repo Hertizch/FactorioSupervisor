@@ -48,6 +48,7 @@
       <SubType>Component</SubType>
     </Compile>
     <Compile Include="Models\ApiData.cs" />
+    <Compile Include="Models\InfoJson.cs" />
     <Compile Include="Models\Release.cs" />
     <Compile Include="Models\Result.cs" />
     <Compile Include="ModPortalApi.cs" />

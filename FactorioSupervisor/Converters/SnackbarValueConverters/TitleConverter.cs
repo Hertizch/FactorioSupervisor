@@ -11,17 +11,13 @@ namespace FactorioSupervisor.Converters.SnackbarValueConverters
         {
             var isUpdating = (bool)values[0];
             var mod = (Mod)values[1];
-            var dependency = (Dependency)values[2];
 
             string output = null;
 
             if (isUpdating)
             {
                 if (mod != null)
-                    output = $"Updating: {mod.Title} - {mod.ProgressPercentage}%";
-
-                if (dependency != null)
-                    output = $"Installing: {dependency.Name} - {dependency.ProgressPercentage}%";
+                    output = $"Updating mod: {mod.Title} - {mod.ProgressPercentage}%";
             }
             else
                 output = "Warming up...";
