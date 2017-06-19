@@ -19,9 +19,6 @@
     </Style>
 
     <Style x:Key="GenericListBoxItem" TargetType="{x:Type ListBoxItem}">
-        <Style.Resources>
-            <conv:FactorioVersionVisibilityConverter x:Key="FactorioVersionVisibilityConverter" />
-        </Style.Resources>
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />
         <Setter Property="Background" Value="Transparent" />
@@ -87,7 +84,7 @@
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsSelected" Value="True">
-                            <Setter Property="Background" Value="{StaticResource AccentColorLight}" />
+                            <Setter Property="Background" Value="{StaticResource Color_Accent}" />
                             <Setter Property="Foreground" Value="#FFFFFFFF" />
                         </Trigger>
                         <Trigger Property="IsMouseOver" Value="True">

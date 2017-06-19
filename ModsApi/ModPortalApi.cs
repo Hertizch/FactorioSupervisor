@@ -1,5 +1,4 @@
-﻿using ModsApi.Extensions;
-using ModsApi.Models;
+﻿using ModsApi.Models;
 using Newtonsoft.Json;
 using System;
 using System.Diagnostics;
@@ -64,8 +63,7 @@ namespace ModsApi
 
             using (_webClient = new WebClient { Proxy = null })
             {
-                _webClient.DownloadProgressChanged += (sender, args) => Debug.WriteLine($"_webClient.DownloadProgressChanged {args.BytesReceived}");
-                _webClient.DownloadStringCompleted += (sender, args) => Debug.WriteLine($"_webClient.DownloadStringCompleted");
+                _webClient.DownloadStringCompleted += (sender, args) => Debug.WriteLine("_webClient.DownloadStringCompleted");
 
                 try
                 {

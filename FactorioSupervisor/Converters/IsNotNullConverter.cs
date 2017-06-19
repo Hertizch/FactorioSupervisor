@@ -1,22 +1,16 @@
-﻿using FactorioSupervisor.ViewModels;
-using System;
+﻿using System;
+using System.Diagnostics;
 using System.Globalization;
 using System.Windows;
 using System.Windows.Data;
 
 namespace FactorioSupervisor.Converters
 {
-    public class FactorioVersionVisibilityConverter : IValueConverter
+    public class IsNotNullConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value == null)
-                return null;
-
-            if (value.ToString().Contains("0.14") && BaseVm.ModsVm.HideIncompatibleMods)
-                return Visibility.Collapsed;
-
-            return Visibility.Visible;
+            return value == null;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

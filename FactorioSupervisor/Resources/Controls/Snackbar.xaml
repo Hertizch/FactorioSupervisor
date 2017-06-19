@@ -8,7 +8,7 @@
 
     <UserControl.Resources>
         <Storyboard x:Key="OnIsOpenTrue">
-            <DoubleAnimation Storyboard.TargetProperty="Height" To="65" Duration="0:0:0.25">
+            <DoubleAnimation Storyboard.TargetProperty="Height" To="50" Duration="0:0:0.25">
                 <DoubleAnimation.EasingFunction>
                     <CubicEase EasingMode="EaseOut" />
                 </DoubleAnimation.EasingFunction>
@@ -40,17 +40,16 @@
     </UserControl.Style>
 
     <Grid Background="{StaticResource Color_SnackbarBackground}">
-        <StackPanel Margin="35,15">
+        <StackPanel Margin="35,0" VerticalAlignment="Center">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="{Binding ElementName=SnackbarControl, Path=Title}" Foreground="{StaticResource Color_Text100}" />
-                <TextBlock Grid.Column="1" Text="{Binding ElementName=SnackbarControl, Path=TotalProgressPercentage, StringFormat={}Total: {0}%}" Foreground="{StaticResource Color_Text70}" HorizontalAlignment="Right" Margin="0,0,0,5" />
+                <TextBlock Grid.Column="1" Text="{Binding ElementName=SnackbarControl, Path=TotalProgressPercentage, StringFormat={}Progress: {0:0}%}" Foreground="{StaticResource Color_Text70}" HorizontalAlignment="Right" Margin="0,0,0,5" />
             </Grid>
-            <ProgressBar Foreground="{StaticResource Color_AccentMuted}" Height="2" BorderBrush="Transparent" Background="Transparent" Value="{Binding ElementName=SnackbarControl, Path=ItemProgressPercentage}" Margin="0,0,0,1" />
-            <ProgressBar Foreground="{StaticResource Color_Accent}" Height="4" BorderBrush="Transparent" Background="Transparent" Value="{Binding ElementName=SnackbarControl, Path=TotalProgressPercentage}" />
+            <ProgressBar Foreground="{StaticResource Color_Accent}" Height="2" BorderBrush="Transparent" Background="Transparent" Value="{Binding ElementName=SnackbarControl, Path=TotalProgressPercentage}" />
         </StackPanel>
     </Grid>
 </UserControl>

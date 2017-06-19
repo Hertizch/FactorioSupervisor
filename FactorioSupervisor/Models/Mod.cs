@@ -34,7 +34,6 @@ namespace FactorioSupervisor.Models
         private bool _executeUpdate;
         private double _progressPercentage;
         private bool _hasError;
-        private bool _hideInModList;
         private ObservableImmutableList<Dependency> _dependenciesCollection;
         private bool _hasOptionalDependencies;
         private Dependency _selectedDependency;
@@ -213,14 +212,6 @@ namespace FactorioSupervisor.Models
         public bool HasError
         {
             get => _hasError; set { if (value == _hasError) return; _hasError = value; OnPropertyChanged(); }
-        }
-
-        /// <summary>
-        /// Gets or sets a boolean value if the mod should be dispalyed in the mod list
-        /// </summary>
-        public bool HideInModList
-        {
-            get => _hideInModList; set { if (value == _hideInModList) return; _hideInModList = value; OnPropertyChanged(); }
         }
 
         /// <summary>

@@ -46,17 +46,20 @@ namespace FactorioSupervisor.ViewModels
         private RelayCommand _saveUserSettingsCmd;
         private RelayCommand _getCurrentFactorioBranchCmd;
         private RelayCommand _resetWindowPosDimCmd;
+        private RelayCommand _resetAllUserSettingsCmd;
 
         /*
          * Properties
          */
+
+        #region Properties
 
         /// <summary>
         /// Gets or sets the factorio exe full path
         /// </summary>
         public string FactorioPath
         {
-            get => _factorioPath; set { if (value == _factorioPath) return; _factorioPath = value; OnPropertyChanged(nameof(FactorioPath)); }
+            get => _factorioPath; set { if (value == _factorioPath) return; _factorioPath = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -64,7 +67,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public string ModsPath
         {
-            get => _modsPath; set { if (value == _modsPath) return; _modsPath = value; OnPropertyChanged(nameof(ModsPath)); }
+            get => _modsPath; set { if (value == _modsPath) return; _modsPath = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -72,7 +75,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public string ModPortalUsername
         {
-            get => _modPortalUsername; set { if (value == _modPortalUsername) return; _modPortalUsername = value; OnPropertyChanged(nameof(ModPortalUsername)); }
+            get => _modPortalUsername; set { if (value == _modPortalUsername) return; _modPortalUsername = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -80,7 +83,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public string ModPortalPassword
         {
-            get => _modPortalPassword; set { if (value == _modPortalPassword) return; _modPortalPassword = value; OnPropertyChanged(nameof(ModPortalPassword)); }
+            get => _modPortalPassword; set { if (value == _modPortalPassword) return; _modPortalPassword = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -88,7 +91,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public string ModPortalAuthToken
         {
-            get => _modPortalAuthToken; set { if (value == _modPortalAuthToken) return; _modPortalAuthToken = value; OnPropertyChanged(nameof(ModPortalAuthToken)); }
+            get => _modPortalAuthToken; set { if (value == _modPortalAuthToken) return; _modPortalAuthToken = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -96,7 +99,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public bool AutoCheckModUpdate
         {
-            get => _autoCheckModUpdate; set { if (value == _autoCheckModUpdate) return; _autoCheckModUpdate = value; OnPropertyChanged(nameof(AutoCheckModUpdate)); }
+            get => _autoCheckModUpdate; set { if (value == _autoCheckModUpdate) return; _autoCheckModUpdate = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -104,7 +107,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public bool AutoDownloadModUpdate
         {
-            get => _autoDownloadModUpdate; set { if (value == _autoDownloadModUpdate) return; _autoDownloadModUpdate = value; OnPropertyChanged(nameof(AutoDownloadModUpdate)); }
+            get => _autoDownloadModUpdate; set { if (value == _autoDownloadModUpdate) return; _autoDownloadModUpdate = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -112,7 +115,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public string CurrentFactorioBranch
         {
-            get => _currentFactorioBranch; set { if (value == _currentFactorioBranch) return; _currentFactorioBranch = value; OnPropertyChanged(nameof(CurrentFactorioBranch)); }
+            get => _currentFactorioBranch; set { if (value == _currentFactorioBranch) return; _currentFactorioBranch = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -120,7 +123,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public double UiPosLeft
         {
-            get => _uiPosLeft; set { if (Math.Abs(value - _uiPosLeft) < 0.01) return; _uiPosLeft = value; OnPropertyChanged(nameof(UiPosLeft)); }
+            get => _uiPosLeft; set { if (Math.Abs(value - _uiPosLeft) < 0.01) return; _uiPosLeft = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -128,7 +131,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public double UiPosTop
         {
-            get => _uiPosTop; set { if (Math.Abs(value - _uiPosTop) < 0.01) return; _uiPosTop = value; OnPropertyChanged(nameof(UiPosTop)); }
+            get => _uiPosTop; set { if (Math.Abs(value - _uiPosTop) < 0.01) return; _uiPosTop = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -136,7 +139,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public double UiDimWidth
         {
-            get => _uiDimWidth; set { if (Math.Abs(value - _uiDimWidth) < 0.01) return; _uiDimWidth = value; OnPropertyChanged(nameof(UiDimWidth)); }
+            get => _uiDimWidth; set { if (Math.Abs(value - _uiDimWidth) < 0.01) return; _uiDimWidth = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -144,7 +147,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public double UiDimHeight
         {
-            get => _uiDimHeight; set { if (Math.Abs(value - _uiDimHeight) < 0.01) return; _uiDimHeight = value; OnPropertyChanged(nameof(UiDimHeight)); }
+            get => _uiDimHeight; set { if (Math.Abs(value - _uiDimHeight) < 0.01) return; _uiDimHeight = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -152,7 +155,7 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public GridLength UiDimModListWidth
         {
-            get => _uiDimModListWidth; set { if (value == _uiDimModListWidth) return; _uiDimModListWidth = value; OnPropertyChanged(nameof(UiDimModListWidth)); }
+            get => _uiDimModListWidth; set { if (value == _uiDimModListWidth) return; _uiDimModListWidth = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -160,8 +163,10 @@ namespace FactorioSupervisor.ViewModels
         /// </summary>
         public GridLength UiDimModDetailsWidth
         {
-            get => _uiDimModDetailsWidth; set { if (value == _uiDimModDetailsWidth) return; _uiDimModDetailsWidth = value; OnPropertyChanged(nameof(UiDimModDetailsWidth)); }
+            get => _uiDimModDetailsWidth; set { if (value == _uiDimModDetailsWidth) return; _uiDimModDetailsWidth = value; OnPropertyChanged(); }
         }
+
+        #endregion
 
         /*
          * Commands
@@ -178,6 +183,9 @@ namespace FactorioSupervisor.ViewModels
 
         public RelayCommand ResetWindowPosDimCmd => _resetWindowPosDimCmd ??
             (_resetWindowPosDimCmd = new RelayCommand(Execute_ResetWindowPosDimCmd, p => true));
+
+        public RelayCommand ResetAllUserSettingsCmd => _resetAllUserSettingsCmd ??
+            (_resetAllUserSettingsCmd = new RelayCommand(Execute_ResetAllUserSettingsCmd, p => true));
 
         /*
          * Methods
@@ -240,6 +248,8 @@ namespace FactorioSupervisor.ViewModels
             settings.SelectedProfile = BaseVm.ProfilesVm.SelectedProfile.Name;
             settings.AutoCheckModUpdate = AutoCheckModUpdate;
             settings.AutoDownloadModUpdate = AutoDownloadModUpdate;
+            settings.HideGroups = BaseVm.ModsVm.HideGroups;
+            settings.ModsSortDirection = BaseVm.ModsVm.ModsSortDirection;
 
             settings.Save();
 
@@ -292,11 +302,11 @@ namespace FactorioSupervisor.ViewModels
                         Logger.WriteLine($"Retreived current Factorio branch version: {CurrentFactorioBranch}", true);
                     }
                     else
-                        Logger.WriteLine($"Unable to retreive current Factorio branch version", true);
+                        Logger.WriteLine("Unable to retreive current Factorio branch version", true);
                 }
                 else
                 {
-                    Logger.WriteLine($"Unable to retreive current Factorio branch version", true);
+                    Logger.WriteLine("Unable to retreive current Factorio branch version", true);
                 }
             }
             else
@@ -317,6 +327,36 @@ namespace FactorioSupervisor.ViewModels
             UiDimModDetailsWidth = new GridLength(2.5, GridUnitType.Star);
 
             Logger.WriteLine("UI user settings reset to default");
+        }
+
+        private static void Execute_ResetAllUserSettingsCmd(object obj)
+        {
+            var p = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FactorioSupervisor");
+            var ss = Directory.GetDirectories(p, "FactorioSupervisor.*");
+            foreach (var s in ss)
+            {
+                Exception exception = null;
+
+                try
+                {
+                    FileHelpers.DeleteDirectory(s);
+                }
+                catch (Exception ex)
+                {
+                    exception = ex;
+                    Logger.WriteLine($"[ERROR] Unable to delete folder: '{s}'", true, ex);
+                }
+                finally
+                {
+                    if (exception == null)
+                        Logger.WriteLine($"[INFO] Deleted folder: '{s}'", true);
+                }
+            }
+
+            var settings = Settings.Default;
+            settings.Reset();
+
+            Logger.WriteLine("All user settings reset to default");
         }
     }
 }

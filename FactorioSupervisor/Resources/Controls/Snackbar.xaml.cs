@@ -25,12 +25,6 @@ namespace FactorioSupervisor.Resources.Controls
             set => SetValue(TitleProperty, value);
         }
 
-        public double ItemProgressPercentage
-        {
-            get => (double)GetValue(ItemProgressPercentageProperty);
-            set => SetValue(ItemProgressPercentageProperty, value);
-        }
-
         public double TotalProgressPercentage
         {
             get => (double)GetValue(TotalProgressPercentageProperty);
@@ -42,9 +36,6 @@ namespace FactorioSupervisor.Resources.Controls
 
         public static readonly DependencyProperty TitleProperty = DependencyProperty.Register(nameof(Title), typeof(string),
             typeof(Snackbar), new PropertyMetadata(default(string)));
-
-        public static readonly DependencyProperty ItemProgressPercentageProperty = DependencyProperty.Register(nameof(ItemProgressPercentage), typeof(double),
-            typeof(Snackbar), new PropertyMetadata((double)0));
 
         public static readonly DependencyProperty TotalProgressPercentageProperty = DependencyProperty.Register(nameof(TotalProgressPercentage), typeof(double),
             typeof(Snackbar), new PropertyMetadata((double)0));

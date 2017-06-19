@@ -65,4 +65,36 @@
         </Setter>
     </Style>
 
+    <Style x:Key="OptionsCheckBox" TargetType="{x:Type CheckBox}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Text70}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type CheckBox}">
+                    <Grid Background="{TemplateBinding Background}" HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" Margin="0,3">
+                            <Viewbox Width="16" Height="16">
+                                <Canvas Width="24" Height="24">
+                                    <Path x:Name="Icon" Data="{DynamicResource IconCheckmarkUnchecked}" Fill="{StaticResource Color_Text20}" />
+                                </Canvas>
+                            </Viewbox>
+                            <ContentPresenter Margin="8,0,0,0" />
+                        </StackPanel>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsChecked" Value="True">
+                            <Setter TargetName="Icon" Property="Data" Value="{DynamicResource IconCheckmarkChecked}" />
+                            <Setter TargetName="Icon" Property="Fill" Value="{StaticResource Color_Text70}" />
+                        </Trigger>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Icon" Property="Fill" Value="{StaticResource Color_Text70}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

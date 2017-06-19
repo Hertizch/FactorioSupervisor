@@ -8,6 +8,9 @@ namespace ModsApi.Models
         [JsonProperty("name")]
         public string Name { get; private set; }
 
+        [JsonProperty("title")]
+        public string Title { get; private set; }
+
         [JsonProperty("releases")]
         public List<Release> Releases { get; private set; }
     }

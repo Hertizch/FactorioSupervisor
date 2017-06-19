@@ -47,5 +47,11 @@
     <Setting Name="UiDimModDetailsWidth" Type="System.Windows.GridLength" Scope="User">
       <Value Profile="(Default)">2.5*</Value>
     </Setting>
+    <Setting Name="HideGroups" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
+    <Setting Name="ModsSortDirection" Type="System.ComponentModel.ListSortDirection" Scope="User">
+      <Value Profile="(Default)">Ascending</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

@@ -202,5 +202,29 @@ namespace FactorioSupervisor.Properties {
                 this["UiDimModDetailsWidth"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool HideGroups {
+            get {
+                return ((bool)(this["HideGroups"]));
+            }
+            set {
+                this["HideGroups"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("Ascending")]
+        public global::System.ComponentModel.ListSortDirection ModsSortDirection {
+            get {
+                return ((global::System.ComponentModel.ListSortDirection)(this["ModsSortDirection"]));
+            }
+            set {
+                this["ModsSortDirection"] = value;
+            }
+        }
     }
 }

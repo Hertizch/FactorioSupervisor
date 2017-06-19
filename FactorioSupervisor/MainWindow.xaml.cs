@@ -1,17 +1,11 @@
-﻿using FactorioSupervisor.Extensions;
-using FactorioSupervisor.Helpers;
+﻿using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Models;
 using FactorioSupervisor.ViewModels;
-using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
 using System.Windows.Input;
-using System.Windows.Media.Animation;
 
 namespace FactorioSupervisor
 {
@@ -23,58 +17,6 @@ namespace FactorioSupervisor
         public MainWindow()
         {
             InitializeComponent();
-
-            // Animation fps
-            Timeline.DesiredFrameRateProperty.OverrideMetadata(typeof(Timeline), new FrameworkPropertyMetadata { DefaultValue = 120 });
-        }
-
-        private string _searchFilter;
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public string SearchFilter
-        {
-            get { return _searchFilter; }
-            set
-            {
-                if (value == _searchFilter) return;
-
-                _searchFilter = value;
-                OnPropertyChanged();
-
-                if (!string.IsNullOrEmpty(_searchFilter))
-                    AddFilter();
-
-                ((CollectionViewSource)Resources["ModsVs"])?.View.Refresh();
-
-                if (ModsListBox.SelectedIndex == -1)
-                    ModsListBox.SelectedIndex = 0;
-            }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void ModList_Filter(object sender, FilterEventArgs e)
-        {
-            var mod = e.Item as Mod;
-
-            if (mod == null)
-                e.Accepted = false;
-            else if (!mod.Title.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase) && !mod.Name.Contains(_searchFilter, StringComparison.OrdinalIgnoreCase) && !mod.HideInModList)
-                e.Accepted = false;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        private void AddFilter()
-        {
-            ((CollectionViewSource)Resources["ModsVs"]).Filter -= ModList_Filter;
-            ((CollectionViewSource)Resources["ModsVs"]).Filter += ModList_Filter;
         }
 
         /// <summary>
@@ -120,18 +62,15 @@ namespace FactorioSupervisor
         /// <param name="e"></param>
         private void ListBox_PreviewMouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
-            if (ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item)
-            {
-                var mod = item.DataContext as Mod;
+            if (!(ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item)) return;
 
-                if (mod.HasError)
-                    return;
+            var mod = item.DataContext as Mod;
+            if (mod == null) return;
 
-                if (mod.IsEnabled)
-                    mod.IsEnabled = false;
-                else
-                    mod.IsEnabled = true;
-            }
+            if (mod.HasError)
+                return;
+
+            mod.IsEnabled = !mod.IsEnabled;
         }
 
         /// <summary>
@@ -141,18 +80,15 @@ namespace FactorioSupervisor
         /// <param name="e"></param>
         private void ModsListBox_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item && e.Key == Key.Return)
-            {
-                var mod = item.DataContext as Mod;
+            if (!(ItemsControl.ContainerFromElement(ModsListBox, e.OriginalSource as DependencyObject) is ListBoxItem item) || e.Key != Key.Return) return;
 
-                if (mod.HasError)
-                    return;
+            var mod = item.DataContext as Mod;
+            if (mod == null) return;
 
-                if (mod.IsEnabled)
-                    mod.IsEnabled = false;
-                else
-                    mod.IsEnabled = true;
-            }
+            if (mod.HasError)
+                return;
+
+            mod.IsEnabled = !mod.IsEnabled;
         }
 
         /// <summary>
@@ -162,18 +98,12 @@ namespace FactorioSupervisor
         /// <param name="e"></param>
         private void WindowRoot_PreviewKeyDown(object sender, KeyEventArgs e)
         {
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) | Keyboard.IsKeyDown(Key.RightCtrl) && e.Key == Key.F)
-            {
-                e.Handled = true;
+            if (!(Keyboard.IsKeyDown(Key.LeftCtrl) | Keyboard.IsKeyDown(Key.RightCtrl)) || e.Key != Key.F) return;
 
-                SearchTextBox.SelectAll();
-                SearchTextBox.Focus();
-            }
-        }
+            e.Handled = true;
 
-        private void ToggleButton_Click(object sender, RoutedEventArgs e)
-        {
-            UpdaterSnackbar.Title = "Test";
+            SearchTextBox.SelectAll();
+            SearchTextBox.Focus();
         }
     }
 }

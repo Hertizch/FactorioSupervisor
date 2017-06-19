@@ -75,18 +75,18 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Converters\FactorioVersionVisibilityConverter.cs" />
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
     <Compile Include="Converters\InvertedBooleanMultiConverter.cs" />
+    <Compile Include="Converters\IsNotNullConverter.cs" />
     <Compile Include="Converters\ModListConverters\EntryInstallCodeCommandParameterConverter.cs" />
-    <Compile Include="Converters\SnackbarValueConverters\ProgressPercentageConverter.cs" />
-    <Compile Include="Converters\SnackbarValueConverters\TitleConverter.cs" />
     <Compile Include="Converters\ValueToVisibilityConverter.cs" />
     <Compile Include="Enums\EntryInstallMethod.cs" />
     <Compile Include="Extensions\ExtendedButton.cs" />
+    <Compile Include="Helpers\FileHelpers.cs" />
     <Compile Include="Helpers\NetcodeHelpers.cs" />
     <Compile Include="Helpers\ResourceHelper.cs" />
     <Compile Include="Helpers\ScreenHelpers.cs" />
+    <Compile Include="InitializationOptions.cs" />
     <Compile Include="MessageBoxWindow.xaml.cs">
       <DependentUpon>MessageBoxWindow.xaml</DependentUpon>
     </Compile>
