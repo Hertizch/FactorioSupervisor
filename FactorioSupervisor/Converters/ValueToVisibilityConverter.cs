@@ -11,9 +11,9 @@ namespace FactorioSupervisor.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (parameter != null)
-                if (value != null && ((string)parameter == "inverted" && (bool)value))
-                    return Visibility.Collapsed;
+            /*if (parameter != null)
+                if (value != null && (string)parameter == "inverted" && (bool)value)
+                    return Visibility.Collapsed;*/
 
             // If object is null
             if (value == null)
@@ -33,6 +33,10 @@ namespace FactorioSupervisor.Converters
             // If value is integer
             if (value as int? == 0)
                 return Visibility.Collapsed;
+
+            if (parameter != null)
+                if (value as int? == 0 && parameter as string == "inverted")
+                    return Visibility.Collapsed;
 
             // If object is JArray
             if (value is JArray)

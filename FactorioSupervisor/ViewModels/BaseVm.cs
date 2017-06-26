@@ -1,6 +1,8 @@
-﻿using FactorioSupervisor.Helpers;
+﻿using System.ComponentModel;
+using FactorioSupervisor.Helpers;
 using FactorioSupervisor.Relays;
 using System.Reflection;
+using System.Windows;
 
 namespace FactorioSupervisor.ViewModels
 {
@@ -20,6 +22,8 @@ namespace FactorioSupervisor.ViewModels
             ModsVm = new ModsVm();
             ProfilesVm = new ProfilesVm();
         }
+
+        public static bool DesignMode { get; set; } = DesignerProperties.GetIsInDesignMode(new DependencyObject());
 
         public static NotifyBannerRelay NotifyBannerRelay { get; private set; }
 

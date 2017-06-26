@@ -17,6 +17,10 @@ namespace FactorioSupervisor
         public MainWindow()
         {
             InitializeComponent();
+
+            // Prompt to input paths - open settings
+            if (string.IsNullOrWhiteSpace(BaseVm.ConfigVm.FactorioPath) || string.IsNullOrWhiteSpace(BaseVm.ConfigVm.ModsPath))
+                SettingsButton.IsChecked = true;
         }
 
         /// <summary>

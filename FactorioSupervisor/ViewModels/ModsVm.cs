@@ -34,6 +34,7 @@ namespace FactorioSupervisor.ViewModels
 
             Mods = new ObservableImmutableList<Mod>();
 
+            // Set view source
             ModsVs = CollectionViewSource.GetDefaultView(Mods);
             ModsVs.SortDescriptions.Add(new SortDescription(nameof(Mod.Title), ListSortDirection.Ascending));
             ModsVs.GroupDescriptions.Add(new PropertyGroupDescription(nameof(Mod.FactorioVersion)));
@@ -47,7 +48,7 @@ namespace FactorioSupervisor.ViewModels
                 GetLocalModsCmd.Execute(null);
 
             /* Create example mod */
-            if (Mods.Count == 0)
+            if (BaseVm.DesignMode)
             {
                 var mod = new Mod()
                 {
@@ -433,6 +434,8 @@ namespace FactorioSupervisor.ViewModels
 
         private async void Execute_GetModRemoteDataCmd(object obj)
         {
+            if (Mods.Count <= 0) return;
+
             if (!await NetcodeHelpers.VerifyInternetConnection())
             {
                 // Open message box to user
@@ -628,7 +631,9 @@ namespace FactorioSupervisor.ViewModels
                 if (string.IsNullOrWhiteSpace(BaseVm.ConfigVm.ModPortalAuthToken))
                 {
                     // Open message box to user
-                    MessageBoxWindow.Show(ResourceHelper.GetValue("MessageBox_AuthRequired_Title"), ResourceHelper.GetValue("MessageBox_AuthRequired"), MessageBoxButton.OKCancel, true);
+                    if (MessageBoxWindow.Show(ResourceHelper.GetValue("MessageBox_AuthRequired_Title"),
+                            ResourceHelper.GetValue("MessageBox_AuthRequired"), MessageBoxButton.OKCancel,
+                            true) == MessageBoxResult.Cancel) return false;
                 }
 
                 Exception exception = null;
