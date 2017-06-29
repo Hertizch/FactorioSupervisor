@@ -328,13 +328,28 @@
 
                                 <!-- Latest version -->
                                 <Border Grid.ColumnSpan="2" Margin="0,0,0,40" Visibility="{Binding Path=ModsVm.SelectedMod.UpdateAvailable, Converter={StaticResource ValueToVisibilityConverter}}" Background="#FF141414" BorderBrush="#FF474747" BorderThickness="1">
-                                    <StackPanel Margin="30,15">
-                                        <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.RemoteVersion}" Margin="0" Foreground="{StaticResource Color_Update}" />
-                                        <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Margin="0">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="Auto" />
+                                            <ColumnDefinition />
+                                        </Grid.ColumnDefinitions>
+                                        <Button Style="{StaticResource ModUpdateButton}" Content="{StaticResource IconDownload}" Width="50" Command="{Binding Path=ModsVm.InstallEntryCmd}">
+                                            <Button.CommandParameter>
+                                                <MultiBinding Converter="{StaticResource EntryInstallCodeCommandParameterConverter}">
+                                                    <Binding Source="{StaticResource EntryInstallCodeUpdateExistingMod}" />
+                                                    <Binding Source="{StaticResource EntryInstallCodeSingle}" />
+                                                    <Binding Path="ModsVm.SelectedMod.Name" />
+                                                </MultiBinding>
+                                            </Button.CommandParameter>
+                                        </Button>
+                                        <StackPanel Grid.Column="1" Margin="10,15">
+                                            <TextBlock Style="{StaticResource PropertyValueTextBlock}" Text="{Binding Path=ModsVm.SelectedMod.RemoteVersion}" Margin="0" Foreground="{StaticResource Color_Update}" />
+                                            <TextBlock Style="{StaticResource PropertyDescriptorTextBlock}" Margin="0">
                                             <Run Text="{Binding Path=ModsVm.SelectedMod.ReleasedAt, StringFormat='{}Released {0} -'}" />
                                             <Run Text="{Binding Path=ModsVm.SelectedMod.RemoteFactorioVersion, StringFormat='{}Compatible with Factorio {0}'}" />
-                                        </TextBlock>
-                                    </StackPanel>
+                                            </TextBlock>
+                                        </StackPanel>
+                                    </Grid>
                                 </Border>
 
                                 <!-- mod info -->
