@@ -186,6 +186,32 @@
         </Setter>
     </Style>
 
+    <Style x:Key="IconButton" TargetType="{x:Type Button}">
+        <Setter Property="OverridesDefaultStyle" Value="True" />
+        <Setter Property="UseLayoutRounding" Value="True" />
+        <Setter Property="Foreground" Value="{StaticResource Color_Button40}" />
+        <Setter Property="Background" Value="{StaticResource Color_IconButtonBackground}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Border Background="{TemplateBinding Background}">
+                        <Viewbox Width="{Binding Path=Width, RelativeSource={RelativeSource TemplatedParent}}" Height="{Binding Path=Height, RelativeSource={RelativeSource TemplatedParent}}">
+                            <Canvas Width="24" Height="24">
+                                <Path x:Name="Icon" Data="{Binding Path=Content, RelativeSource={RelativeSource TemplatedParent}}" Fill="{TemplateBinding Foreground}" Stretch="None" />
+                            </Canvas>
+                        </Viewbox>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter Property="Foreground" Value="{StaticResource Color_Button70}" />
+                            <Setter Property="Background" Value="{StaticResource Color_IconButtonBackgroundHover}" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <Style x:Key="ModUpdateButton" TargetType="{x:Type Button}">
         <Setter Property="OverridesDefaultStyle" Value="True" />
         <Setter Property="UseLayoutRounding" Value="True" />

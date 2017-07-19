@@ -40,7 +40,7 @@
     <sys:String x:Key="Settings_Username">Username</sys:String>
     <sys:String x:Key="Settings_AuthenticationToken">Authentication token</sys:String>
 
-    <sys:String x:Key="Settings_AutoCheckModUpdate_Description">Immediately check all mods for any new versions each time the app is started</sys:String>
+    <sys:String x:Key="Settings_AutoCheckModUpdate_Description">Immediately check all mods for new versions each time the app is started</sys:String>
     <sys:String x:Key="Settings_AutoCheckModUpdate">Check for mod updates at startup</sys:String>
 
     <sys:String x:Key="Settings_AutoDownloadModUpdate_Description">If any mod has an update available, download it right away</sys:String>

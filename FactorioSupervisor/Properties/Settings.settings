@@ -53,5 +53,8 @@
     <Setting Name="ModsSortDirection" Type="System.ComponentModel.ListSortDirection" Scope="User">
       <Value Profile="(Default)">Ascending</Value>
     </Setting>
+    <Setting Name="UiDisableHardwareAcc" Type="System.Boolean" Scope="User">
+      <Value Profile="(Default)">False</Value>
+    </Setting>
   </Settings>
 </SettingsFile>

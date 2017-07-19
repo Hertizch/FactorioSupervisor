@@ -37,6 +37,7 @@ namespace FactorioSupervisor.Models
         private ObservableImmutableList<Dependency> _dependenciesCollection;
         private bool _hasOptionalDependencies;
         private Dependency _selectedDependency;
+        private string _githubPath;
 
         /// <summary>
         /// Gets or sets the filename with extension
@@ -236,6 +237,14 @@ namespace FactorioSupervisor.Models
         public Dependency SelectedDependency
         {
             get => _selectedDependency; set { if (value == _selectedDependency) return; _selectedDependency = value; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Gets or sets the GitHub path
+        /// </summary>
+        public string GithubPath
+        {
+            get => _githubPath; set { if (value == _githubPath) return; _githubPath = value; OnPropertyChanged(); }
         }
     }
 }

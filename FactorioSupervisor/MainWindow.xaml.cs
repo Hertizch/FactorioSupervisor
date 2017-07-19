@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Interop;
 
 namespace FactorioSupervisor
 {
@@ -16,6 +17,10 @@ namespace FactorioSupervisor
     {
         public MainWindow()
         {
+            // Determine rendering mode of ui elements
+            if (PresentationSource.FromVisual(this) is HwndSource hwndSource)
+                hwndSource.CompositionTarget.RenderMode = BaseVm.ConfigVm.UiDisableHardwareAcc ? RenderMode.SoftwareOnly : RenderMode.Default;
+
             InitializeComponent();
 
             // Prompt to input paths - open settings

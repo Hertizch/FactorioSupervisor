@@ -40,6 +40,7 @@ namespace FactorioSupervisor.ViewModels
         private double _uiPosTop;
         private double _uiDimWidth;
         private double _uiDimHeight;
+        private bool _uiDisableHardwareAcc;
         private GridLength _uiDimModListWidth;
         private GridLength _uiDimModDetailsWidth;
         private RelayCommand _loadUserSettingsCmd;
@@ -166,6 +167,14 @@ namespace FactorioSupervisor.ViewModels
             get => _uiDimModDetailsWidth; set { if (value == _uiDimModDetailsWidth) return; _uiDimModDetailsWidth = value; OnPropertyChanged(); }
         }
 
+        /// <summary>
+        /// Gets or sets a boolean value wheter hardware acceleration is disabled
+        /// </summary>
+        public bool UiDisableHardwareAcc
+        {
+            get => _uiDisableHardwareAcc; set { if (value == _uiDisableHardwareAcc) return; _uiDisableHardwareAcc = value; OnPropertyChanged(); }
+        }
+
         #endregion
 
         /*
@@ -218,6 +227,7 @@ namespace FactorioSupervisor.ViewModels
             UiDimHeight = settings.UiDimHeight;
             UiDimModListWidth = settings.UiDimModListWidth;
             UiDimModDetailsWidth = settings.UiDimModDetailsWidth;
+            UiDisableHardwareAcc = settings.UiDisableHardwareAcc;
 
             FactorioPath = settings.FactorioPath;
             ModsPath = settings.ModsPath;
@@ -240,6 +250,7 @@ namespace FactorioSupervisor.ViewModels
             settings.UiDimHeight = UiDimHeight;
             settings.UiDimModListWidth = UiDimModListWidth;
             settings.UiDimModDetailsWidth = UiDimModDetailsWidth;
+            settings.UiDisableHardwareAcc = UiDisableHardwareAcc;
 
             settings.FactorioPath = FactorioPath;
             settings.ModsPath = ModsPath;

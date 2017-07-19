@@ -19,6 +19,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Data;
 using FactorioSupervisor.Properties;
+using System.Timers;
 
 namespace FactorioSupervisor.ViewModels
 {
@@ -55,7 +56,7 @@ namespace FactorioSupervisor.ViewModels
                     Name = "aai-programmable-vehicles",
                     Title = "AAI Programmable Vehicles",
                     Description = "Program and control autonomous vehicles using a remote control handset, or circuit conditions and zones. Can be used for base enemy base assault, patrols, friendly base navigation, vehicle-based mining, and more advanced applications. Works with vanilla and modded vehicles.",
-                    FactorioVersion = "0.15",
+                    FactorioVersion = "0.14",
                     InstalledVersion = "0.3.2",
                     Author = "Earendel",
                     Homepage = "https://forums.factorio.com/viewtopic.php?f=93&t=38475",
@@ -75,7 +76,8 @@ namespace FactorioSupervisor.ViewModels
                     RemoteFactorioVersion = "0.15",
                     UpdateAvailable = true,
                     IsUpdating = true,
-                    ProgressPercentage = 33
+                    ProgressPercentage = 33,
+                    GithubPath = "Ben-Ramchandani/OutpostPlanner",
                 };
 
                 // Set dependencies
@@ -128,6 +130,7 @@ namespace FactorioSupervisor.ViewModels
         private ICollectionView _modsVs;
         private string _searchFilter;
         private bool _hideGroups;
+        private bool _hideDisabled;
         private ListSortDirection _modsSortDirection;
         private Mod _selectedMod;
         private bool _isCheckingForUpdates;
@@ -138,6 +141,7 @@ namespace FactorioSupervisor.ViewModels
         private string _currentUpdatingEntryTitle;
         private bool _showProgressBar;
         private bool _isAuthenticated;
+        private bool _gameIsLaunched;
         private FileSystemWatcher _fileSystemWatcher;
         private RelayCommand _getLocalModsCmd;
         private RelayCommand _toggleEnableModsCmd;
@@ -192,7 +196,7 @@ namespace FactorioSupervisor.ViewModels
         }
 
         /// <summary>
-        /// Gets or sets a boolean value whether the mod list groups should be hidden
+        /// Gets or sets a boolean value whether the mod list groups should be hidden from view
         /// </summary>
         public bool HideGroups
         {
@@ -208,6 +212,14 @@ namespace FactorioSupervisor.ViewModels
 
                 OnPropertyChanged();
             }
+        }
+
+        /// <summary>
+        /// Gets or sets a boolean value whether the disabled mods should be hidden from view
+        /// </summary>
+        public bool HideDisabled
+        {
+            get => _hideDisabled; set { if (value == _hideDisabled) return; _hideDisabled = value; OnPropertyChanged(); }
         }
 
         /// <summary>
@@ -313,6 +325,14 @@ namespace FactorioSupervisor.ViewModels
         public bool IsAuthenticated
         {
             get => _isAuthenticated; set { if (value == _isAuthenticated) return; _isAuthenticated = value; OnPropertyChanged(); }
+        }
+
+        /// <summary>
+        /// Gets or sets a boolean value whether the game process has launched
+        /// </summary>
+        public bool GameIsLaunched
+        {
+            get => _gameIsLaunched; set { if (value == _gameIsLaunched) return; _gameIsLaunched = value; OnPropertyChanged(); }
         }
 
         #endregion
@@ -430,6 +450,9 @@ namespace FactorioSupervisor.ViewModels
 
             if (param == "portalpage" && SelectedMod.Name != null)
                 Process.Start($"https://mods.factorio.com/?q={SelectedMod.Name}");
+
+            if (param == "gitHub" && SelectedMod.GithubPath != null)
+                Process.Start($"https://github.com/{SelectedMod.GithubPath}");
         }
 
         private async void Execute_GetModRemoteDataCmd(object obj)
@@ -472,6 +495,7 @@ namespace FactorioSupervisor.ViewModels
                     mod.RemoteFilename = result.Releases.First().FileName;
                     mod.ReleasedAt = TimeHelpers.GetTimeSpanDuration(result.Releases.First().ReleasedAt);
                     mod.RemoteFactorioVersion = result.Releases.First().FactorioVersion;
+                    mod.GithubPath = result.GithubPath;
 
                     // Check if remote version is greater than installed version
                     if (Version.Parse(mod.RemoteVersion) > Version.Parse(mod.InstalledVersion))
@@ -512,8 +536,15 @@ namespace FactorioSupervisor.ViewModels
         {
             if (Directory.Exists(BaseVm.ConfigVm.ModsPath))
             {
-                // Select all mods from collection
-                var modListItems = Mods.Select(mod => new ModListItem
+                // Create 5 seconds timer to temporarily disable the launch button to avoid multiple launches
+                if (GameIsLaunched) return;
+                GameIsLaunched = true;
+                var timer = new Timer(5000);
+                timer.Elapsed += (sender, args) => { timer?.Dispose(); GameIsLaunched = false; };
+                timer.Enabled = true;
+
+                 // Select all mods from collection
+                 var modListItems = Mods.Select(mod => new ModListItem
                 {
                     Name = mod.Name,
                     Enabled = mod.IsEnabled
@@ -653,7 +684,7 @@ namespace FactorioSupervisor.ViewModels
 
                     try
                     {
-                        await webClient.OpenReadTaskAsync($"https://mods.factorio.com/api/downloads/data/mods/34/rso-mod_3.2.1.zip?username={BaseVm.ConfigVm.ModPortalUsername}&token={BaseVm.ConfigVm.ModPortalAuthToken}");
+                        await webClient.OpenReadTaskAsync($"https://mods.factorio.com/api/downloads/data/mods/34/rso-mod_3.3.11.zip?username={BaseVm.ConfigVm.ModPortalUsername}&token={BaseVm.ConfigVm.ModPortalAuthToken}");
                     }
                     catch (Exception ex)
                     {
@@ -873,6 +904,8 @@ namespace FactorioSupervisor.ViewModels
                 MessageBoxWindow.Show(ResourceHelper.GetValue("MessageBox_NoInternetConnection_Title"), ResourceHelper.GetValue("MessageBox_NoInternetConnection"), MessageBoxButton.OK);
                 return;
             }
+
+            //todo verify auth here
 
             /*
              * Install New Mod

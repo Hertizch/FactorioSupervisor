@@ -77,6 +77,7 @@
     </ApplicationDefinition>
     <Compile Include="Converters\InvertedBooleanConverter.cs" />
     <Compile Include="Converters\InvertedBooleanMultiConverter.cs" />
+    <Compile Include="Converters\IsNewFactorioVersionToStringConverter.cs" />
     <Compile Include="Converters\IsNotNullConverter.cs" />
     <Compile Include="Converters\ModListConverters\EntryInstallCodeCommandParameterConverter.cs" />
     <Compile Include="Converters\ValueToVisibilityConverter.cs" />

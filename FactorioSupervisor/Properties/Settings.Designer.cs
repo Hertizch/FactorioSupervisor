@@ -226,5 +226,17 @@ namespace FactorioSupervisor.Properties {
                 this["ModsSortDirection"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("False")]
+        public bool UiDisableHardwareAcc {
+            get {
+                return ((bool)(this["UiDisableHardwareAcc"]));
+            }
+            set {
+                this["UiDisableHardwareAcc"] = value;
+            }
+        }
     }
 }

@@ -13,5 +13,8 @@ namespace ModsApi.Models
 
         [JsonProperty("releases")]
         public List<Release> Releases { get; private set; }
+
+        [JsonProperty("github_path")]
+        public string GithubPath { get; private set; }
     }
 }
